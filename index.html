@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>OwerPlay Gestor</title>
     
-    <!-- ÍCONE PARA TELA INICIAL (PWA) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%236366f1'/%3E%3Ctext x='50' y='68' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle'%3EOW%3C/text%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%236366f1'/%3E%3Ctext x='50' y='68' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle'%3EOW%3C/text%3E%3C/svg%3E">
     <meta name="theme-color" content="#6366f1">
@@ -54,15 +53,10 @@
         
         .backup-alert-banner {
             background: linear-gradient(135deg, rgba(251, 113, 133, 0.15), rgba(251, 113, 133, 0.05));
-            border: 1px solid rgba(251, 113, 133, 0.3); border-radius: 14px;
-            padding: 12px 14px; margin-bottom: 14px; display: flex; align-items: flex-start;
-            gap: 8px; animation: pulse 2s infinite;
+            border: 1px solid rgba(251, 113, 133, 0.3); border-radius: 14px; padding: 12px 14px;
+            margin-bottom: 14px; display: flex; align-items: flex-start; gap: 8px; animation: pulse 2s infinite;
         }
-        @keyframes pulse {
-            0% { border-color: rgba(251, 113, 133, 0.3); }
-            50% { border-color: rgba(251, 113, 133, 0.7); }
-            100% { border-color: rgba(251, 113, 133, 0.3); }
-        }
+        @keyframes pulse { 0% { border-color: rgba(251, 113, 133, 0.3); } 50% { border-color: rgba(251, 113, 133, 0.7); } 100% { border-color: rgba(251, 113, 133, 0.3); } }
         .backup-alert-icon { color: var(--saida); min-width: 20px; margin-top: 1px; }
         .backup-alert-content { flex: 1; }
         .backup-alert-content p { font-size: 0.65rem; color: var(--text); line-height: 1.4; margin-bottom: 8px; font-weight: 500; }
@@ -72,71 +66,31 @@
         .btn-backup-primary { background: var(--saida); color: white; }
         .btn-backup-secondary { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border); }
         
-        .btn-icon:active, .btn-save:active, .upgrade-btn:active, .chip:active, .fab:active, .btn-backup:active {
-            transform: scale(0.96) !important; transition: transform 0.1s ease !important;
-        }
-        
+        .btn-icon:active, .btn-save:active, .upgrade-btn:active, .chip:active, .fab:active, .btn-backup:active { transform: scale(0.96) !important; transition: transform 0.1s ease !important; }
         .item-card { transition: all 0.2s ease; touch-action: pan-y; }
         .item-card:active { background: rgba(22, 27, 44, 0.8); box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
-        .client-avatar {
-            width: 38px; height: 38px; border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.9rem; color: white; text-transform: uppercase;
-            margin-right: 10px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
-        }
+        .client-avatar { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), #8B5CF6); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: white; text-transform: uppercase; margin-right: 10px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
         .client-info-row { display: flex; align-items: center; margin-bottom: 8px; }
         .client-details { flex: 1; }
         .item-card { position: relative; overflow: hidden; }
 
-        .premium-badge {
-            background: linear-gradient(135deg, var(--premium-color), #A78BFA);
-            color: white; font-size: 0.55rem; font-weight: 800; padding: 3px 8px;
-            border-radius: 20px; margin-left: 8px; text-transform: uppercase;
-            letter-spacing: 0.5px; box-shadow: var(--premium-glow);
-        }
-
-        .upgrade-btn {
-            background: linear-gradient(135deg, var(--premium-color), #A78BFA);
-            color: white; border: none; padding: 13px 18px; border-radius: 14px;
-            font-weight: 700; font-size: 0.85rem; cursor: pointer; width: 100%;
-            margin-top: 12px; box-shadow: var(--premium-glow); transition: 0.3s;
-            text-align: center; letter-spacing: 0.3px;
-        }
+        .premium-badge { background: linear-gradient(135deg, var(--premium-color), #A78BFA); color: white; font-size: 0.55rem; font-weight: 800; padding: 3px 8px; border-radius: 20px; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: var(--premium-glow); }
+        .upgrade-btn { background: linear-gradient(135deg, var(--premium-color), #A78BFA); color: white; border: none; padding: 13px 18px; border-radius: 14px; font-weight: 700; font-size: 0.85rem; cursor: pointer; width: 100%; margin-top: 12px; box-shadow: var(--premium-glow); transition: 0.3s; text-align: center; letter-spacing: 0.3px; }
         .upgrade-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5); }
-
-        .plan-card {
-            background: linear-gradient(135deg, #1e2438, #161b2c);
-            border: 2px solid var(--premium-color); border-radius: 18px;
-            padding: 16px; margin-bottom: 16px;
-            box-shadow: inset 0 0 20px rgba(139, 92, 246, 0.1);
-        }
+        .plan-card { background: linear-gradient(135deg, #1e2438, #161b2c); border: 2px solid var(--premium-color); border-radius: 18px; padding: 16px; margin-bottom: 16px; box-shadow: inset 0 0 20px rgba(139, 92, 246, 0.1); }
         .plan-price-container { display: flex; align-items: baseline; justify-content: flex-end; gap: 2px; }
         .plan-price-small { font-size: 1.1rem; font-weight: 600; color: var(--premium-color); }
         .plan-price-big { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--premium-color), #C4B5FD); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
         .plan-price-cents { font-size: 1rem; font-weight: 600; color: var(--premium-color); align-self: flex-start; margin-top: 2px; }
 
         .plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .current-plan-badge {
-            background: var(--primary); padding: 5px 12px; border-radius: 20px;
-            font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.3s; color: white;
-        }
-        .current-plan-badge.premium {
-            background: linear-gradient(135deg, var(--premium-color), #A78BFA);
-            color: white; box-shadow: var(--premium-glow);
-            display: flex; align-items: center; gap: 4px;
-        }
+        .current-plan-badge { background: var(--primary); padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.3s; color: white; }
+        .current-plan-badge.premium { background: linear-gradient(135deg, var(--premium-color), #A78BFA); color: white; box-shadow: var(--premium-glow); display: flex; align-items: center; gap: 4px; }
         .current-plan-badge.premium::before { content: "💎"; font-size: 11px; }
         
-        .free-slots-tip {
-            background: rgba(99, 102, 241, 0.10); border-radius: 14px;
-            padding: 12px 15px; margin-bottom: 12px; font-size: 0.7rem;
-            color: var(--text-dim); text-align: center;
-            border: 1px solid rgba(99, 102, 241, 0.2); line-height: 1.6; letter-spacing: 0.3px;
-        }
+        .free-slots-tip { background: rgba(99, 102, 241, 0.10); border-radius: 14px; padding: 12px 15px; margin-bottom: 12px; font-size: 0.7rem; color: var(--text-dim); text-align: center; border: 1px solid rgba(99, 102, 241, 0.2); line-height: 1.6; letter-spacing: 0.3px; }
         .free-slots-tip strong { color: white; font-weight: 700; }
         .free-slots-tip .premium-link { color: var(--premium-color); font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-
         .config-btn-slim { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 8px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; cursor: pointer; width: fit-content; margin-left: auto; margin-right: auto; }
         .config-btn-slim b { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
 
@@ -147,27 +101,14 @@
 
         .search-container { margin-bottom: 12px; }
         .search-input { width: 100%; background: var(--card); border: 1.5px solid var(--border); padding: 11px 20px; border-radius: 100px; color: white; outline: none; font-size: 0.8rem; }
-        .filter-chips { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
-        .chip { padding: 11px 5px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text-dim); font-size: 0.6rem; font-weight: 700; text-align: center; cursor: pointer; text-transform: uppercase; position: relative; overflow: visible; }
+        .filter-chips { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom: 20px; }
+        .chip { padding: 10px 4px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text-dim); font-size: 0.55rem; font-weight: 700; text-align: center; cursor: pointer; text-transform: uppercase; position: relative; overflow: visible; }
         .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
         .chip-badge { position: absolute; top: -6px; right: -4px; min-width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 0.5rem; color: white; font-weight: 800; box-shadow: 0 2px 5px rgba(0,0,0,0.5); pointer-events: none; z-index: 5; }
 
-        .welcome-state { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            padding: 50px 25px; background: rgba(22, 27, 44, 0.3); 
-            border: 2px dashed var(--border); border-radius: 30px; text-align: center; margin-top: 10px; 
-        }
-        .welcome-icon { 
-            width: 70px; height: 70px; 
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1)); 
-            color: var(--primary); border-radius: 22px; display: flex; align-items: center; justify-content: center; 
-            margin-bottom: 20px; border: 1px solid rgba(99, 102, 241, 0.2);
-        }
-        .welcome-state h3 { 
-            font-size: 1.2rem; font-weight: 700; color: white; margin-bottom: 8px; 
-            background: linear-gradient(135deg, white, #c4b5fd);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
+        .welcome-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 25px; background: rgba(22, 27, 44, 0.3); border: 2px dashed var(--border); border-radius: 30px; text-align: center; margin-top: 10px; }
+        .welcome-icon { width: 70px; height: 70px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1)); color: var(--primary); border-radius: 22px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .welcome-state h3 { font-size: 1.2rem; font-weight: 700; color: white; margin-bottom: 8px; background: linear-gradient(135deg, white, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .welcome-state p { font-size: 0.8rem; color: var(--text-dim); max-width: 280px; line-height: 1.6; margin-bottom: 25px; }
         .welcome-state .btn-save { width: auto; padding: 14px 35px; font-size: 0.85rem; margin-top: 0; display: flex; align-items: center; gap: 8px; }
 
@@ -176,6 +117,9 @@
         .card-border-ativo { border-color: var(--lucro); }
         .card-border-alerta { border-color: var(--alerta); }
         .card-border-vencido { border-color: var(--saida); }
+        .card-border-hoje { border-color: var(--saida); }
+        .card-border-plano { border-color: var(--primary); }
+        .card-border-servidor { border-color: var(--primary); }
 
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
         .card-status-badge { padding: 3px 8px; border-radius: 6px; font-size: 0.5rem; font-weight: 800; color: white; text-transform: uppercase; }
@@ -210,19 +154,9 @@
         @keyframes fadein { from {top: 0; opacity: 0;} to {top: 35px; opacity: 1;} }
         @keyframes fadeout { from {top: 35px; opacity: 1;} to {top: 0; opacity: 0;} }
         
-        .premium-locked-overlay {
-            position: absolute; inset: 0;
-            background: rgba(22, 27, 44, 0.95); backdrop-filter: blur(3px);
-            border-radius: 20px; display: flex; align-items: center; justify-content: center;
-            flex-direction: column; gap: 15px; cursor: pointer;
-        }
+        .premium-locked-overlay { position: absolute; inset: 0; background: rgba(22, 27, 44, 0.95); backdrop-filter: blur(3px); border-radius: 20px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 15px; cursor: pointer; }
         .diamond-icon { filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.8)); }
-        
-        .msg-menu-item {
-            display: flex; align-items: center; gap: 10px; padding: 14px;
-            background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px;
-            cursor: pointer; transition: 0.2s; border: 1px solid transparent;
-        }
+        .msg-menu-item { display: flex; align-items: center; gap: 10px; padding: 14px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
         .msg-menu-item:hover, .msg-menu-item:active { background: rgba(99, 102, 241, 0.1); border-color: var(--primary); }
         .msg-menu-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
         .msg-menu-info { flex: 1; }
@@ -248,20 +182,17 @@
     <div id="tab-dash" class="tab-content active-tab">
         <div class="plan-header">
             <h2 class="app-brand" style="margin-bottom: 0;">OWERPLAY GESTOR <span class="version-tag">v1.0</span></h2>
-            <div class="current-plan-badge" onclick="mostrarModalUpgrade()">
-                <span id="plan-text-dash">FREE</span>
-            </div>
+            <div class="current-plan-badge" onclick="mostrarModalUpgrade()"><span id="plan-text-dash">FREE</span></div>
         </div>
         <div id="free-slots-dash" class="free-slots-tip" style="display: none;"></div>
         <div class="mini-stats">
-            <div class="mini-card" style="border-color: var(--lucro);"><small>Lucro do Mês</small><b id="ds-lucro">R$ 0,00</b>
-                <div style="position:absolute; right:12px; top:12px; cursor:pointer" onclick="togglePriv()"><i data-lucide="eye" id="eye-icon" size="14"></i></div>
-            </div>
-            <div class="mini-card"><small>Ativos</small><b id="ds-ativos">0</b></div>
+            <div class="mini-card" style="border-color: var(--lucro);"><small>Lucro do Mês</small><b id="ds-lucro">R$ 0,00</b><div style="position:absolute; right:12px; top:12px; cursor:pointer" onclick="togglePriv()"><i data-lucide="eye" id="eye-icon" size="14"></i></div></div>
+            <div class="mini-card" style="border-color: var(--primary);"><small>Novos Clientes</small><b id="ds-novos">0</b></div>
         </div>
-        <div class="search-container"><input type="text" id="search-main" class="search-input" placeholder="Buscar por nome..." onkeyup="atualizar()"></div>
+        <div class="search-container"><input type="text" id="search-main" class="search-input" placeholder="Buscar por nome..." oninput="atualizar()"></div>
         <div class="filter-chips">
-            <div class="chip" id="chip-ativo" onclick="filtrarStatus('ativo')">Ativos</div>
+            <div class="chip" id="chip-ativo" onclick="filtrarStatus('ativo')">Ativos <div id="badge-ativo" class="chip-badge" style="background:var(--lucro)">0</div></div>
+            <div class="chip" id="chip-hoje" onclick="filtrarStatus('hoje')">Hoje <div id="badge-hoje" class="chip-badge" style="background:var(--saida)">0</div></div>
             <div class="chip" id="chip-alerta" onclick="filtrarStatus('alerta')">A Vencer <div id="badge-alerta" class="chip-badge" style="background:var(--alerta)">0</div></div>
             <div class="chip" id="chip-vencido" onclick="filtrarStatus('vencido')">Vencidos <div id="badge-vencido" class="chip-badge" style="background:var(--saida)">0</div></div>
         </div>
@@ -269,361 +200,80 @@
     </div>
 
     <div id="tab-cli" class="tab-content">
-        <div class="plan-header">
-            <h2 class="app-brand" style="margin-bottom: 0;">CLIENTES</h2>
-            <div class="current-plan-badge" onclick="mostrarModalUpgrade()">
-                <span id="plan-text-cli">FREE</span>
-            </div>
-        </div>
+        <div class="plan-header"><h2 class="app-brand" style="margin-bottom: 0;">CLIENTES</h2><div class="current-plan-badge" onclick="mostrarModalUpgrade()"><span id="plan-text-cli">FREE</span></div></div>
         <div id="free-slots-cli" class="free-slots-tip" style="display: none;"></div>
-        <div class="config-btn-slim" onclick="abrirConfigMsgComValidacao()">
-            <i data-lucide="message-square-text" size="14"></i>
-            <b>Configurar Cobrança</b>
-            <span class="premium-badge" id="msg-premium-badge">PREMIUM</span>
-        </div>
+        <div class="config-btn-slim" onclick="abrirConfigMsgComValidacao()"><i data-lucide="message-square-text" size="14"></i><b>Configurar Cobrança</b><span class="premium-badge" id="msg-premium-badge">PREMIUM</span></div>
         <div id="grid-cli" class="item-grid"></div>
     </div>
     
-    <div id="tab-pla" class="tab-content">
-        <div class="plan-header">
-            <h2 class="app-brand" style="margin-bottom: 0;">PLANOS</h2>
-            <div class="current-plan-badge" onclick="mostrarModalUpgrade()">
-                <span id="plan-text-pla">FREE</span>
-            </div>
-        </div>
-        <div id="grid-pla" class="item-grid"></div>
-    </div>
-    
-    <div id="tab-srv" class="tab-content">
-        <div class="plan-header">
-            <h2 class="app-brand" style="margin-bottom: 0;">SERVIDORES</h2>
-            <div class="current-plan-badge" onclick="mostrarModalUpgrade()">
-                <span id="plan-text-srv">FREE</span>
-            </div>
-        </div>
-        <div id="grid-srv" class="item-grid"></div>
-    </div>
+    <div id="tab-pla" class="tab-content"><div class="plan-header"><h2 class="app-brand" style="margin-bottom: 0;">PLANOS</h2><div class="current-plan-badge" onclick="mostrarModalUpgrade()"><span id="plan-text-pla">FREE</span></div></div><div id="grid-pla" class="item-grid"></div></div>
+    <div id="tab-srv" class="tab-content"><div class="plan-header"><h2 class="app-brand" style="margin-bottom: 0;">SERVIDORES</h2><div class="current-plan-badge" onclick="mostrarModalUpgrade()"><span id="plan-text-srv">FREE</span></div></div><div id="grid-srv" class="item-grid"></div></div>
 
     <div id="tab-fin" class="tab-content">
-        <div class="plan-header">
-            <h2 class="app-brand" style="margin-bottom: 0;">FINANCEIRO</h2>
-            <div class="current-plan-badge" onclick="mostrarModalUpgrade()">
-                <span id="plan-text-fin">FREE</span>
-            </div>
-        </div>
-        <div id="backup-alert-banner" class="backup-alert-banner" style="display: none;">
-            <div class="backup-alert-icon"><i data-lucide="alert-triangle" size="20"></i></div>
-            <div class="backup-alert-content">
-                <p><strong>⚠️ ALERTA!</strong> Seus dados estão salvos apenas neste navegador. Se você limpar os dados, trocar de celular ou desinstalar o app, <strong>perderá TODOS os clientes, planos e finanças!</strong></p>
-                <div class="backup-alert-actions">
-                    <button class="btn-backup btn-backup-primary" onclick="copiarTokenComToast()"><i data-lucide="download" size="12"></i> Fazer Backup Agora</button>
-                    <button class="btn-backup btn-backup-secondary" onclick="confirmarBackupFeito()">✅ Já fiz o backup</button>
-                </div>
-            </div>
-        </div>
-        <div class="fin-card-top">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom: 10px;">
-                <i data-lucide="shield-check" style="color:var(--lucro)"></i>
-                <b style="font-size:0.85rem; color:var(--lucro); display: flex; align-items: center;">
-                    TOKEN DE SEGURANÇA BACKUP
-                    <span class="premium-badge" id="token-premium-badge" style="margin-left: 10px;">PREMIUM</span>
-                </b>
-            </div>
-            <p style="font-size:0.65rem; color:var(--text-dim); margin-bottom:15px">Gere seu token para criar uma cópia de segurança e garantir a proteção dos seus dados.</p>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-save" style="margin:0; flex:1; background:var(--lucro)" onclick="copiarTokenComValidacao()">Copiar Token</button>
-                <button class="btn-save" style="margin:0; flex:1; background:var(--border)" onclick="restaurarTokenComValidacao()">Restaurar</button>
-            </div>
-        </div>
-        <div class="mini-stats">
-            <div class="mini-card" style="border-color: var(--entrada);"><small>Entrada</small><b id="fin-total-ent">R$ 0,00</b></div>
-            <div class="mini-card" style="border-color: var(--saida);"><small>Saída</small><b id="fin-total-sai">R$ 0,00</b></div>
-            <div class="mini-card" style="border-color: var(--lucro);"><small>Lucro</small><b id="fin-total-luc">R$ 0,00</b></div>
-        </div>
-        <div id="fin-hide-area" class="mini-card" style="height: 220px; border-radius:24px; padding:15px; margin-top:20px; margin-bottom:20px; position: relative;">
-            <canvas id="finChart"></canvas>
-            <div id="chart-premium-overlay" class="premium-locked-overlay" style="display: none;" onclick="mostrarModalUpgrade()">
-                <i data-lucide="gem" class="diamond-icon" style="color: var(--premium-color); width: 56px; height: 56px;"></i>
-                <p style="color: white; font-weight: 700; text-align: center;">Recurso PREMIUM<br><span style="font-size: 0.7rem; color: var(--text-dim);">Desbloqueie gráficos avançados</span></p>
-                <button class="upgrade-btn" style="width: auto; padding: 12px 30px;">ASSINAR PREMIUM</button>
-            </div>
-        </div>
+        <div class="plan-header"><h2 class="app-brand" style="margin-bottom: 0;">FINANCEIRO</h2><div class="current-plan-badge" onclick="mostrarModalUpgrade()"><span id="plan-text-fin">FREE</span></div></div>
+        <div id="backup-alert-banner" class="backup-alert-banner" style="display: none;"><div class="backup-alert-icon"><i data-lucide="alert-triangle" size="20"></i></div><div class="backup-alert-content"><p><strong>⚠️ ALERTA!</strong> Seus dados estão salvos apenas neste navegador. Se você limpar os dados, trocar de celular ou desinstalar o app, <strong>perderá TODOS os clientes, planos e finanças!</strong></p><div class="backup-alert-actions"><button class="btn-backup btn-backup-primary" onclick="copiarTokenComToast()"><i data-lucide="download" size="12"></i> Fazer Backup Agora</button><button class="btn-backup btn-backup-secondary" onclick="confirmarBackupFeito()">✅ Já fiz o backup</button></div></div></div>
+        <div class="fin-card-top"><div style="display:flex; align-items:center; gap:10px; margin-bottom: 10px;"><i data-lucide="shield-check" style="color:var(--lucro)"></i><b style="font-size:0.85rem; color:var(--lucro); display: flex; align-items: center;">TOKEN DE SEGURANÇA BACKUP <span class="premium-badge" id="token-premium-badge" style="margin-left: 10px;">PREMIUM</span></b></div><p style="font-size:0.65rem; color:var(--text-dim); margin-bottom:15px">Gere seu token para criar uma cópia de segurança e garantir a proteção dos seus dados.</p><div style="display:flex; gap:10px;"><button class="btn-save" style="margin:0; flex:1; background:var(--lucro)" onclick="copiarTokenComValidacao()">Copiar Token</button><button class="btn-save" style="margin:0; flex:1; background:var(--border)" onclick="restaurarTokenComValidacao()">Restaurar</button></div></div>
+        <div class="mini-stats"><div class="mini-card" style="border-color: var(--entrada);"><small>Entrada</small><b id="fin-total-ent">R$ 0,00</b></div><div class="mini-card" style="border-color: var(--saida);"><small>Saída</small><b id="fin-total-sai">R$ 0,00</b></div><div class="mini-card" style="border-color: var(--lucro);"><small>Lucro</small><b id="fin-total-luc">R$ 0,00</b></div></div>
+        <div id="fin-hide-area" class="mini-card" style="height: 220px; border-radius:24px; padding:15px; margin-top:20px; margin-bottom:20px; position: relative;"><canvas id="finChart"></canvas><div id="chart-premium-overlay" class="premium-locked-overlay" style="display: none;" onclick="mostrarModalUpgrade()"><i data-lucide="gem" class="diamond-icon" style="color: var(--premium-color); width: 56px; height: 56px;"></i><p style="color: white; font-weight: 700; text-align: center;">Recurso PREMIUM<br><span style="font-size: 0.7rem; color: var(--text-dim);">Desbloqueie gráficos avançados</span></p><button class="upgrade-btn" style="width: auto; padding: 12px 30px;">ASSINAR PREMIUM</button></div></div>
         <div id="grid-fin" class="item-grid"></div>
     </div>
 </main>
 
-<!-- MODAL DE ESCOLHA DE MENSAGEM -->
-<div class="overlay" id="modal-msg-chooser">
-    <div class="modal" style="max-width: 340px;">
-        <h3>📩 Enviar mensagem</h3>
-        <div class="msg-menu-item" onclick="enviarMsgTipo('cobranca')">
-            <div class="msg-menu-icon" style="background: rgba(251, 113, 133, 0.15);">💰</div>
-            <div class="msg-menu-info"><b>Cobrança</b><span>Lembrete de vencimento</span></div>
-            <i data-lucide="chevron-right" style="color: var(--text-dim);"></i>
-        </div>
-        <div class="msg-menu-item" onclick="enviarMsgTipo('renovacao')">
-            <div class="msg-menu-icon" style="background: rgba(56, 189, 248, 0.15);">🔄</div>
-            <div class="msg-menu-info"><b>Renovação</b><span>Confirmação de renovação</span></div>
-            <i data-lucide="chevron-right" style="color: var(--text-dim);"></i>
-        </div>
-        <div class="msg-menu-item" onclick="enviarMsgTipo('promocao')">
-            <div class="msg-menu-icon" style="background: rgba(16, 185, 129, 0.15);">🎉</div>
-            <div class="msg-menu-info"><b>Promoção</b><span>Ofertas e novidades</span></div>
-            <i data-lucide="chevron-right" style="color: var(--text-dim);"></i>
-        </div>
-        <button class="btn-save" style="background: var(--border); margin-top: 8px; padding: 10px;" onclick="fecharModais()">Cancelar</button>
-    </div>
-</div>
-
-<!-- MODAL DE CONFIGURAÇÃO DE MENSAGENS -->
-<div class="overlay" id="modal-config-msg">
-    <div class="modal" style="max-width: 380px;">
-        <h3>Configurar Mensagens</h3>
-        <p style="font-size:0.55rem; color:var(--text-dim); margin-bottom:12px">Use: {nome}, {sobrenome}, {vencimento}, {valor}</p>
-        <label>💰 Cobrança</label><textarea id="cfg-msg-cobranca" rows="3"></textarea>
-        <label>🔄 Renovação</label><textarea id="cfg-msg-renovacao" rows="3"></textarea>
-        <label>🎉 Promoção</label><textarea id="cfg-msg-promocao" rows="3"></textarea>
-        <button class="btn-save" onclick="salvarConfigMsg()">Salvar Todas</button>
-    </div>
-</div>
-
-<!-- Modal de Upgrade PREMIUM -->
-<div class="overlay" id="modal-upgrade">
-    <div class="modal" style="max-width: 340px; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 15px;">
-            <i data-lucide="gem" class="diamond-icon" style="color: var(--premium-color); width: 48px; height: 48px; margin-bottom: 6px;"></i>
-            <h3 style="font-size: 1.1rem; background: linear-gradient(135deg, var(--premium-color), #C4B5FD); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 3px;">OWERPLAY PREMIUM</h3>
-            <p style="color: var(--text-dim); font-size: 0.7rem;">Desbloqueie todo o poder do seu gestor</p>
-        </div>
-        <div class="plan-card" style="padding: 14px; margin-bottom: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h4 style="font-size: 1rem; font-weight: 700;">Plano PREMIUM</h4>
-                <div class="plan-price-container"><span class="plan-price-small">R$</span><span class="plan-price-big">19</span><span class="plan-price-cents">,90</span></div>
-            </div>
-            <p style="color: var(--text-dim); font-size: 0.6rem; margin-bottom: 12px; text-align: right;">/mês ou R$ 199/ano</p>
-            <div style="margin: 12px 0;">
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Clientes ilimitados</span></div>
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Servidores ilimitados</span></div>
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Backup e restauração de tokens</span></div>
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Múltiplas mensagens</span></div>
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Gráficos e relatórios avançados</span></div>
-                <div style="display: flex; gap: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Histórico financeiro completo</span></div>
-            </div>
-        </div>
-        <div id="upgrade-code-section" style="margin-top: 12px;">
-            <label style="font-size: 0.6rem;">Já tem um código PREMIUM?</label>
-            <div style="display: flex; gap: 6px;">
-                <input type="text" id="pro-code-input" placeholder="Digite o código" style="flex: 1; text-transform: uppercase; padding: 10px; font-size: 0.8rem;">
-                <button class="btn-save" style="margin: 0; width: auto; padding: 10px 16px; background: var(--premium-color); font-size: 0.8rem;" onclick="ativarCodigoPremium()">Ativar</button>
-            </div>
-        </div>
-        <button class="upgrade-btn" onclick="simularCompraPremium()">Assinar via WhatsApp</button>
-        <button class="btn-save" style="background: var(--border); margin-top: 6px; padding: 10px; font-size: 0.8rem;" onclick="fecharModais()">Talvez depois</button>
-    </div>
-</div>
-
-<!-- Demais Modais -->
-<div class="overlay" id="modal-cli">
-    <div class="modal">
-        <h3>Cliente</h3>
-        <input type="hidden" id="edit-idx-cli" value="-1">
-        <label>Nome</label><input type="text" id="c-nome">
-        <label>WhatsApp</label><input type="number" id="c-wpp" placeholder="Ex: 5511999998888">
-        <small style="font-size:0.55rem; color:var(--text-dim); display:block; margin-top:-2px; margin-bottom:10px">Apenas números (DDI+DDD+NÚMERO)</small>
-        <label>Vencimento</label><input type="date" id="c-venc">
-        <label>Plano</label><select id="c-plano"></select>
-        <label>Servidor</label><select id="c-srv"></select>
-        <button class="btn-save" onclick="salvarCli()">Salvar</button>
-    </div>
-</div>
-
+<!-- MODAIS (mantidos iguais ao último código funcional) -->
+<div class="overlay" id="modal-msg-chooser"><div class="modal" style="max-width: 340px;"><h3>📩 Enviar mensagem</h3><div class="msg-menu-item" onclick="enviarMsgTipo('cobranca')"><div class="msg-menu-icon" style="background: rgba(251, 113, 133, 0.15);">💰</div><div class="msg-menu-info"><b>Cobrança</b><span>Lembrete de vencimento</span></div><i data-lucide="chevron-right" style="color: var(--text-dim);"></i></div><div class="msg-menu-item" onclick="enviarMsgTipo('renovacao')"><div class="msg-menu-icon" style="background: rgba(56, 189, 248, 0.15);">🔄</div><div class="msg-menu-info"><b>Renovação</b><span>Confirmação de renovação</span></div><i data-lucide="chevron-right" style="color: var(--text-dim);"></i></div><div class="msg-menu-item" onclick="enviarMsgTipo('promocao')"><div class="msg-menu-icon" style="background: rgba(16, 185, 129, 0.15);">🎉</div><div class="msg-menu-info"><b>Promoção</b><span>Ofertas e novidades</span></div><i data-lucide="chevron-right" style="color: var(--text-dim);"></i></div><button class="btn-save" style="background: var(--border); margin-top: 8px; padding: 10px;" onclick="fecharModais()">Cancelar</button></div></div>
+<div class="overlay" id="modal-config-msg"><div class="modal" style="max-width: 380px;"><h3>Configurar Mensagens</h3><p style="font-size:0.55rem; color:var(--text-dim); margin-bottom:12px">Use: {nome}, {sobrenome}, {vencimento}, {valor}</p><label>💰 Cobrança</label><textarea id="cfg-msg-cobranca" rows="3"></textarea><label>🔄 Renovação</label><textarea id="cfg-msg-renovacao" rows="3"></textarea><label>🎉 Promoção</label><textarea id="cfg-msg-promocao" rows="3"></textarea><button class="btn-save" onclick="salvarConfigMsg()">Salvar Todas</button></div></div>
+<div class="overlay" id="modal-upgrade"><div class="modal" style="max-width: 340px; padding: 20px;"><div style="text-align: center; margin-bottom: 15px;"><i data-lucide="gem" class="diamond-icon" style="color: var(--premium-color); width: 48px; height: 48px; margin-bottom: 6px;"></i><h3 style="font-size: 1.1rem; background: linear-gradient(135deg, var(--premium-color), #C4B5FD); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 3px;">OWERPLAY PREMIUM</h3><p style="color: var(--text-dim); font-size: 0.7rem;">Desbloqueie todo o poder do seu gestor</p></div><div class="plan-card" style="padding: 14px; margin-bottom: 14px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><h4 style="font-size: 1rem; font-weight: 700;">Plano PREMIUM</h4><div class="plan-price-container"><span class="plan-price-small">R$</span><span class="plan-price-big">19</span><span class="plan-price-cents">,90</span></div></div><p style="color: var(--text-dim); font-size: 0.6rem; margin-bottom: 12px; text-align: right;">/mês ou R$ 199/ano</p><div style="margin: 12px 0;"><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Clientes ilimitados</span></div><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Servidores ilimitados</span></div><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Backup e restauração de tokens</span></div><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Múltiplas mensagens</span></div><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Gráficos e relatórios avançados</span></div><div style="display: flex; gap: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Histórico financeiro completo</span></div></div></div><div id="upgrade-code-section" style="margin-top: 12px;"><label style="font-size: 0.6rem;">Já tem um código PREMIUM?</label><div style="display: flex; gap: 6px;"><input type="text" id="pro-code-input" placeholder="Digite o código" style="flex: 1; text-transform: uppercase; padding: 10px; font-size: 0.8rem;"><button class="btn-save" style="margin: 0; width: auto; padding: 10px 16px; background: var(--premium-color); font-size: 0.8rem;" onclick="ativarCodigoPremium()">Ativar</button></div></div><button class="upgrade-btn" onclick="simularCompraPremium()">Assinar via WhatsApp</button><button class="btn-save" style="background: var(--border); margin-top: 6px; padding: 10px; font-size: 0.8rem;" onclick="fecharModais()">Talvez depois</button></div></div>
+<div class="overlay" id="modal-cli"><div class="modal"><h3>Cliente</h3><input type="hidden" id="edit-idx-cli" value="-1"><label>Nome</label><input type="text" id="c-nome"><label>WhatsApp</label><input type="number" id="c-wpp" placeholder="Ex: 5511999998888"><small style="font-size:0.55rem; color:var(--text-dim); display:block; margin-top:-2px; margin-bottom:10px">Apenas números (DDI+DDD+NÚMERO)</small><label>Vencimento</label><input type="date" id="c-venc"><label>Plano</label><select id="c-plano"></select><label>Servidor</label><select id="c-srv"></select><button class="btn-save" onclick="salvarCli()">Salvar</button></div></div>
 <div class="overlay" id="modal-pla"><div class="modal"><h3>Plano</h3><input type="hidden" id="edit-idx-pla" value="-1"><label>Nome</label><input type="text" id="p-nome"><label>Preço</label><input type="number" id="p-val"><button class="btn-save" onclick="salvarPla()">Salvar</button></div></div>
 <div class="overlay" id="modal-srv"><div class="modal"><h3>Servidor</h3><input type="hidden" id="edit-idx-srv" value="-1"><label>Nome</label><input type="text" id="s-nome"><label>Custo</label><input type="number" id="s-custo"><button class="btn-save" onclick="salvarSrvComValidacao()">Salvar</button></div></div>
-<div class="overlay" id="modal-renew"><div class="modal"><h3>Renovar</h3><input type="hidden" id="renew-idx">
-    <button class="btn-save" onclick="calcularPrevia30()">Calcular +30 Dias</button>
-    <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:15px;">
-        <label>Nova Data:</label><input type="date" id="renew-custom-date">
-        <button class="btn-save" style="background:var(--lucro); margin-top:10px;" onclick="confirmarRenovacaoFinal()">Confirmar</button>
-    </div>
-</div></div>
+<div class="overlay" id="modal-renew"><div class="modal"><h3>Renovar</h3><input type="hidden" id="renew-idx"><button class="btn-save" onclick="calcularPrevia30()">Calcular +30 Dias</button><div style="margin-top:15px; border-top:1px solid var(--border); padding-top:15px;"><label>Nova Data:</label><input type="date" id="renew-custom-date"><button class="btn-save" style="background:var(--lucro); margin-top:10px;" onclick="confirmarRenovacaoFinal()">Confirmar</button></div></div></div>
 <div class="overlay" id="modal-opt-fin"><div class="modal" style="text-align:center"><h3>Opções</h3><div class="confirm-btns"><button class="btn-save" id="btn-opt-edit" style="background:var(--alerta); margin-top:0">Editar</button><button class="btn-save" id="btn-opt-del" style="background:var(--saida); margin-top:0">Excluir</button></div></div></div>
 <div class="overlay" id="modal-edit-fin"><div class="modal"><h3>Editar Venda</h3><input type="hidden" id="edit-fin-idx"><label>Venda</label><input type="number" id="ef-entrada"><label>Custo</label><input type="number" id="ef-saida"><button class="btn-save" onclick="salvarEditFin()">Salvar</button></div></div>
 <div class="overlay" id="modal-confirm"><div class="modal" style="text-align:center"><i data-lucide="trash-2" color="var(--saida)" size="48"></i><h3>Excluir?</h3><p style="color:var(--text-dim); font-size:0.8rem">Esta ação é permanente.</p><div class="confirm-btns"><button class="btn-cancel" onclick="fecharModais()">Não</button><button class="btn-confirm" id="btn-do-delete">Sim</button></div></div></div>
 <div class="overlay" id="modal-token"><div class="modal"><h3>Restaurar</h3><textarea id="token-input" rows="8" style="width:100%; background:var(--bg); color:white; border-radius:15px; padding:15px; border:1.5px solid var(--border); outline:none;"></textarea><button class="btn-save" onclick="confirmarToken()">Aplicar</button></div></div>
+<div class="overlay" id="modal-pos-renovacao"><div class="modal" style="max-width: 340px; text-align: center;"><i data-lucide="check-circle" style="color: var(--lucro); width: 48px; height: 48px; margin-bottom: 12px;"></i><h3>Renovado com sucesso!</h3><p style="font-size: 0.75rem; color: var(--text-dim); margin: 10px 0 20px;">Deseja enviar uma mensagem de renovação para <strong id="pos-renovacao-nome"></strong>?</p><div class="confirm-btns"><button class="btn-save" style="background: #22c55e; flex: 1;" onclick="enviarMsgRenovacaoAgora()">📩 Enviar WhatsApp</button><button class="btn-cancel" style="flex: 1;" onclick="fecharModais()">Agora não</button></div></div></div>
 
 <script>
-    // =============================================
-    // SISTEMA DE PROTEÇÃO ANTI-PERDA DE DADOS
-    // =============================================
     const STORAGE_KEY = 'OWERPLAY_FINAL_MASTER_V22';
     const BACKUP_KEY = 'OWERPLAY_FINAL_BACKUP_V22';
     const PREMIUM_STORAGE_KEY = 'OWERPLAY_PREMIUM_LICENSE';
     const BACKUP_ALERT_KEY = 'OWERPLAY_BACKUP_ALERT_DISMISSED';
-    
     let clienteMsgAtual = null;
+    let clientePosRenovacao = null;
+    let novaDataPosRenovacao = null;
+
+    document.body.addEventListener('touchmove', function(e) { if (e.target.closest('main')) return; if (e.target.closest('.overlay')) return; e.preventDefault(); }, { passive: false });
+    document.addEventListener('focusin', function(e) { if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') { setTimeout(() => { window.scrollTo(0, 0); }, 300); } });
+    document.addEventListener('focusout', function() { setTimeout(() => { window.scrollTo(0, 0); }, 100); });
     
-    // =============================================
-    // CORREÇÃO DO BUG DE ROLAGEM (TELA CORTADA)
-    // =============================================
-    document.body.addEventListener('touchmove', function(e) {
-        if (e.target.closest('main')) return;
-        if (e.target.closest('.overlay')) return;
-        e.preventDefault();
-    }, { passive: false });
-    
-    // Impede scroll acidental ao focar em inputs
-    document.addEventListener('focusin', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-            setTimeout(() => {
-                window.scrollTo(0, 0);
-            }, 300);
-        }
-    });
-    
-    // Corrige posição ao fechar teclado
-    document.addEventListener('focusout', function() {
-        setTimeout(() => {
-            window.scrollTo(0, 0);
-        }, 100);
-    });
-    
-    function salvarDadosProtegidos(dados) {
-        try {
-            const json = JSON.stringify(dados);
-            localStorage.setItem(STORAGE_KEY, json);
-            localStorage.setItem(BACKUP_KEY, json);
-        } catch(e) {}
-    }
-    
-    function carregarDadosProtegidos() {
-        let dados = localStorage.getItem(STORAGE_KEY);
-        if (!dados) {
-            dados = localStorage.getItem(BACKUP_KEY);
-            if (dados) localStorage.setItem(STORAGE_KEY, dados);
-        }
-        if (dados) {
-            try { return JSON.parse(dados); } catch(e) { return null; }
-        }
-        return null;
-    }
-    
-    function deveMostrarAlertaBackup() {
-        if (!isPremium) return false;
-        const dismissed = localStorage.getItem(BACKUP_ALERT_KEY);
-        if (!dismissed) return true;
-        const dismissedDate = new Date(parseInt(dismissed));
-        const now = new Date();
-        const daysDiff = (now - dismissedDate) / (1000 * 60 * 60 * 24);
-        return daysDiff >= 7;
-    }
-    
-    function confirmarBackupFeito() {
-        localStorage.setItem(BACKUP_ALERT_KEY, Date.now().toString());
-        document.getElementById('backup-alert-banner').style.display = 'none';
-        showToast('✅ Backup confirmado! Lembre-se de salvar o token em local seguro.');
-    }
-    
-    function atualizarBannerBackup() {
-        const banner = document.getElementById('backup-alert-banner');
-        if (banner) {
-            banner.style.display = deveMostrarAlertaBackup() ? 'flex' : 'none';
-        }
-    }
-    
+    function salvarDadosProtegidos(d) { try { const j = JSON.stringify(d); localStorage.setItem(STORAGE_KEY, j); localStorage.setItem(BACKUP_KEY, j); } catch(e) {} }
+    function carregarDadosProtegidos() { let d = localStorage.getItem(STORAGE_KEY); if (!d) { d = localStorage.getItem(BACKUP_KEY); if (d) localStorage.setItem(STORAGE_KEY, d); } if (d) { try { return JSON.parse(d); } catch(e) { return null; } } return null; }
+    function deveMostrarAlertaBackup() { if (!isPremium) return false; const dismissed = localStorage.getItem(BACKUP_ALERT_KEY); if (!dismissed) return true; const dismissedDate = new Date(parseInt(dismissed)); const now = new Date(); const daysDiff = (now - dismissedDate) / (1000 * 60 * 60 * 24); return daysDiff >= 7; }
+    function confirmarBackupFeito() { localStorage.setItem(BACKUP_ALERT_KEY, Date.now().toString()); document.getElementById('backup-alert-banner').style.display = 'none'; showToast('✅ Backup confirmado!'); }
+    function atualizarBannerBackup() { const b = document.getElementById('backup-alert-banner'); if (b) b.style.display = deveMostrarAlertaBackup() ? 'flex' : 'none'; }
+
     let isPremium = localStorage.getItem(PREMIUM_STORAGE_KEY) === 'true';
-    
-    const CODIGOS_PREMIUM_VALIDOS = [
-        'PREMIUM-2024', 'OWER-A7B3-C9D1', 'OWER-E2F4-G6H8', 'OWER-J1K5-L3M7',
-        'OWER-N9P2-Q4R6', 'OWER-S8T1-U5V3', 'OWER-W7X9-Y2Z4', 'OWER-B5D8-F1H3',
-        'OWER-K6M2-P9R5', 'OWER-T4V7-X1Z8', 'OWER-C3G9-J6N4',
-    ];
-    
+    const CODIGOS_PREMIUM_VALIDOS = ['PREMIUM-2024','OWER-A7B3-C9D1','OWER-E2F4-G6H8','OWER-J1K5-L3M7','OWER-N9P2-Q4R6','OWER-S8T1-U5V3','OWER-W7X9-Y2Z4','OWER-B5D8-F1H3','OWER-K6M2-P9R5','OWER-T4V7-X1Z8','OWER-C3G9-J6N4'];
     const MSG_COBRANCA_PADRAO = "Olá {nome}! 👋 Passando para lembrar que seu acesso vence dia {vencimento}. O valor para renovação é de R$ {valor}. Como deseja pagar?";
     const MSG_RENOVACAO_PADRAO = "Olá {nome}! ✅ Sua renovação foi confirmada! Novo vencimento: {vencimento}. Obrigado pela confiança!";
     const MSG_PROMOCAO_PADRAO = "Olá {nome}! 🎉 Temos uma oferta especial para você! Entre em contato para saber mais.";
-    
-    let db = carregarDadosProtegidos() || { 
-        clientes: [], planos: [], servidores: [], transacoes: [], priv: false,
-        configMsg: MSG_COBRANCA_PADRAO,
-        configMsgRenovacao: MSG_RENOVACAO_PADRAO,
-        configMsgPromocao: MSG_PROMOCAO_PADRAO
-    };
-    
+
+    let db = carregarDadosProtegidos() || { clientes: [], planos: [], servidores: [], transacoes: [], priv: false, configMsg: MSG_COBRANCA_PADRAO, configMsgRenovacao: MSG_RENOVACAO_PADRAO, configMsgPromocao: MSG_PROMOCAO_PADRAO };
     let curTabId = 'tab-dash', chartObj = null, filtroAtual = null;
     const tabsOrder = ['tab-dash', 'tab-cli', 'tab-pla', 'tab-srv', 'tab-fin'];
     let touchStartX = 0, touchStartY = 0;
 
-    function abrirModalComHistorico(modalId) {
-        const modal = document.getElementById(modalId);
-        if (!modal) return;
-        modal.style.display = 'flex';
-        history.pushState({ modalOpen: true, modalId: modalId }, '');
-    }
-    
-    window.addEventListener('popstate', function(event) {
-        if (event.state && event.state.modalOpen) fecharModais();
-    });
-    
-    function mostrarModalUpgrade() {
-        if (isPremium) { showToast('Você já é PREMIUM! 💎'); return; }
-        abrirModalComHistorico('modal-upgrade');
-    }
-    
-    function abrirMsgChooser(i) {
-        if (!isPremium) { mostrarModalUpgrade(); return; }
-        clienteMsgAtual = i;
-        abrirModalComHistorico('modal-msg-chooser');
-    }
-    
-    function enviarMsgTipo(tipo) {
-        if (clienteMsgAtual === null) return;
-        const c = db.clientes[clienteMsgAtual];
-        const dataFmt = c.venc.split("-").reverse().join("/");
-        const partesNome = c.nome.trim().split(' ');
-        const primeiroNome = partesNome[0];
-        const sobrenome = partesNome.length > 1 ? partesNome.slice(1).join(' ') : '';
-        let mensagem = '';
-        if (tipo === 'cobranca') {
-            mensagem = (db.configMsg || MSG_COBRANCA_PADRAO).replace("{nome}", primeiroNome).replace("{sobrenome}", sobrenome).replace("{vencimento}", dataFmt).replace("{valor}", c.pVal.toFixed(2));
-        } else if (tipo === 'renovacao') {
-            mensagem = (db.configMsgRenovacao || MSG_RENOVACAO_PADRAO).replace("{nome}", primeiroNome).replace("{sobrenome}", sobrenome).replace("{vencimento}", dataFmt).replace("{valor}", c.pVal.toFixed(2));
-        } else if (tipo === 'promocao') {
-            mensagem = (db.configMsgPromocao || MSG_PROMOCAO_PADRAO).replace("{nome}", primeiroNome).replace("{sobrenome}", sobrenome);
-        }
-        fecharModais();
-        window.open(`https://wa.me/${c.wpp}?text=${encodeURIComponent(mensagem)}`);
-        clienteMsgAtual = null;
-    }
-    
-    function atualizarUIPremium() {
-        const planTexts = document.querySelectorAll('[id^="plan-text-"]');
-        planTexts.forEach(el => { if (el) el.textContent = isPremium ? 'PREMIUM' : 'FREE'; });
-        const planBadges = document.querySelectorAll('.current-plan-badge');
-        planBadges.forEach(el => { if (isPremium) el.classList.add('premium'); else el.classList.remove('premium'); });
-        const msgBadge = document.getElementById('msg-premium-badge');
-        if (msgBadge) msgBadge.style.display = isPremium ? 'none' : 'inline';
-        const tokenBadge = document.getElementById('token-premium-badge');
-        if (tokenBadge) tokenBadge.style.display = isPremium ? 'none' : 'inline';
-        const chartOverlay = document.getElementById('chart-premium-overlay');
-        if (chartOverlay) chartOverlay.style.display = isPremium ? 'none' : 'flex';
-        atualizarBannerBackup(); atualizarTooltipVagas();
-        lucide.createIcons();
-    }
-    
-    function atualizarTooltipVagas() {
-        if (isPremium) { document.querySelectorAll('.free-slots-tip').forEach(el => el.style.display = 'none'); return; }
-        const vagasRestantes = 10 - db.clientes.length; let msg;
-        if (vagasRestantes > 0) { msg = `<strong>${vagasRestantes} cliente${vagasRestantes>1?'s':''} gratuito${vagasRestantes>1?'s':''}</strong> disponíve${vagasRestantes>1?'is':'l'}`; msg += `<br>Aproveite para testar. Depois, libere ilimitados no <span class="premium-link" onclick="mostrarModalUpgrade()">PREMIUM</span>`; }
-        else { msg = `Limite de <strong>10 clientes</strong> atingido`; msg += `<br><span class="premium-link" onclick="mostrarModalUpgrade()">Assine o PREMIUM para continuar crescendo</span>`; }
-        document.querySelectorAll('.free-slots-tip').forEach(el => { el.innerHTML = msg; el.style.display = 'block'; });
-    }
-    
-    function ativarCodigoPremium() {
-        const codigo = document.getElementById('pro-code-input').value.toUpperCase().trim();
-        if (CODIGOS_PREMIUM_VALIDOS.includes(codigo)) { isPremium = true; localStorage.setItem(PREMIUM_STORAGE_KEY, 'true'); fecharModais(); showToast('✅ Plano PREMIUM ativado! 💎', false); atualizarUIPremium(); atualizar(); }
-        else { showToast('❌ Código inválido!', true); }
-    }
-    
+    function abrirModalComHistorico(id) { const m = document.getElementById(id); if (!m) return; m.style.display = 'flex'; history.pushState({ modalOpen: true, modalId: id }, ''); }
+    window.addEventListener('popstate', function(e) { if (e.state && e.state.modalOpen) fecharModais(); });
+    function mostrarModalUpgrade() { if (isPremium) { showToast('Você já é PREMIUM! 💎'); return; } abrirModalComHistorico('modal-upgrade'); }
+    function abrirMsgChooser(i) { if (!isPremium) { mostrarModalUpgrade(); return; } clienteMsgAtual = i; abrirModalComHistorico('modal-msg-chooser'); }
+    function enviarMsgTipo(tipo) { if (clienteMsgAtual === null) return; const c = db.clientes[clienteMsgAtual]; enviarMsgCliente(c, tipo); fecharModais(); clienteMsgAtual = null; }
+    function enviarMsgCliente(c, tipo) { const dataFmt = c.venc.split("-").reverse().join("/"); const partesNome = c.nome.trim().split(' '); const pNome = partesNome[0]; const sobrenome = partesNome.length > 1 ? partesNome.slice(1).join(' ') : ''; let msg = ''; if (tipo === 'cobranca') { msg = (db.configMsg || MSG_COBRANCA_PADRAO).replace("{nome}", pNome).replace("{sobrenome}", sobrenome).replace("{vencimento}", dataFmt).replace("{valor}", c.pVal.toFixed(2)); } else if (tipo === 'renovacao') { msg = (db.configMsgRenovacao || MSG_RENOVACAO_PADRAO).replace("{nome}", pNome).replace("{sobrenome}", sobrenome).replace("{vencimento}", dataFmt).replace("{valor}", c.pVal.toFixed(2)); } else if (tipo === 'promocao') { msg = (db.configMsgPromocao || MSG_PROMOCAO_PADRAO).replace("{nome}", pNome).replace("{sobrenome}", sobrenome); } window.open(`https://wa.me/${c.wpp}?text=${encodeURIComponent(msg)}`); }
+    function enviarMsgRenovacaoAgora() { if (clientePosRenovacao === null) return; const c = db.clientes[clientePosRenovacao]; const dataFmt = (novaDataPosRenovacao || c.venc).split("-").reverse().join("/"); const partesNome = c.nome.trim().split(' '); const pNome = partesNome[0]; const sobrenome = partesNome.length > 1 ? partesNome.slice(1).join(' ') : ''; let msg = (db.configMsgRenovacao || MSG_RENOVACAO_PADRAO).replace("{nome}", pNome).replace("{sobrenome}", sobrenome).replace("{vencimento}", dataFmt).replace("{valor}", c.pVal.toFixed(2)); fecharModais(); window.open(`https://wa.me/${c.wpp}?text=${encodeURIComponent(msg)}`); clientePosRenovacao = null; novaDataPosRenovacao = null; }
+
+    function atualizarUIPremium() { const pts = document.querySelectorAll('[id^="plan-text-"]'); pts.forEach(el => { if (el) el.textContent = isPremium ? 'PREMIUM' : 'FREE'; }); const pbs = document.querySelectorAll('.current-plan-badge'); pbs.forEach(el => { if (isPremium) el.classList.add('premium'); else el.classList.remove('premium'); }); const mb = document.getElementById('msg-premium-badge'); if (mb) mb.style.display = isPremium ? 'none' : 'inline'; const tb = document.getElementById('token-premium-badge'); if (tb) tb.style.display = isPremium ? 'none' : 'inline'; const co = document.getElementById('chart-premium-overlay'); if (co) co.style.display = isPremium ? 'none' : 'flex'; atualizarBannerBackup(); atualizarTooltipVagas(); lucide.createIcons(); }
+    function atualizarTooltipVagas() { if (isPremium) { document.querySelectorAll('.free-slots-tip').forEach(el => el.style.display = 'none'); return; } const vagas = 10 - db.clientes.length; let msg; if (vagas > 0) { msg = `<strong>${vagas} cliente${vagas>1?'s':''} gratuito${vagas>1?'s':''}</strong> disponíve${vagas>1?'is':'l'}`; msg += `<br>Aproveite para testar. Depois, libere ilimitados no <span class="premium-link" onclick="mostrarModalUpgrade()">PREMIUM</span>`; } else { msg = `Limite de <strong>10 clientes</strong> atingido`; msg += `<br><span class="premium-link" onclick="mostrarModalUpgrade()">Assine o PREMIUM para continuar crescendo</span>`; } document.querySelectorAll('.free-slots-tip').forEach(el => { el.innerHTML = msg; el.style.display = 'block'; }); }
+    function ativarCodigoPremium() { const cod = document.getElementById('pro-code-input').value.toUpperCase().trim(); if (CODIGOS_PREMIUM_VALIDOS.includes(cod)) { isPremium = true; localStorage.setItem(PREMIUM_STORAGE_KEY, 'true'); fecharModais(); showToast('✅ Plano PREMIUM ativado! 💎', false); atualizarUIPremium(); atualizar(); } else { showToast('❌ Código inválido!', true); } }
     function simularCompraPremium() { window.open(`https://wa.me/5532984911522?text=${encodeURIComponent("Olá! Gostaria de assinar o plano PREMIUM do OwerPlay Gestor por R$ 19,90/mês.")}`); showToast('Redirecionando para WhatsApp...'); }
     function abrirConfigMsgComValidacao() { if (!isPremium) { mostrarModalUpgrade(); return; } document.getElementById('cfg-msg-cobranca').value = db.configMsg || MSG_COBRANCA_PADRAO; document.getElementById('cfg-msg-renovacao').value = db.configMsgRenovacao || MSG_RENOVACAO_PADRAO; document.getElementById('cfg-msg-promocao').value = db.configMsgPromocao || MSG_PROMOCAO_PADRAO; abrirModalComHistorico('modal-config-msg'); }
     function copiarTokenComValidacao() { if (!isPremium) { mostrarModalUpgrade(); return; } copiarTokenComToast(); confirmarBackupFeito(); }
@@ -634,17 +284,14 @@
     function fecharModais() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); }
     function togglePriv() { db.priv = !db.priv; persistir(); }
     function showToast(msg, isAlert = false) { const t = document.getElementById("toast"); t.innerText = msg; t.className = isAlert ? "show alert" : "show"; setTimeout(() => { t.className = ""; }, 3000); }
-
     function showTab(id, el) { curTabId = id; document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-tab')); document.querySelectorAll('.menu-item').forEach(n => n.classList.remove('active')); document.getElementById(id).classList.add('active-tab'); if(el) el.classList.add('active'); else document.querySelector(`[data-tab="${id}"]`).classList.add('active'); atualizarUIPremium(); atualizar(); }
 
-    function copiarTokenComToast() { const compact = { c: db.clientes.map(i=>({n:i.nome,w:i.wpp,v:i.venc,p:i.pNome,pv:i.pVal,s:i.sNome,sv:i.sVal})), p: db.planos.map(i=>({n:i.nome,v:i.val})), s: db.servidores.map(i=>({n:i.nome,c:i.custo})), t: db.transacoes.map(i=>({c:i.cli,p:i.pVal,s:i.sVal,d:i.data})), m: db.configMsg, mr: db.configMsgRenovacao, mp: db.configMsgPromocao }; const token = btoa(unescape(encodeURIComponent(JSON.stringify(compact)))); navigator.clipboard.writeText(token).then(()=>showToast("✅ Token copiado! Salve em local seguro.")); }
-
+    function copiarTokenComToast() { const compact = { c: db.clientes.map(i=>({n:i.nome,w:i.wpp,v:i.venc,p:i.pNome,pv:i.pVal,s:i.sNome,sv:i.sVal})), p: db.planos.map(i=>({n:i.nome,v:i.val})), s: db.servidores.map(i=>({n:i.nome,c:i.custo})), t: db.transacoes.map(i=>({c:i.cli,p:i.pVal,s:i.sVal,d:i.data})), m: db.configMsg, mr: db.configMsgRenovacao, mp: db.configMsgPromocao }; const token = btoa(unescape(encodeURIComponent(JSON.stringify(compact)))); navigator.clipboard.writeText(token).then(()=>showToast("✅ Token copiado!")); }
     function confirmarToken() { try { const raw = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('token-input').value)))); if(raw.c) { db.clientes = raw.c.map(i=>({nome:i.n,wpp:i.w,venc:i.v,pNome:i.p,pVal:i.pv,sNome:i.s,sVal:i.sv})); db.planos = raw.p.map(i=>({nome:i.n,val:i.v})); db.servidores = raw.s.map(i=>({nome:i.n,custo:i.c})); db.transacoes = raw.t.map(i=>({cli:i.c,pVal:i.p,sVal:i.s,data:i.d})); db.configMsg = raw.m || db.configMsg; db.configMsgRenovacao = raw.mr || db.configMsgRenovacao; db.configMsgPromocao = raw.mp || db.configMsgPromocao; } else if(raw.clientes) { db = raw; } persistir(); fecharModais(); showToast("Restaurado!"); } catch(e) { showToast("Código Inválido!", true); } }
 
-    function salvarCli() { const n=document.getElementById('c-nome').value, v=document.getElementById('c-venc').value, pIdx=document.getElementById('c-plano').value, sIdx=document.getElementById('c-srv').value, idx=parseInt(document.getElementById('edit-idx-cli').value); if(!n||!v||pIdx===""||sIdx==="") return; if (!isPremium && idx===-1 && db.clientes.length>=10) { fecharModais(); mostrarModalUpgrade(); return; } const d={nome:n,wpp:document.getElementById('c-wpp').value,venc:v,pNome:db.planos[pIdx].nome,pVal:parseFloat(db.planos[pIdx].val),sNome:db.servidores[sIdx].nome,sVal:parseFloat(db.servidores[sIdx].custo)}; if(idx===-1) { db.clientes.push(d); db.transacoes.push({cli:n,pVal:d.pVal,sVal:d.sVal,data:new Date().toISOString().slice(0,7)}); } else db.clientes[idx]=d; fecharModais(); persistir(); }
+    function salvarCli() { const n=document.getElementById('c-nome').value, v=document.getElementById('c-venc').value, pIdx=document.getElementById('c-plano').value, sIdx=document.getElementById('c-srv').value, idx=parseInt(document.getElementById('edit-idx-cli').value); if(!n||!v||pIdx===""||sIdx==="") return; if (!isPremium && idx===-1 && db.clientes.length>=10) { fecharModais(); mostrarModalUpgrade(); return; } const d={nome:n,wpp:document.getElementById('c-wpp').value,venc:v,pNome:db.planos[pIdx].nome,pVal:parseFloat(db.planos[pIdx].val),sNome:db.servidores[sIdx].nome,sVal:parseFloat(db.servidores[sIdx].custo),dataCadastro:new Date().toISOString().split('T')[0]}; if(idx===-1) { db.clientes.push(d); db.transacoes.push({cli:n,pVal:d.pVal,sVal:d.sVal,data:new Date().toISOString().slice(0,7)}); } else { db.clientes[idx].nome=d.nome; db.clientes[idx].wpp=d.wpp; db.clientes[idx].venc=d.venc; db.clientes[idx].pNome=d.pNome; db.clientes[idx].pVal=d.pVal; db.clientes[idx].sNome=d.sNome; db.clientes[idx].sVal=d.sVal; } fecharModais(); persistir(); }
     function salvarPla() { const n=document.getElementById('p-nome').value, v=document.getElementById('p-val').value, idx=parseInt(document.getElementById('edit-idx-pla').value); if(n) { if(idx===-1) db.planos.push({nome:n,val:v}); else db.planos[idx]={nome:n,val:v}; fecharModais(); persistir(); } }
     function salvarSrv() { const n=document.getElementById('s-nome').value, c=document.getElementById('s-custo').value, idx=parseInt(document.getElementById('edit-idx-srv').value); if(n) { if(idx===-1) db.servidores.push({nome:n,custo:c}); else db.servidores[idx]={nome:n,custo:c}; fecharModais(); persistir(); } }
-
     function abrirNovoManual() { if(curTabId==='tab-dash'||curTabId==='tab-cli') { if (!isPremium&&db.clientes.length>=10) { mostrarModalUpgrade(); return; } document.getElementById('edit-idx-cli').value="-1"; document.getElementById('c-nome').value=""; document.getElementById('c-wpp').value=""; document.getElementById('c-venc').value=""; document.getElementById('modal-cli').style.display='flex'; abrirModalComHistorico('modal-cli'); } else if(curTabId==='tab-pla') { document.getElementById('edit-idx-pla').value="-1"; document.getElementById('p-nome').value=""; document.getElementById('p-val').value=""; document.getElementById('modal-pla').style.display='flex'; abrirModalComHistorico('modal-pla'); } else if(curTabId==='tab-srv') { if (!isPremium&&db.servidores.length>=1) { mostrarModalUpgrade(); return; } document.getElementById('edit-idx-srv').value="-1"; document.getElementById('s-nome').value=""; document.getElementById('s-custo').value=""; document.getElementById('modal-srv').style.display='flex'; abrirModalComHistorico('modal-srv'); } }
     function editarItem(tipo,i) { if(tipo==='cli'){ const c=db.clientes[i]; document.getElementById('edit-idx-cli').value=i; document.getElementById('c-nome').value=c.nome; document.getElementById('c-wpp').value=c.wpp; document.getElementById('c-venc').value=c.venc; document.getElementById('modal-cli').style.display='flex'; abrirModalComHistorico('modal-cli'); } else if(tipo==='pla'){ const p=db.planos[i]; document.getElementById('edit-idx-pla').value=i; document.getElementById('p-nome').value=p.nome; document.getElementById('p-val').value=p.val; document.getElementById('modal-pla').style.display='flex'; abrirModalComHistorico('modal-pla'); } else if(tipo==='srv'){ const s=db.servidores[i]; document.getElementById('edit-idx-srv').value=i; document.getElementById('s-nome').value=s.nome; document.getElementById('s-custo').value=s.custo; document.getElementById('modal-srv').style.display='flex'; abrirModalComHistorico('modal-srv'); } }
     function salvarConfigMsg() { if (!isPremium) { mostrarModalUpgrade(); return; } db.configMsg = document.getElementById('cfg-msg-cobranca').value; db.configMsgRenovacao = document.getElementById('cfg-msg-renovacao').value; db.configMsgPromocao = document.getElementById('cfg-msg-promocao').value; persistir(); fecharModais(); showToast("Mensagens salvas!"); }
@@ -661,22 +308,53 @@
         ['grid-home','grid-cli','grid-pla','grid-srv','grid-fin'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerHTML=''; });
         const fab = document.getElementById('main-fab');
         if(fab) { const temDados = db.clientes.length>0||(curTabId==='tab-pla')||(curTabId==='tab-srv'); const podeCadastrarCliente = (curTabId==='tab-cli'||curTabId==='tab-dash')&&db.servidores.length>0&&db.planos.length>0; fab.style.display = (curTabId!=='tab-fin'&&(temDados||podeCadastrarCliente))?'flex':'none'; }
+        
         if(db.servidores.length===0&&curTabId==='tab-srv') { document.getElementById('grid-srv').innerHTML=`<div class="welcome-state"><div class="welcome-icon"><i data-lucide="database" size="32"></i></div><h3>Cadastre seu Servidor</h3><p>Adicione seu servidor de origem para gerenciar seus custos operacionais e vincular aos clientes.</p><button class="btn-save" onclick="abrirNovoManual()"><i data-lucide="plus" size="18"></i> Novo Servidor</button></div>`; }
-        else if(curTabId==='tab-srv') { db.servidores.forEach((s,i)=>{ document.getElementById('grid-srv').innerHTML+=`<div class="item-card" style="border:1.5px solid var(--saida)"><b>${s.nome}</b><p style="font-size:0.7rem;color:var(--text-dim)">Custo: R$ ${parseFloat(s.custo).toFixed(2)}</p><div class="card-actions"><button class="btn-icon btn-edit" onclick="editarItem('srv',${i})"><i data-lucide="pencil"></i></button><button class="btn-icon btn-del" onclick="confirmarExclusao('srv',${i})"><i data-lucide="trash-2"></i></button></div></div>`; }); }
+        else if(curTabId==='tab-srv') { db.servidores.forEach((s,i)=>{ document.getElementById('grid-srv').innerHTML+=`<div class="item-card card-border-servidor"><b>${s.nome}</b><p style="font-size:0.7rem;color:var(--text-dim)">Custo: R$ ${parseFloat(s.custo).toFixed(2)}</p><div class="card-actions"><button class="btn-icon btn-edit" onclick="editarItem('srv',${i})"><i data-lucide="pencil"></i></button><button class="btn-icon btn-del" onclick="confirmarExclusao('srv',${i})"><i data-lucide="trash-2"></i></button></div></div>`; }); }
         if(db.planos.length===0&&curTabId==='tab-pla') { document.getElementById('grid-pla').innerHTML=`<div class="welcome-state"><div class="welcome-icon"><i data-lucide="package" size="32"></i></div><h3>Crie seus Planos</h3><p>Defina categorias de venda com nome e valor para oferecer aos seus clientes de forma organizada.</p><button class="btn-save" onclick="abrirNovoManual()"><i data-lucide="plus" size="18"></i> Criar Plano</button></div>`; }
-        else if(curTabId==='tab-pla') { db.planos.forEach((p,i)=>{ document.getElementById('grid-pla').innerHTML+=`<div class="item-card" style="border:1.5px solid var(--entrada)"><b>${p.nome}</b><p style="font-size:0.7rem;color:var(--text-dim)">Venda: R$ ${parseFloat(p.val).toFixed(2)}</p><div class="card-actions"><button class="btn-icon btn-edit" onclick="editarItem('pla',${i})"><i data-lucide="pencil"></i></button><button class="btn-icon btn-del" onclick="confirmarExclusao('pla',${i})"><i data-lucide="trash-2"></i></button></div></div>`; }); }
+        else if(curTabId==='tab-pla') { db.planos.forEach((p,i)=>{ document.getElementById('grid-pla').innerHTML+=`<div class="item-card card-border-plano"><b>${p.nome}</b><p style="font-size:0.7rem;color:var(--text-dim)">Venda: R$ ${parseFloat(p.val).toFixed(2)}</p><div class="card-actions"><button class="btn-icon btn-edit" onclick="editarItem('pla',${i})"><i data-lucide="pencil"></i></button><button class="btn-icon btn-del" onclick="confirmarExclusao('pla',${i})"><i data-lucide="trash-2"></i></button></div></div>`; }); }
         if(db.clientes.length===0&&curTabId==='tab-cli') { const temServidor=db.servidores.length>0,temPlano=db.planos.length>0; if(temServidor&&temPlano){ document.getElementById('grid-cli').innerHTML=`<div class="welcome-state"><div class="welcome-icon"><i data-lucide="users" size="32"></i></div><h3>Pronto para começar!</h3><p>Tudo configurado. Cadastre seu primeiro cliente agora.</p><button class="btn-save" onclick="abrirNovoManual()"><i data-lucide="plus" size="18"></i> Novo Cliente</button></div>`; } else { const faltando=[]; if(!temServidor) faltando.push('<strong>Servidor</strong>'); if(!temPlano) faltando.push('<strong>Plano</strong>'); document.getElementById('grid-cli').innerHTML=`<div class="welcome-state"><div class="welcome-icon"><i data-lucide="users" size="32"></i></div><h3>Nenhum cliente</h3><p>Cadastre primeiro ${faltando.join(' e ')}.</p></div>`; } }
 
-        let proc = db.clientes.map((c,i) => { const hoje = new Date(); hoje.setHours(0,0,0,0); const partesData = c.venc.split('-'); const dv = new Date(parseInt(partesData[0]),parseInt(partesData[1])-1,parseInt(partesData[2])); dv.setHours(0,0,0,0); const diffMs = dv.getTime()-hoje.getTime(); const diff = Math.round(diffMs/(1000*60*60*24)); let st="ativo",stC="card-border-ativo",stT="Ativo",stB="var(--lucro)",peso=2; if(diff<0){st="vencido";stC="card-border-vencido";stT="Vencido";stB="var(--saida)";peso=3;} else if(diff===0){st="vencido";stC="card-border-vencido";stT="Hoje";stB="var(--saida)";peso=3;} else if(diff===1){st="alerta";stC="card-border-alerta";stT="Amanhã";stB="var(--alerta)";peso=1;} return {...c,id:i,st,stC,stT,stB,peso}; });
-        const countVenc = proc.filter(p=>p.st==="vencido").length, countAlert = proc.filter(p=>p.st==="alerta").length;
-        const bVenc=document.getElementById('badge-vencido'),bAlert=document.getElementById('badge-alerta');
+        let proc = db.clientes.map((c,i) => { const hoje = new Date(); hoje.setHours(0,0,0,0); const partesData = c.venc.split('-'); const dv = new Date(parseInt(partesData[0]),parseInt(partesData[1])-1,parseInt(partesData[2])); dv.setHours(0,0,0,0); const diffMs = dv.getTime()-hoje.getTime(); const diff = Math.round(diffMs/(1000*60*60*24)); let st="ativo",stC="card-border-ativo",stT="Ativo",stB="var(--lucro)",peso=2; if(diff<0){st="vencido";stC="card-border-vencido";stT="Vencido";stB="var(--saida)";peso=3;} else if(diff===0){st="hoje";stC="card-border-vencido";stT="Hoje";stB="var(--saida)";peso=4;} else if(diff===1){st="alerta";stC="card-border-alerta";stT="Amanhã";stB="var(--alerta)";peso=1;} return {...c,id:i,st,stC,stT,stB,peso}; });
+        
+        const countHoje = proc.filter(p=>p.st==="hoje").length;
+        const countVenc = proc.filter(p=>p.st==="vencido").length;
+        const countAlert = proc.filter(p=>p.st==="alerta").length;
+        const countAtivos = proc.filter(p=>p.st==="ativo").length;
+        
+        const hoje = new Date();
+        const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        const countNovos = db.clientes.filter(c => { const dataCadastro = new Date(c.dataCadastro || '2000-01-01'); return dataCadastro >= primeiroDiaMes; }).length;
+        
+        const bAtivo=document.getElementById('badge-ativo'),bHoje=document.getElementById('badge-hoje'),bVenc=document.getElementById('badge-vencido'),bAlert=document.getElementById('badge-alerta');
+        if(bAtivo){ if(countAtivos>0){bAtivo.innerText=countAtivos;bAtivo.style.display='flex';}else bAtivo.style.display='none'; }
+        if(bHoje){ if(countHoje>0){bHoje.innerText=countHoje;bHoje.style.display='flex';}else bHoje.style.display='none'; }
         if(bVenc){ if(countVenc>0){bVenc.innerText=countVenc;bVenc.style.display='flex';}else bVenc.style.display='none'; }
         if(bAlert){ if(countAlert>0){bAlert.innerText=countAlert;bAlert.style.display='flex';}else bAlert.style.display='none'; }
         proc.sort((a,b)=>a.peso-b.peso);
 
-        proc.forEach((c)=>{ if(curTabId==='tab-cli'||curTabId==='tab-dash'){ if(termo&&!c.nome.toLowerCase().includes(termo)) return; if(curTabId==='tab-dash'&&!filtroAtual&&c.st==='vencido') return; if(filtroAtual&&c.st!==filtroAtual) return; const iniciais = getIniciais(c.nome); const card = `<div class="item-card ${c.stC}"><div class="client-info-row"><div class="client-avatar">${iniciais}</div><div class="client-details"><div class="card-header"><b style="font-size:0.9rem">${c.nome}</b><span class="card-status-badge" style="background:${c.stB}">${c.stT}</span></div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:3px">Venc: <b>${c.venc.split("-").reverse().join("/")}</b> | ${c.pNome}</div></div></div><div class="card-actions"><button class="btn-icon" style="color:#22c55e" onclick="abrirMsgChooser(${c.id})"><i data-lucide="message-circle"></i></button><button class="btn-icon" style="color:var(--entrada)" onclick="document.getElementById('renew-idx').value='${c.id}';document.getElementById('modal-renew').style.display='flex';abrirModalComHistorico('modal-renew');"><i data-lucide="refresh-cw"></i></button><button class="btn-icon btn-edit" onclick="editarItem('cli',${c.id})"><i data-lucide="pencil"></i></button><button class="btn-icon btn-del" onclick="confirmarExclusao('cli',${c.id})"><i data-lucide="trash-2"></i></button></div></div>`; if(curTabId==='tab-dash') document.getElementById('grid-home').innerHTML+=card; else document.getElementById('grid-cli').innerHTML+=card; } });
+        // BUSCA CORRIGIDA: se tem termo de busca, ignora o filtro de chip e mostra todos
+        const buscaAtiva = termo.length > 0;
+        
+        proc.forEach((c)=>{ 
+            if(curTabId==='tab-cli'||curTabId==='tab-dash'){
+                // Se tem busca ativa, filtra apenas pelo nome (ignora chips)
+                if(buscaAtiva) {
+                    if(!c.nome.toLowerCase().includes(termo)) return;
+                } else {
+                    // Sem busca, usa o filtro de chip normalmente
+                    if(filtroAtual==='hoje'&&c.st!=='hoje') return;
+                    if(curTabId==='tab-dash'&&!filtroAtual&&(c.st==='vencido'||c.st==='hoje')) return;
+                    if(filtroAtual&&filtroAtual!=='hoje'&&c.st!==filtroAtual) return;
+                }
+                const iniciais = getIniciais(c.nome); 
+                const card = `<div class="item-card ${c.stC}"><div class="client-info-row"><div class="client-avatar">${iniciais}</div><div class="client-details"><div class="card-header"><b style="font-size:0.9rem">${c.nome}</b><span class="card-status-badge" style="background:${c.stB}">${c.stT}</span></div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:3px">Venc: <b>${c.venc.split("-").reverse().join("/")}</b> | ${c.pNome}</div></div></div><div class="card-actions"><button class="btn-icon" style="color:#22c55e" onclick="abrirMsgChooser(${c.id})"><i data-lucide="message-circle"></i></button><button class="btn-icon" style="color:var(--entrada)" onclick="document.getElementById('renew-idx').value='${c.id}';document.getElementById('modal-renew').style.display='flex';abrirModalComHistorico('modal-renew');"><i data-lucide="refresh-cw"></i></button><button class="btn-icon btn-edit" onclick="editarItem('cli',${c.id})"><i data-lucide="pencil"></i></button><button class="btn-icon btn-del" onclick="confirmarExclusao('cli',${c.id})"><i data-lucide="trash-2"></i></button></div></div>`; 
+                if(curTabId==='tab-dash') document.getElementById('grid-home').innerHTML+=card; 
+                else document.getElementById('grid-cli').innerHTML+=card; 
+            } 
+        });
 
-        if(curTabId==='tab-fin'||curTabId==='tab-dash'){ let entT=0,saiT=0,lucM=0; const mesAtual=hojeISO.slice(0,7); db.transacoes.forEach(t=>{entT+=t.pVal;saiT+=t.sVal;if(t.data===mesAtual)lucM+=(t.pVal-t.sVal);}); const dsLucro=document.getElementById('ds-lucro'),dsAtivos=document.getElementById('ds-ativos'); if(dsLucro)dsLucro.innerText=db.priv?'••••':`R$ ${lucM.toFixed(2)}`; if(dsAtivos)dsAtivos.innerText=proc.filter(p=>p.st!=="vencido").length; if(curTabId==='tab-fin'){ const finEnt=document.getElementById('fin-total-ent'),finSai=document.getElementById('fin-total-sai'),finLuc=document.getElementById('fin-total-luc'); let transacoesConsideradas=isPremium?db.transacoes:db.transacoes.slice(-10); let entT10=0,saiT10=0; transacoesConsideradas.forEach(t=>{entT10+=t.pVal;saiT10+=t.sVal;}); if(finEnt)finEnt.innerText=db.priv?'••':`R$ ${entT10.toFixed(2)}`; if(finSai)finSai.innerText=db.priv?'••':`R$ ${saiT10.toFixed(2)}`; if(finLuc)finLuc.innerText=db.priv?'••':`R$ ${(entT10-saiT10).toFixed(2)}`; if(isPremium&&!db.priv)renderFin(entT10,saiT10,entT10-saiT10); const gridFin=document.getElementById('grid-fin'); let transacoesParaMostrar=isPremium?db.transacoes.slice().reverse():db.transacoes.slice(-10).reverse(); transacoesParaMostrar.forEach((t,i)=>{const realIdx=db.transacoes.indexOf(t);gridFin.innerHTML+=`<div class="item-card" style="border:1px solid var(--border)"><button class="btn-more-fin" onclick="document.getElementById('modal-opt-fin').style.display='flex';abrirModalComHistorico('modal-opt-fin');document.getElementById('btn-opt-edit').onclick=function(){fecharModais();abrirEditFin(${realIdx})};document.getElementById('btn-opt-del').onclick=function(){fecharModais();confirmarExclusao('fin',${realIdx});};"><i data-lucide="more-horizontal"></i></button><b>${t.cli}</b><div class="fin-smooth-row"><div class="fin-item"><span class="fin-label">Venda</span><span class="fin-val" style="color:var(--entrada)">${db.priv?'••':'R$ '+t.pVal.toFixed(2)}</span></div><div class="fin-item"><span class="fin-label">Custo</span><span class="fin-val" style="color:var(--saida)">${db.priv?'••':'R$ '+t.sVal.toFixed(2)}</span></div><div class="fin-item"><span class="fin-label">Lucro</span><span class="fin-val" style="color:var(--lucro)">${db.priv?'••':'R$ '+(t.pVal-t.sVal).toFixed(2)}</span></div></div></div>`;}); if(!isPremium&&db.transacoes.length>10){gridFin.innerHTML+=`<div class="welcome-state" style="margin-top:15px;padding:30px 20px;cursor:pointer" onclick="mostrarModalUpgrade()"><i data-lucide="gem" class="diamond-icon" style="color:var(--premium-color);width:48px;height:48px;margin-bottom:10px"></i><p style="font-size:.75rem">+${db.transacoes.length-10} transações ocultas</p><p style="font-size:.65rem;color:var(--text-dim);margin-bottom:15px">Assine PREMIUM para histórico completo</p><button class="upgrade-btn" style="width:auto;padding:10px 30px">ASSINAR PREMIUM</button></div>`;} } }
+        if(curTabId==='tab-fin'||curTabId==='tab-dash'){ let entT=0,saiT=0,lucM=0; const mesAtual=hojeISO.slice(0,7); db.transacoes.forEach(t=>{entT+=t.pVal;saiT+=t.sVal;if(t.data===mesAtual)lucM+=(t.pVal-t.sVal);}); const dsLucro=document.getElementById('ds-lucro'),dsNovos=document.getElementById('ds-novos'); if(dsLucro)dsLucro.innerText=db.priv?'••••':`R$ ${lucM.toFixed(2)}`; if(dsNovos)dsNovos.innerText=countNovos; if(curTabId==='tab-fin'){ const finEnt=document.getElementById('fin-total-ent'),finSai=document.getElementById('fin-total-sai'),finLuc=document.getElementById('fin-total-luc'); let tC=isPremium?db.transacoes:db.transacoes.slice(-10); let entT10=0,saiT10=0; tC.forEach(t=>{entT10+=t.pVal;saiT10+=t.sVal;}); if(finEnt)finEnt.innerText=db.priv?'••':`R$ ${entT10.toFixed(2)}`; if(finSai)finSai.innerText=db.priv?'••':`R$ ${saiT10.toFixed(2)}`; if(finLuc)finLuc.innerText=db.priv?'••':`R$ ${(entT10-saiT10).toFixed(2)}`; if(isPremium&&!db.priv)renderFin(entT10,saiT10,entT10-saiT10); const gridFin=document.getElementById('grid-fin'); let tPM=isPremium?db.transacoes.slice().reverse():db.transacoes.slice(-10).reverse(); tPM.forEach((t,i)=>{const realIdx=db.transacoes.indexOf(t);gridFin.innerHTML+=`<div class="item-card" style="border:1px solid var(--border)"><button class="btn-more-fin" onclick="document.getElementById('modal-opt-fin').style.display='flex';abrirModalComHistorico('modal-opt-fin');document.getElementById('btn-opt-edit').onclick=function(){fecharModais();abrirEditFin(${realIdx})};document.getElementById('btn-opt-del').onclick=function(){fecharModais();confirmarExclusao('fin',${realIdx});};"><i data-lucide="more-horizontal"></i></button><b>${t.cli}</b><div class="fin-smooth-row"><div class="fin-item"><span class="fin-label">Venda</span><span class="fin-val" style="color:var(--entrada)">${db.priv?'••':'R$ '+t.pVal.toFixed(2)}</span></div><div class="fin-item"><span class="fin-label">Custo</span><span class="fin-val" style="color:var(--saida)">${db.priv?'••':'R$ '+t.sVal.toFixed(2)}</span></div><div class="fin-item"><span class="fin-label">Lucro</span><span class="fin-val" style="color:var(--lucro)">${db.priv?'••':'R$ '+(t.pVal-t.sVal).toFixed(2)}</span></div></div></div>`;}); if(!isPremium&&db.transacoes.length>10){gridFin.innerHTML+=`<div class="welcome-state" style="margin-top:15px;padding:30px 20px;cursor:pointer" onclick="mostrarModalUpgrade()"><i data-lucide="gem" class="diamond-icon" style="color:var(--premium-color);width:48px;height:48px;margin-bottom:10px"></i><p style="font-size:.75rem">+${db.transacoes.length-10} transações ocultas</p><p style="font-size:.65rem;color:var(--text-dim);margin-bottom:15px">Assine PREMIUM para histórico completo</p><button class="upgrade-btn" style="width:auto;padding:10px 30px">ASSINAR PREMIUM</button></div>`;} } }
         lucide.createIcons(); atualizarUIPremium(); atualizarTooltipVagas(); atualizarBannerBackup();
     }
 
@@ -684,7 +362,7 @@
     function abrirEditFin(idx){const t=db.transacoes[idx];document.getElementById('edit-fin-idx').value=idx;document.getElementById('ef-entrada').value=t.pVal;document.getElementById('ef-saida').value=t.sVal;document.getElementById('modal-edit-fin').style.display='flex';abrirModalComHistorico('modal-edit-fin');}
     function salvarEditFin(){const idx=document.getElementById('edit-fin-idx').value;db.transacoes[idx].pVal=parseFloat(document.getElementById('ef-entrada').value);db.transacoes[idx].sVal=parseFloat(document.getElementById('ef-saida').value);persistir();fecharModais();showToast("OK!");}
     function calcularPrevia30(){const idx=document.getElementById('renew-idx').value;const base=new Date(db.clientes[idx].venc+"T12:00:00"),hoje=new Date();const inicio=base<hoje?hoje:base;inicio.setDate(inicio.getDate()+30);document.getElementById('renew-custom-date').value=inicio.toISOString().split('T')[0];}
-    function confirmarRenovacaoFinal(){const idx=document.getElementById('renew-idx').value,novaData=document.getElementById('renew-custom-date').value;if(!novaData)return;db.clientes[idx].venc=novaData;db.transacoes.push({cli:db.clientes[idx].nome,pVal:db.clientes[idx].pVal,sVal:db.clientes[idx].sVal,data:new Date().toISOString().slice(0,7)});persistir();fecharModais();showToast("Renovado! "+novaData.split("-").reverse().join("/"));}
+    function confirmarRenovacaoFinal(){const idx=document.getElementById('renew-idx').value,novaData=document.getElementById('renew-custom-date').value;if(!novaData)return;db.clientes[idx].venc=novaData;db.transacoes.push({cli:db.clientes[idx].nome,pVal:db.clientes[idx].pVal,sVal:db.clientes[idx].sVal,data:new Date().toISOString().slice(0,7)});persistir();fecharModais();if(isPremium){clientePosRenovacao=parseInt(idx);novaDataPosRenovacao=novaData;document.getElementById('pos-renovacao-nome').innerText=db.clientes[idx].nome;abrirModalComHistorico('modal-pos-renovacao');}else{showToast("Renovado! "+novaData.split("-").reverse().join("/"));}}
 
     document.addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].screenX;touchStartY=e.changedTouches[0].screenY;});
     document.addEventListener('touchend',e=>{if(Array.from(document.querySelectorAll('.overlay')).some(o=>o.style.display==='flex'))return;const diffX=touchStartX-e.changedTouches[0].screenX;const diffY=Math.abs(touchStartY-e.changedTouches[0].screenY);if(Math.abs(diffX)>80&&diffY<30){let idx=tabsOrder.indexOf(curTabId);if(diffX>0&&idx<tabsOrder.length-1)showTab(tabsOrder[idx+1]);else if(diffX<0&&idx>0)showTab(tabsOrder[idx-1]);}});
