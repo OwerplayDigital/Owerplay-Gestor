@@ -6,90 +6,19 @@
     <title>OwerPlay - Seu Código PREMIUM</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #0b0f1a;
-            color: #f8fafc;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .card {
-            background: #161b2c;
-            border: 1px solid #2d3348;
-            border-radius: 24px;
-            padding: 30px 25px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-        .icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-        h2 {
-            font-size: 1.4rem;
-            background: linear-gradient(135deg, #8B5CF6, #C4B5FD);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-        .code-box {
-            background: #0b0f1a;
-            border: 2px dashed #8B5CF6;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #8B5CF6;
-            word-break: break-all;
-            letter-spacing: 1px;
-        }
-        .code-box.generated {
-            border-color: #10b981;
-            color: #10b981;
-        }
-        .btn {
-            background: linear-gradient(135deg, #8B5CF6, #6366f1);
-            color: white;
-            border: none;
-            padding: 14px 30px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: 0.3s;
-        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0b0f1a; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card { background: #161b2c; border: 1px solid #2d3348; border-radius: 24px; padding: 30px 25px; max-width: 400px; width: 100%; text-align: center; }
+        .icon { font-size: 60px; margin-bottom: 15px; }
+        h2 { font-size: 1.4rem; background: linear-gradient(135deg, #8B5CF6, #C4B5FD); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        .code-box { background: #0b0f1a; border: 2px dashed #8B5CF6; border-radius: 16px; padding: 20px; margin: 20px 0; font-size: 1.1rem; font-weight: 800; color: #8B5CF6; word-break: break-all; letter-spacing: 1px; }
+        .code-box.generated { border-color: #10b981; color: #10b981; }
+        .btn { background: linear-gradient(135deg, #8B5CF6, #6366f1); color: white; border: none; padding: 14px 30px; border-radius: 14px; font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.3s; }
         .btn:active { transform: scale(0.97); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .info {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            margin-top: 20px;
-            line-height: 1.6;
-        }
-        .info a {
-            color: #8B5CF6;
-            text-decoration: none;
-            font-weight: 700;
-        }
-        .copied {
-            color: #10b981;
-            font-size: 0.8rem;
-            margin-top: 8px;
-            display: none;
-        }
-        .loading {
-            display: none;
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin: 15px 0;
-        }
+        .info { font-size: 0.8rem; color: #94a3b8; margin-top: 20px; line-height: 1.6; }
+        .info a { color: #8B5CF6; text-decoration: none; font-weight: 700; }
+        .copied { color: #10b981; font-size: 0.8rem; margin-top: 8px; display: none; }
+        .loading { display: none; color: #94a3b8; font-size: 0.9rem; margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -97,44 +26,31 @@
         <div class="icon">💎</div>
         <h2>OWERPLAY PREMIUM</h2>
         <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">Seu código de ativação está pronto!</p>
-        
         <div class="code-box" id="codeBox">Clique no botão abaixo para gerar</div>
-        
         <div class="loading" id="loading">⏳ Gerando seu código único...</div>
-        
         <button class="btn" id="generateBtn" onclick="gerarCodigo()">🎲 Gerar Meu Código</button>
-        
         <button class="btn" id="copyBtn" onclick="copiarCodigo()" style="display:none; background: #10b981;">📋 Copiar Código</button>
-        
         <p class="copied" id="copiedMsg">✅ Código copiado!</p>
-        
         <div class="info">
             <p>📱 Acesse o gestor:</p>
             <a href="https://owerplaydigital.github.io/owerplay/" target="_blank">owerplaydigital.github.io/owerplay/</a>
             <p style="margin-top: 10px;">⚙️ <strong>Como ativar:</strong></p>
-            <p>1. Acesse o link acima<br>
-            2. Clique em "FREE" no canto superior<br>
-            3. Cole o código e clique em ATIVAR</p>
+            <p>1. Acesse o link acima<br>2. Clique em "FREE" no canto superior<br>3. Cole o código e clique em ATIVAR</p>
             <p style="margin-top: 10px; font-size: 0.7rem;">⏰ Válido por 30 dias</p>
         </div>
     </div>
-
     <script>
-        // CONFIGURAÇÃO JSONBIN.IO
-        const JSONBIN_BIN_ID = '69ec1dca36566621a8ebfdbd';
+        const JSONBIN_BIN_ID = '69ec4032aaba882197361318';
         const JSONBIN_API_KEY = '$2a$10$hPThmNbRFc4LJU8Lb39NOufogEbkwaSTJIJV4m3CCTqODEzgcP.y2';
         const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
         const JSONBIN_UPDATE_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-        
         let codigoGerado = '';
         
         function gerarCodigoUnico() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let codigo = 'OWER-';
             for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    codigo += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
+                for (let j = 0; j < 4; j++) codigo += chars.charAt(Math.floor(Math.random() * chars.length));
                 if (i < 3) codigo += '-';
             }
             return codigo;
@@ -144,62 +60,25 @@
             const btn = document.getElementById('generateBtn');
             const loading = document.getElementById('loading');
             const codeBox = document.getElementById('codeBox');
-            
-            btn.disabled = true;
-            btn.textContent = '⏳ Gerando...';
-            loading.style.display = 'block';
-            
+            btn.disabled = true; btn.textContent = '⏳ Gerando...'; loading.style.display = 'block';
             try {
-                // Gerar código único
                 codigoGerado = gerarCodigoUnico();
-                
-                // Calcular expiração (30 dias)
-                const expiracao = new Date();
-                expiracao.setDate(expiracao.getDate() + 30);
+                const expiracao = new Date(); expiracao.setDate(expiracao.getDate() + 30);
                 const dataExpiracao = expiracao.toISOString().split('T')[0];
-                
-                // Buscar dados atuais do JSONbin
-                const response = await fetch(JSONBIN_URL, {
-                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
-                });
-                
+                const response = await fetch(JSONBIN_URL, { headers: { 'X-Master-Key': JSONBIN_API_KEY } });
                 if (!response.ok) throw new Error('Erro ao acessar servidor');
-                
                 const data = await response.json();
                 const codigos = data.record.codigos || [];
-                
-                // Adicionar novo código
-                codigos.push({
-                    codigo: codigoGerado,
-                    expiracao: dataExpiracao
-                });
-                
-                // Atualizar JSONbin
-                const updateResponse = await fetch(JSONBIN_UPDATE_URL, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_API_KEY
-                    },
-                    body: JSON.stringify({ codigos: codigos })
-                });
-                
+                codigos.push({ codigo: codigoGerado, expiracao: dataExpiracao });
+                const updateResponse = await fetch(JSONBIN_UPDATE_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY }, body: JSON.stringify({ codigos: codigos }) });
                 if (!updateResponse.ok) throw new Error('Erro ao registrar código');
-                
-                // Mostrar código na tela
-                codeBox.textContent = codigoGerado;
-                codeBox.classList.add('generated');
-                loading.style.display = 'none';
-                btn.style.display = 'none';
+                codeBox.textContent = codigoGerado; codeBox.classList.add('generated');
+                loading.style.display = 'none'; btn.style.display = 'none';
                 document.getElementById('copyBtn').style.display = 'block';
-                
             } catch (error) {
-                console.error('Erro:', error);
                 codeBox.textContent = '❌ Erro ao gerar código. Tente novamente.';
-                codeBox.style.color = '#fb7185';
-                loading.style.display = 'none';
-                btn.disabled = false;
-                btn.textContent = '🔄 Tentar Novamente';
+                codeBox.style.color = '#fb7185'; loading.style.display = 'none';
+                btn.disabled = false; btn.textContent = '🔄 Tentar Novamente';
             }
         }
         
@@ -207,8 +86,7 @@
             if (!codigoGerado) return;
             navigator.clipboard.writeText(codigoGerado).then(() => {
                 const msg = document.getElementById('copiedMsg');
-                msg.style.display = 'block';
-                setTimeout(() => { msg.style.display = 'none'; }, 2000);
+                msg.style.display = 'block'; setTimeout(() => { msg.style.display = 'none'; }, 2000);
             });
         }
     </script>
