@@ -66,6 +66,48 @@
         .btn-backup-primary { background: var(--saida); color: white; }
         .btn-backup-secondary { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border); }
         
+        .premium-expiry-banner {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: premiumPulse 2s infinite;
+        }
+        @keyframes premiumPulse {
+            0% { border-color: rgba(139, 92, 246, 0.4); }
+            50% { border-color: rgba(139, 92, 246, 0.8); }
+            100% { border-color: rgba(139, 92, 246, 0.4); }
+        }
+        .premium-expiry-banner .expiry-icon {
+            font-size: 1.2rem;
+            min-width: 24px;
+            text-align: center;
+        }
+        .premium-expiry-banner .expiry-text {
+            flex: 1;
+            font-size: 0.65rem;
+            color: var(--text);
+            line-height: 1.4;
+        }
+        .premium-expiry-banner .expiry-text strong {
+            color: var(--premium-color);
+        }
+        .premium-expiry-banner .expiry-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.6rem;
+            cursor: pointer;
+            background: var(--premium-color);
+            color: white;
+            white-space: nowrap;
+        }
+        
         .btn-icon:active, .btn-save:active, .upgrade-btn:active, .chip:active, .fab:active, .btn-backup:active { transform: scale(0.96) !important; transition: transform 0.1s ease !important; }
         .item-card { transition: all 0.2s ease; touch-action: pan-y; }
         .item-card:active { background: rgba(22, 27, 44, 0.8); box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
@@ -187,6 +229,11 @@
         <div class="plan-header">
             <h2 class="app-brand" style="margin-bottom: 0;">OWERPLAY GESTOR <span class="version-tag">v1.0</span></h2>
             <div class="current-plan-badge" onclick="mostrarModalUpgrade()"><span id="plan-text-dash">FREE</span><span id="dias-restantes-dash" class="dias-restantes" style="display:none;"></span></div>
+        </div>
+        <div id="premium-expiry-banner" class="premium-expiry-banner" style="display: none;">
+            <span class="expiry-icon">⚠️</span>
+            <span class="expiry-text" id="expiry-banner-text"></span>
+            <button class="expiry-btn" onclick="copiarTokenComToast()">💾 Backup</button>
         </div>
         <div id="free-slots-dash" class="free-slots-tip" style="display: none;"></div>
         <div class="mini-stats">
@@ -314,6 +361,28 @@
         });
     }
     
+    function atualizarBannerExpiracaoPremium() {
+        const banner = document.getElementById('premium-expiry-banner');
+        const texto = document.getElementById('expiry-banner-text');
+        if (!banner || !texto) return;
+        
+        if (!isPremium) {
+            banner.style.display = 'none';
+            return;
+        }
+        
+        const dias = getDiasRestantes();
+        
+        if (dias <= 1 && dias > 0) {
+            banner.style.display = 'flex';
+            texto.innerHTML = dias === 0 
+                ? '<strong>Premium expira hoje!</strong> Faça backup dos seus dados agora.'
+                : '<strong>Premium expira amanhã!</strong> Faça backup enquanto ainda tem acesso.';
+        } else {
+            banner.style.display = 'none';
+        }
+    }
+    
     async function ativarCodigoPremiumOnline() {
         const codigo = document.getElementById('pro-code-input').value.toUpperCase().trim();
         if (!codigo) { showToast('❌ Digite um código!', true); return; }
@@ -376,7 +445,7 @@
         const mb = document.getElementById('msg-premium-badge'); if (mb) mb.style.display = isPremium ? 'none' : 'inline';
         const tb = document.getElementById('token-premium-badge'); if (tb) tb.style.display = isPremium ? 'none' : 'inline';
         const co = document.getElementById('chart-premium-overlay'); if (co) co.style.display = isPremium ? 'none' : 'flex';
-        atualizarContadorDias(); atualizarBannerBackup(); atualizarTooltipVagas(); lucide.createIcons(); 
+        atualizarContadorDias(); atualizarBannerBackup(); atualizarTooltipVagas(); atualizarBannerExpiracaoPremium(); lucide.createIcons(); 
     }
     function atualizarTooltipVagas() { if (isPremium) { document.querySelectorAll('.free-slots-tip').forEach(el => el.style.display = 'none'); return; } const vagas = 10 - db.clientes.length; let msg; if (vagas > 0) { msg = `<strong>${vagas} cliente${vagas>1?'s':''} gratuito${vagas>1?'s':''}</strong> disponíve${vagas>1?'is':'l'}`; msg += `<br>Aproveite para testar. Depois, libere ilimitados no <span class="premium-link" onclick="mostrarModalUpgrade()">PREMIUM</span>`; } else { msg = `Limite de <strong>10 clientes</strong> atingido`; msg += `<br><span class="premium-link" onclick="mostrarModalUpgrade()">Assine o PREMIUM para continuar crescendo</span>`; } document.querySelectorAll('.free-slots-tip').forEach(el => { el.innerHTML = msg; el.style.display = 'block'; }); }
     function simularCompraPremium() { window.open(`https://wa.me/5532984911522?text=${encodeURIComponent("Olá! Gostaria de assinar o plano PREMIUM do OwerPlay Gestor por R$ 19,90/mês.")}`); showToast('Redirecionando para WhatsApp...'); }
