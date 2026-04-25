@@ -239,7 +239,7 @@
     <div id="tab-cli" class="tab-content">
         <div class="plan-header"><h2 class="app-brand" style="margin-bottom: 0;">CLIENTES</h2><div class="current-plan-badge" onclick="mostrarModalUpgrade()"><span id="plan-text-cli">FREE</span><span id="dias-restantes-cli" class="dias-restantes" style="display:none;"></span></div></div>
         <div id="free-slots-cli" class="free-slots-tip" style="display: none;"></div>
-        <div class="config-btn-slim" onclick="abrirConfigMsgComValidacao()"><i data-lucide="message-square-text" size="14"></i><b>Configurar Cobrança</b><span class="premium-badge" id="msg-premium-badge">PREMIUM</span></div>
+        <div class="config-btn-slim" onclick="abrirConfigMsgComValidacao()"><i data-lucide="message-square-text" size="14"></i><b>Configurar Mensagens</b><span class="premium-badge" id="msg-premium-badge">PREMIUM</span></div>
         <div id="grid-cli" class="item-grid"></div>
     </div>
     
@@ -377,7 +377,6 @@
     
     function ativarCodigoPremium() { ativarCodigoPremiumOnline(); }
     
-    // Função que limpa o número de WhatsApp (remove +, espaços, traços, parênteses)
     function limparWhatsApp(raw) {
         return raw.replace(/[+\s\-()]/g, '');
     }
