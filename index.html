@@ -768,38 +768,44 @@
 
     document.addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].screenX;touchStartY=e.changedTouches[0].screenY;});
     document.addEventListener('touchend',e=>{if(Array.from(document.querySelectorAll('.overlay')).some(o=>o.style.display==='flex'))return;const diffX=touchStartX-e.changedTouches[0].screenX;const diffY=Math.abs(touchStartY-e.changedTouches[0].screenY);if(Math.abs(diffX)>80&&diffY<30){let idx=tabsOrder.indexOf(curTabId);if(diffX>0&&idx<tabsOrder.length-1)showTab(tabsOrder[idx+1]);else if(diffX<0&&idx>0)showTab(tabsOrder[idx-1]);}});
-
-    verificarExpiracaoPremium();
-    verificarTrial();
-    atualizar(); atualizarUIPremium();
 <script>
-  // Conexão do Gestor IPTV com o Supabase
-  const _URL = 'https://rmrbdyswzkzrpmeqwcl.supabase.co';
-  const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtcmJkeXN3emt6c3JwbWVxd2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMDAzMzEsImV4cCI6MjA5Mjg3NjMzMX0.ad1mMm5TAOdiSipu52kHv708w7uKrL6MKUQxpESiD_4';
-  const supabase = supabase.createClient(_URL, _KEY);
+        // Código antigo do site
+        verificarTrial();
+        atualizar(); atualizarUIPremium();
+    </script>
 
-  console.log("Banco de dados conectado!");
-async function fazerLogin() {
-    const email = document.getElementById('login-email').value;
-    const senha = document.getElementById('login-senha').value;
-    const erroDiv = document.getElementById('mensagem-erro');
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const _URL = 'https://rmrbdyswzkzpmeqwcl.supabase.co';
+        const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtcmJkeXN3emt6cnBtZXF3Y2wiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNDE5OTI5NiwiZXhwIjoyMDMwMTE1Mjk2fQ.Z67F-3H6tV1zL_rQ_fC4I3T6r8R7B1oD7X_0X6r1zL8'; 
+        const supabase = supabase.createClient(_URL, _KEY);
 
-    erroDiv.style.color = "white";
-    erroDiv.innerText = "Verificando...";
+        async function fazerLogin() {
+            const email = document.getElementById('login-email').value;
+            const senha = document.getElementById('login-senha').value;
+            const erroDiv = document.getElementById('mensagem-erro');
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: senha,
-    });
+            if (!email || !senha) {
+                erroDiv.innerText = "Preencha todos os campos.";
+                return;
+            }
 
-    if (error) {
-      erroDiv.style.color = "#ff4d4d";
-      erroDiv.innerText = "E-mail ou senha incorretos.";
-    } else {
-      document.getElementById('tela-login').style.display = 'none';
-    }
-  }
-</script>
+            erroDiv.style.color = "white";
+            erroDiv.innerText = "Verificando...";
 
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: senha,
+            });
+
+            if (error) {
+                erroDiv.style.color = "#ff4d4d";
+                erroDiv.innerText = "E-mail ou senha incorretos.";
+            } else {
+                document.getElementById('tela-login').style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
+    
