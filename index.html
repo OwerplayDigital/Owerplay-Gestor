@@ -101,8 +101,69 @@
             100% { box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
         }
         
-        .server-filter-container {
+        /* NOVA LINHA DE BUSCA - ALTURAS IGUAIS E ALINHADAS */
+        .search-filter-row {
+            display: flex;
+            gap: 8px;
             margin-bottom: 12px;
+            align-items: stretch;
+        }
+        .search-icon-btn {
+            width: 42px;
+            min-width: 42px;
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-dim);
+            transition: 0.2s;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .search-icon-btn.active-search {
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
+        .search-input-inline {
+            flex: 1;
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            font-size: 0.8rem;
+            font-family: inherit;
+            display: none;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+        .search-input-inline.visible {
+            display: block;
+        }
+        .server-filter-inline {
+            flex: 1;
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            padding: 10px 12px;
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            font-size: 0.7rem;
+            font-family: inherit;
+            cursor: pointer;
+            min-width: 0;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .server-filter-container {
+            display: none;
         }
         .server-filter {
             width: 100%; background: var(--card); border: 1.5px solid var(--border);
@@ -252,14 +313,24 @@
             <div class="mini-card" style="border-color: var(--lucro);"><small>Lucro do Mês</small><b id="ds-lucro">R$ 0,00</b><div style="position:absolute; right:12px; top:12px; cursor:pointer" onclick="togglePriv()"><i data-lucide="eye" id="eye-icon" size="14"></i></div></div>
             <div class="mini-card" style="border-color: var(--primary);"><small>Novos Clientes</small><b id="ds-novos">0</b></div>
         </div>
-        <div class="search-container"><input type="text" id="search-main" class="search-input" placeholder="Buscar por nome..." oninput="atualizar()" autocomplete="off"></div>
+        
+        <div class="search-filter-row">
+            <div class="search-icon-btn" id="search-icon-dash" onclick="toggleSearchDash()">
+                <i data-lucide="search" size="18"></i>
+            </div>
+            <input type="text" id="search-input-inline-dash" class="search-input-inline" placeholder="Buscar por nome..." oninput="atualizar()" autocomplete="off">
+            <select class="server-filter-inline" id="server-filter-inline-dash" onchange="filtrarServidor(this.value)">
+                <option value="">Todos os servidores</option>
+            </select>
+        </div>
+        
         <div class="filter-chips">
             <div class="chip" id="chip-ativo" onclick="filtrarStatus('ativo')">Ativos <div id="badge-ativo" class="chip-badge" style="background:var(--lucro)">0</div></div>
             <div class="chip" id="chip-hoje" onclick="filtrarStatus('hoje')">Hoje <div id="badge-hoje" class="chip-badge" style="background:var(--saida)">0</div></div>
             <div class="chip" id="chip-alerta" onclick="filtrarStatus('alerta')">A Vencer <div id="badge-alerta" class="chip-badge" style="background:var(--alerta)">0</div></div>
             <div class="chip" id="chip-vencido" onclick="filtrarStatus('vencido')">Vencidos <div id="badge-vencido" class="chip-badge" style="background:var(--saida)">0</div></div>
         </div>
-        <div class="server-filter-container">
+        <div class="server-filter-container" style="display:none;">
             <select class="server-filter" id="server-filter-dash" onchange="filtrarServidor(this.value)">
                 <option value="">Todos os servidores</option>
             </select>
@@ -271,13 +342,24 @@
         <div class="plan-header"><h2 class="app-brand" style="margin-bottom: 0;">CLIENTES</h2><div class="current-plan-badge" onclick="mostrarModalUpgrade()"><span id="plan-text-cli">FREE</span><span id="dias-restantes-cli" class="dias-restantes" style="display:none;"></span></div></div>
         <div id="free-slots-cli" class="free-slots-tip" style="display: none;"></div>
         <div class="config-btn-slim" onclick="abrirConfigMsgComValidacao()"><i data-lucide="message-square-text" size="14"></i><b>Configurar Mensagens</b><span class="premium-badge" id="msg-premium-badge">PREMIUM</span></div>
+        
+        <div class="search-filter-row">
+            <div class="search-icon-btn" id="search-icon-cli" onclick="toggleSearchCli()">
+                <i data-lucide="search" size="18"></i>
+            </div>
+            <input type="text" id="search-input-inline-cli" class="search-input-inline" placeholder="Buscar por nome..." oninput="atualizar()" autocomplete="off">
+            <select class="server-filter-inline" id="server-filter-inline-cli" onchange="filtrarServidor(this.value)">
+                <option value="">Todos os servidores</option>
+            </select>
+        </div>
+        
         <div class="filter-chips">
             <div class="chip" id="chip-cli-ativo" onclick="filtrarStatus('ativo')">Ativos <div id="badge-cli-ativo" class="chip-badge" style="background:var(--lucro)">0</div></div>
             <div class="chip" id="chip-cli-hoje" onclick="filtrarStatus('hoje')">Hoje <div id="badge-cli-hoje" class="chip-badge" style="background:var(--saida)">0</div></div>
             <div class="chip" id="chip-cli-alerta" onclick="filtrarStatus('alerta')">A Vencer <div id="badge-cli-alerta" class="chip-badge" style="background:var(--alerta)">0</div></div>
             <div class="chip" id="chip-cli-vencido" onclick="filtrarStatus('vencido')">Vencidos <div id="badge-cli-vencido" class="chip-badge" style="background:var(--saida)">0</div></div>
         </div>
-        <div class="server-filter-container">
+        <div class="server-filter-container" style="display:none;">
             <select class="server-filter" id="server-filter-cli" onchange="filtrarServidor(this.value)">
                 <option value="">Todos os servidores</option>
             </select>
@@ -447,9 +529,40 @@
         }
     }
     
+    function toggleSearchDash() {
+        const input = document.getElementById('search-input-inline-dash');
+        const icon = document.getElementById('search-icon-dash');
+        if (input.classList.contains('visible')) {
+            input.classList.remove('visible');
+            icon.classList.remove('active-search');
+            input.value = '';
+            atualizar();
+        } else {
+            input.classList.add('visible');
+            icon.classList.add('active-search');
+            input.focus();
+        }
+    }
+    
+    function toggleSearchCli() {
+        const input = document.getElementById('search-input-inline-cli');
+        const icon = document.getElementById('search-icon-cli');
+        if (input.classList.contains('visible')) {
+            input.classList.remove('visible');
+            icon.classList.remove('active-search');
+            input.value = '';
+            atualizar();
+        } else {
+            input.classList.add('visible');
+            icon.classList.add('active-search');
+            input.focus();
+        }
+    }
+    
     function filtrarServidor(srvNome) {
         filtroServidorAtual = srvNome;
-        // Sincroniza os dois dropdowns
+        document.getElementById('server-filter-inline-dash').value = srvNome;
+        document.getElementById('server-filter-inline-cli').value = srvNome;
         document.getElementById('server-filter-dash').value = srvNome;
         document.getElementById('server-filter-cli').value = srvNome;
         atualizar();
@@ -457,7 +570,7 @@
     
     function atualizarDropdownsServidores() {
         const servidores = [...new Set(db.clientes.map(c => c.sNome).filter(Boolean))].sort();
-        ['server-filter-dash', 'server-filter-cli'].forEach(id => {
+        ['server-filter-dash', 'server-filter-cli', 'server-filter-inline-dash', 'server-filter-inline-cli'].forEach(id => {
             const sel = document.getElementById(id);
             if (!sel) return;
             const currentValue = sel.value;
@@ -569,9 +682,9 @@
     function copiarTokenComToast() { const compact = { c: db.clientes.map(i=>({n:i.nome,w:i.wpp,v:i.venc,p:i.pNome,pv:i.pVal,s:i.sNome,sv:i.sVal,d:i.desconto||0})), p: db.planos.map(i=>({n:i.nome,v:i.val})), s: db.servidores.map(i=>({n:i.nome,c:i.custo})), t: db.transacoes.map(i=>({c:i.cli,p:i.pVal,s:i.sVal,d:i.data})), m: db.configMsg, mr: db.configMsgRenovacao }; const token = btoa(unescape(encodeURIComponent(JSON.stringify(compact)))); navigator.clipboard.writeText(token).then(()=>showToast("✅ Token copiado!")); }
     function confirmarToken() { try { const raw = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('token-input').value)))); if(raw.c) { db.clientes = raw.c.map(i=>({nome:i.n,wpp:i.w,venc:i.v,pNome:i.p,pVal:i.pv,sNome:i.s,sVal:i.sv,desconto:i.d||0})); db.planos = raw.p.map(i=>({nome:i.n,val:i.v})); db.servidores = raw.s.map(i=>({nome:i.n,custo:i.c})); db.transacoes = raw.t.map(i=>({cli:i.c,pVal:i.p,sVal:i.s,data:i.d})); db.configMsg = raw.m || db.configMsg; db.configMsgRenovacao = raw.mr || db.configMsgRenovacao; } else if(raw.clientes) { db = raw; } persistir(); fecharModais(); showToast("Restaurado!"); } catch(e) { showToast("Código Inválido!", true); } }
 
-    function salvarCli() { const n=document.getElementById('c-nome').value, v=document.getElementById('c-venc').value, pIdx=document.getElementById('c-plano').value, sIdx=document.getElementById('c-srv').value, idx=parseInt(document.getElementById('edit-idx-cli').value), desc=parseFloat(document.getElementById('c-desconto').value||0), wppRaw=document.getElementById('c-wpp').value, wpp=limparWhatsApp(wppRaw); if(!n||!v||pIdx===""||sIdx==="") return; if (!isPremium && !isTrial && idx===-1 && db.clientes.length>=10) { fecharModais(); mostrarModalUpgrade(); return; } const d={nome:n,wpp:wpp,venc:v,pNome:db.planos[pIdx].nome,pVal:parseFloat(db.planos[pIdx].val),sNome:db.servidores[sIdx].nome,sVal:parseFloat(db.servidores[sIdx].custo),desconto:desc,dataCadastro:new Date().toISOString().split('T')[0]}; const valorFinal = getValorFinal(d); if(idx===-1) { db.clientes.push(d); db.transacoes.push({cli:n,pVal:valorFinal,sVal:d.sVal,data:new Date().toISOString().slice(0,7)}); } else { db.clientes[idx].nome=d.nome; db.clientes[idx].wpp=d.wpp; db.clientes[idx].venc=d.venc; db.clientes[idx].pNome=d.pNome; db.clientes[idx].pVal=d.pVal; db.clientes[idx].sNome=d.sNome; db.clientes[idx].sVal=d.sVal; db.clientes[idx].desconto=d.desconto; } fecharModais(); persistir(); }
-    function salvarPla() { const n=document.getElementById('p-nome').value, v=document.getElementById('p-val').value, idx=parseInt(document.getElementById('edit-idx-pla').value); if(n) { if(idx===-1) db.planos.push({nome:n,val:v}); else db.planos[idx]={nome:n,val:v}; fecharModais(); persistir(); } }
-    function salvarSrv() { const n=document.getElementById('s-nome').value, c=document.getElementById('s-custo').value, idx=parseInt(document.getElementById('edit-idx-srv').value); if(n) { if(idx===-1) db.servidores.push({nome:n,custo:c}); else db.servidores[idx]={nome:n,custo:c}; fecharModais(); persistir(); } }
+    function salvarCli() { const n=document.getElementById('c-nome').value, v=document.getElementById('c-venc').value, pIdx=document.getElementById('c-plano').value, sIdx=document.getElementById('c-srv').value, idx=parseInt(document.getElementById('edit-idx-cli').value), desc=parseFloat(document.getElementById('c-desconto').value||0), wppRaw=document.getElementById('c-wpp').value, wpp=limparWhatsApp(wppRaw); if(!n||!v||pIdx==""||sIdx=="") return; if (!isPremium && !isTrial && idx==-1 && db.clientes.length>=10) { fecharModais(); mostrarModalUpgrade(); return; } const d={nome:n,wpp:wpp,venc:v,pNome:db.planos[pIdx].nome,pVal:parseFloat(db.planos[pIdx].val),sNome:db.servidores[sIdx].nome,sVal:parseFloat(db.servidores[sIdx].custo),desconto:desc,dataCadastro:new Date().toISOString().split('T')[0]}; const valorFinal = getValorFinal(d); if(idx==-1) { db.clientes.push(d); db.transacoes.push({cli:n,pVal:valorFinal,sVal:d.sVal,data:new Date().toISOString().slice(0,7)}); } else { db.clientes[idx].nome=d.nome; db.clientes[idx].wpp=d.wpp; db.clientes[idx].venc=d.venc; db.clientes[idx].pNome=d.pNome; db.clientes[idx].pVal=d.pVal; db.clientes[idx].sNome=d.sNome; db.clientes[idx].sVal=d.sVal; db.clientes[idx].desconto=d.desconto; } fecharModais(); persistir(); }
+    function salvarPla() { const n=document.getElementById('p-nome').value, v=document.getElementById('p-val').value, idx=parseInt(document.getElementById('edit-idx-pla').value); if(n) { if(idx==-1) db.planos.push({nome:n,val:v}); else db.planos[idx]={nome:n,val:v}; fecharModais(); persistir(); } }
+    function salvarSrv() { const n=document.getElementById('s-nome').value, c=document.getElementById('s-custo').value, idx=parseInt(document.getElementById('edit-idx-srv').value); if(n) { if(idx==-1) db.servidores.push({nome:n,custo:c}); else db.servidores[idx]={nome:n,custo:c}; fecharModais(); persistir(); } }
     function abrirNovoManual() { if(curTabId==='tab-dash'||curTabId==='tab-cli') { if (!isPremium && !isTrial && db.clientes.length>=10) { mostrarModalUpgrade(); return; } document.getElementById('edit-idx-cli').value="-1"; document.getElementById('c-nome').value=""; document.getElementById('c-wpp').value=""; document.getElementById('c-venc').value=""; document.getElementById('c-desconto').value=""; document.getElementById('modal-cli').style.display='flex'; abrirModalComHistorico('modal-cli'); } else if(curTabId==='tab-pla') { document.getElementById('edit-idx-pla').value="-1"; document.getElementById('p-nome').value=""; document.getElementById('p-val').value=""; document.getElementById('modal-pla').style.display='flex'; abrirModalComHistorico('modal-pla'); } else if(curTabId==='tab-srv') { if (!isPremium && !isTrial && db.servidores.length>=1) { mostrarModalUpgrade(); return; } document.getElementById('edit-idx-srv').value="-1"; document.getElementById('s-nome').value=""; document.getElementById('s-custo').value=""; document.getElementById('modal-srv').style.display='flex'; abrirModalComHistorico('modal-srv'); } }
     function editarItem(tipo,i) { if(tipo==='cli'){ const c=db.clientes[i]; document.getElementById('edit-idx-cli').value=i; document.getElementById('c-nome').value=c.nome; document.getElementById('c-wpp').value=c.wpp; document.getElementById('c-venc').value=c.venc; document.getElementById('c-desconto').value=c.desconto||0; document.getElementById('modal-cli').style.display='flex'; abrirModalComHistorico('modal-cli'); } else if(tipo==='pla'){ const p=db.planos[i]; document.getElementById('edit-idx-pla').value=i; document.getElementById('p-nome').value=p.nome; document.getElementById('p-val').value=p.val; document.getElementById('modal-pla').style.display='flex'; abrirModalComHistorico('modal-pla'); } else if(tipo==='srv'){ const s=db.servidores[i]; document.getElementById('edit-idx-srv').value=i; document.getElementById('s-nome').value=s.nome; document.getElementById('s-custo').value=s.custo; document.getElementById('modal-srv').style.display='flex'; abrirModalComHistorico('modal-srv'); } }
     function salvarConfigMsg() { if (!isPremium && !isTrial) { mostrarModalUpgrade(); return; } db.configMsg = document.getElementById('cfg-msg-cobranca').value; db.configMsgRenovacao = document.getElementById('cfg-msg-renovacao').value; persistir(); fecharModais(); showToast("Mensagens salvas!"); }
@@ -584,7 +697,15 @@
 
     function atualizar() {
         const hojeISO = new Date().toISOString().split('T')[0];
-        const termo = (document.getElementById('search-main')?.value || '').toLowerCase();
+        const searchDash = document.getElementById('search-input-inline-dash');
+        const searchCli = document.getElementById('search-input-inline-cli');
+        let termo = '';
+        if (curTabId === 'tab-dash' && searchDash && searchDash.classList.contains('visible')) {
+            termo = searchDash.value.toLowerCase();
+        } else if (curTabId === 'tab-cli' && searchCli && searchCli.classList.contains('visible')) {
+            termo = searchCli.value.toLowerCase();
+        }
+        
         const planoSelect = document.getElementById('c-plano'), srvSelect = document.getElementById('c-srv');
         if(planoSelect) planoSelect.innerHTML = db.planos.map((p,i)=>`<option value="${i}">${p.nome}</option>`).join('');
         if(srvSelect) srvSelect.innerHTML = db.servidores.map((s,i)=>`<option value="${i}">${s.nome}</option>`).join('');
@@ -621,12 +742,10 @@
         if(bVencCli){ if(countVenc>0){bVencCli.innerText=countVenc;bVencCli.style.display='flex';}else bVencCli.style.display='none'; }
         if(bAlertCli){ if(countAlert>0){bAlertCli.innerText=countAlert;bAlertCli.style.display='flex';}else bAlertCli.style.display='none'; }
         
-        // Ordena por data de vencimento (do mais próximo para o mais distante)
         proc.sort((a,b)=>a.diff-b.diff);
 
         const buscaAtiva = termo.length > 0;
         proc.forEach((c)=>{ if(curTabId==='tab-cli'||curTabId==='tab-dash'){ 
-            // Filtro por servidor
             if (filtroServidorAtual && c.sNome !== filtroServidorAtual) return;
             if(buscaAtiva) { if(!c.nome.toLowerCase().includes(termo)) return; } else { if(filtroAtual==='hoje'&&c.st!=='hoje') return; if(curTabId==='tab-dash'&&!filtroAtual&&(c.st==='vencido'||c.st==='hoje')) return; if(filtroAtual&&filtroAtual!=='hoje'&&c.st!==filtroAtual) return; } const iniciais = getIniciais(c.nome); const valorFinal = getValorFinal(c).toFixed(2); const descontoStr = (parseFloat(c.desconto||0) > 0) ? ` <span style="color:var(--lucro)">(-R$ ${parseFloat(c.desconto).toFixed(2)})</span>` : ''; const card = `<div class="item-card ${c.stC}"><div class="client-info-row"><div class="client-avatar">${iniciais}</div><div class="client-details"><div class="card-header"><b style="font-size:0.9rem">${c.nome}</b><span class="card-status-badge" style="background:${c.stB}">${c.stT}</span></div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:3px">Venc: <b>${c.venc.split("-").reverse().join("/")}</b> | ${c.pNome} | R$ ${valorFinal}${descontoStr}</div><div class="server-line">Servidor: ${c.sNome || '—'}</div></div></div><div class="card-actions"><button class="btn-icon" style="color:#22c55e" onclick="abrirMsgChooser(${c.id})"><i data-lucide="message-circle"></i></button><button class="btn-icon" style="color:var(--entrada)" onclick="document.getElementById('renew-idx').value='${c.id}';document.getElementById('modal-renew').style.display='flex';abrirModalComHistorico('modal-renew');"><i data-lucide="refresh-cw"></i></button><button class="btn-icon btn-edit" onclick="editarItem('cli',${c.id})"><i data-lucide="pencil"></i></button><button class="btn-icon btn-del" onclick="confirmarExclusao('cli',${c.id})"><i data-lucide="trash-2"></i></button></div></div>`; if(curTabId==='tab-dash') document.getElementById('grid-home').innerHTML+=card; else document.getElementById('grid-cli').innerHTML+=card; } });
 
