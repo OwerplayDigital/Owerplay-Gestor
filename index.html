@@ -766,5 +766,14 @@
     verificarTrial();
     atualizar(); atualizarUIPremium();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Conexão do Gestor IPTV com o Supabase
+  const _URL = 'https://rmrbdyswzkzrpmeqwcl.supabase.co';
+  const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtcmJkeXN3emt6c3JwbWVxd2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMDAzMzEsImV4cCI6MjA5Mjg3NjMzMX0.ad1mMm5TAOdiSipu52kHv708w7uKrL6MKUQxpESiD_4';
+  const supabase = supabase.createClient(_URL, _KEY);
+
+  console.log("Banco de dados conectado!");
+</script>
 </body>
 </html>
