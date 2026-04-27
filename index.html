@@ -9,263 +9,528 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --bg: #0b0f1a; --card: #161b2c; --primary: #6366f1; --text: #f8fafc;
-            --text-dim: #94a3b8; --border: #2d3348; 
-            --saida: #fb7185; --alerta: #f59e0b; --entrada: #38bdf8;
-            --lucro: #10b981; --vencido: #fb7185; 
-            --premium-color: #8B5CF6;
-            --premium-glow: 0 0 15px rgba(139, 92, 246, 0.5);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+            background: #0b0f1a;
+            color: #f8fafc;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); 
-            height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; 
-            touch-action: pan-y; position: fixed; width: 100%; top: 0; left: 0;
-            -webkit-overflow-scrolling: touch; overscroll-behavior: none;
-        }
-        #login-screen {
-            position: fixed; inset: 0; background: var(--bg); z-index: 99999;
-            display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 30px;
+        /* TELA DE LOGIN */
+        #tela-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+            background: #0b0f1a;
         }
         .login-card {
-            background: var(--card); border: 1px solid var(--border); border-radius: 24px;
-            padding: 30px 22px; width: 100%; max-width: 350px; text-align: center;
+            background: #161b2c;
+            border: 1px solid #2d3348;
+            border-radius: 24px;
+            padding: 30px 22px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
         }
-        .login-logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: 1.5px; margin-bottom: 8px; }
-        .login-subtitle { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 25px; }
-        .login-input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); padding: 14px; border-radius: 14px; color: white; outline: none; margin-bottom: 12px; font-family: inherit; font-size: 0.85rem; text-align: center; }
-        .btn-login { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 700; font-size: 0.9rem; cursor: pointer; margin-top: 8px; font-family: inherit; }
-        .btn-toggle { display: block; width: 100%; margin-top: 12px; padding: 12px; background: transparent; color: var(--primary); border: 1.5px solid var(--primary); border-radius: 14px; font-weight: 700; font-size: 0.8rem; cursor: pointer; font-family: inherit; }
-        .login-toggle-text { margin-top: 15px; font-size: 0.7rem; color: var(--text-dim); }
-        .login-error { color: var(--saida); font-size: 0.65rem; margin-top: 8px; min-height: 20px; }
-        .loading-spinner { width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 20px auto; display: none; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        nav { 
-            width: 100%; height: 75px; background: #070a13; border-radius: 20px 20px 0 0; 
-            border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border);
-            display: flex; justify-content: space-around; align-items: center; position: fixed; bottom: 0; z-index: 9999; padding-bottom: 5px; 
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+        .login-logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #6366f1;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
         }
-        .menu-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); cursor: pointer; font-size: 0.65rem; font-weight: 600; transition: 0.3s; position: relative; height: 100%; justify-content: center; }
-        .menu-item.active { color: var(--text); }
-        .menu-item.active::after { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 22px; height: 3px; background: var(--primary); border-radius: 0 0 4px 4px; }
-        main { flex: 1; padding: 18px; overflow-y: auto; padding-bottom: 100px; position: relative; z-index: 10; }
-        .tab-content { display: none; }
-        .active-tab { display: block; animation: slideFade 0.3s ease-out; }
-        @keyframes slideFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .app-brand { font-size: 1.1rem; font-weight: 800; color: var(--primary); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; }
-        .version-tag { font-size: 0.55rem; color: var(--text-dim); opacity: 0.5; margin-left: 4px; }
-        .btn-trial-banner { display: none; width: 100%; padding: 14px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 14px; font-weight: 700; font-size: 0.8rem; cursor: pointer; margin-bottom: 14px; text-align: center; }
-        .search-filter-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: stretch; }
-        .search-icon-btn { width: 42px; min-width: 42px; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim); }
-        .search-input-inline { flex: 1; background: var(--card); border: 1.5px solid var(--border); padding: 10px 14px; border-radius: 12px; color: white; outline: none; font-size: 0.8rem; display: none; }
-        .search-input-inline.visible { display: block; }
-        .server-filter-inline { flex: 1; background: var(--card); border: 1.5px solid var(--border); padding: 10px 12px; border-radius: 12px; color: white; outline: none; font-size: 0.7rem; cursor: pointer; -webkit-appearance: none; }
-        .filter-chips { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px; }
-        .chip { padding: 10px 4px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text-dim); font-size: 0.55rem; font-weight: 700; text-align: center; cursor: pointer; text-transform: uppercase; }
-        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .mini-stats { display: flex; gap: 10px; margin-bottom: 20px; }
-        .mini-card { flex: 1; background: var(--card); padding: 15px; border-radius: 18px; border: 1.5px solid var(--border); }
-        .item-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        .item-card { background: var(--card); padding: 14px; border-radius: 18px; border: 1.5px solid transparent; }
-        .card-border-ativo { border-color: var(--lucro); }
-        .card-border-vencido { border-color: var(--saida); }
-        .card-border-alerta { border-color: var(--alerta); }
-        .client-avatar { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), #8B5CF6); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: white; text-transform: uppercase; margin-right: 10px; }
-        .client-info-row { display: flex; align-items: center; margin-bottom: 8px; }
-        .card-actions { display: flex; gap: 6px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
-        .btn-icon { width: 36px; height: 36px; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); }
-        .fab { position: fixed; bottom: 95px; right: 25px; width: 54px; height: 54px; background: var(--primary); border-radius: 18px; display: none; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 5000; }
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
-        .modal { background: var(--card); width: 100%; max-width: 350px; padding: 22px; border-radius: 24px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
-        .modal h3 { margin-bottom: 12px; font-weight: 800; font-size: 1.1rem; }
-        .modal label { display: block; font-size: 0.7rem; color: var(--text-dim); margin: 10px 0 5px; text-transform: uppercase; font-weight: 800; }
-        .modal input, .modal select, .modal textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); padding: 12px; border-radius: 12px; color: white; outline: none; margin-bottom: 4px; font-family: inherit; font-size: 0.85rem; }
-        .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 700; margin-top: 12px; cursor: pointer; font-size: 0.85rem; }
-        .confirm-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-confirm { background: var(--saida); flex: 1; padding: 14px; border: none; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; }
-        .btn-cancel { background: var(--border); flex: 1; padding: 14px; border: none; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; }
-        #toast { visibility: hidden; min-width: 280px; background-color: var(--lucro); color: #fff; text-align: center; border-radius: 18px; padding: 18px; position: fixed; z-index: 11000; left: 50%; top: 35px; transform: translateX(-50%); font-weight: 700; }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        #toast.alert { background-color: var(--saida); }
-        @keyframes fadein { from {top: 0; opacity: 0;} to {top: 35px; opacity: 1;} }
-        @keyframes fadeout { from {top: 35px; opacity: 1;} to {top: 0; opacity: 0;} }
-        #app-container { display: none; }
-        .plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .current-plan-badge { background: var(--primary); padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; color: white; }
+        .login-sub {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+        .login-card input {
+            width: 100%;
+            background: #0b0f1a;
+            border: 1.5px solid #2d3348;
+            padding: 14px;
+            border-radius: 14px;
+            color: white;
+            outline: none;
+            margin-bottom: 10px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 8px;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #6366f1;
+            border: 2px solid #6366f1;
+            margin-top: 14px;
+        }
+        .login-msg {
+            color: #fb7185;
+            font-size: 0.65rem;
+            margin-top: 8px;
+            min-height: 18px;
+            text-align: center;
+        }
+        .login-info {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 12px;
+        }
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #2d3348;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: rodar 0.8s linear infinite;
+            margin: 15px auto;
+            display: none;
+        }
+        @keyframes rodar { to { transform: rotate(360deg); } }
+
+        /* APP */
+        #tela-app { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+        nav {
+            width: 100%;
+            height: 70px;
+            background: #070a13;
+            border-radius: 20px 20px 0 0;
+            border-top: 1px solid #2d3348;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            z-index: 9999;
+            padding-bottom: 5px;
+        }
+        nav button {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 0.55rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 5px;
+        }
+        nav button.ativo { color: white; }
+        nav button .nav-icon { font-size: 1.3rem; }
+        main {
+            flex: 1;
+            padding: 18px;
+            overflow-y: auto;
+            padding-bottom: 85px;
+        }
+        .tab { display: none; }
+        .tab.ativo { display: block; }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .app-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #6366f1;
+            letter-spacing: 1px;
+        }
+        .btn-sair {
+            background: rgba(251,113,133,0.15);
+            color: #fb7185;
+            border: 1px solid rgba(251,113,133,0.3);
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .stats-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .stat-card {
+            flex: 1;
+            background: #161b2c;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid #2d3348;
+        }
+        .stat-card small {
+            font-size: 0.5rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .stat-card b {
+            font-size: 0.95rem;
+            color: white;
+        }
+        .card {
+            background: #161b2c;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid #2d3348;
+            margin-bottom: 8px;
+        }
+        .card b {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+        .card p {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+        /* Toast */
+        .toast {
+            visibility: hidden;
+            min-width: 260px;
+            background: #10b981;
+            color: white;
+            text-align: center;
+            border-radius: 16px;
+            padding: 16px;
+            position: fixed;
+            z-index: 99999;
+            left: 50%;
+            top: 30px;
+            transform: translateX(-50%);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .toast.mostrar { visibility: visible; animation: toastAnim 3s; }
+        @keyframes toastAnim {
+            0% { top: 0; opacity: 0; }
+            10% { top: 30px; opacity: 1; }
+            90% { top: 30px; opacity: 1; }
+            100% { top: 0; opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-<div id="toast"></div>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
-<div id="login-screen">
+<!-- TELA DE LOGIN -->
+<div id="tela-login">
     <div class="login-card">
         <div class="login-logo">OWERPLAY</div>
-        <div class="login-subtitle" id="login-subtitle">Faça login para acessar seu gestor</div>
-        <input type="email" id="login-email" class="login-input" placeholder="Seu email" autocomplete="email">
-        <input type="password" id="login-password" class="login-input" placeholder="Sua senha">
-        <div class="login-error" id="login-error"></div>
-        <button class="btn-login" id="btn-login-action" onclick="handleLogin()">Entrar</button>
-        <div class="login-toggle-text" id="login-toggle-text">Não tem conta?</div>
-        <button class="btn-toggle" id="login-toggle-btn" onclick="toggleLoginMode()">Criar conta grátis</button>
-        <div class="loading-spinner" id="login-spinner"></div>
+        <div class="login-sub" id="login-sub">Faça login para acessar seu gestor</div>
+        <input type="email" id="login-email" placeholder="Seu email" autocomplete="email">
+        <input type="password" id="login-senha" placeholder="Sua senha">
+        <div class="login-msg" id="login-msg"></div>
+        <button class="btn btn-primary" id="btn-login" onclick="handleLogin()">Entrar</button>
+        <div class="login-info" id="login-info">Não tem conta?</div>
+        <button class="btn btn-outline" id="btn-toggle" onclick="toggleModo()">Criar conta grátis</button>
+        <div class="spinner" id="spinner"></div>
     </div>
 </div>
 
-<div id="app-container">
-<nav id="bottom-nav">
-    <div class="menu-item active" data-tab="tab-dash" onclick="showTab('tab-dash')"><span>🏠 Início</span></div>
-    <div class="menu-item" data-tab="tab-cli" onclick="showTab('tab-cli')"><span>👥 Clientes</span></div>
-    <div class="menu-item" data-tab="tab-pla" onclick="showTab('tab-pla')"><span>📦 Planos</span></div>
-    <div class="menu-item" data-tab="tab-srv" onclick="showTab('tab-srv')"><span>🖥️ Servidores</span></div>
-    <div class="menu-item" data-tab="tab-fin" onclick="showTab('tab-fin')"><span>💰 Finanças</span></div>
-</nav>
-<main>
-    <button class="fab" id="main-fab" onclick="abrirNovoManual()">+</button>
+<!-- TELA DO APP -->
+<div id="tela-app">
+    <main>
+        <!-- DASHBOARD -->
+        <div class="tab ativo" id="tab-dash">
+            <div class="app-header">
+                <div class="app-title">OWERPLAY GESTOR</div>
+                <button class="btn-sair" onclick="handleLogout()">Sair</button>
+            </div>
+            <div class="stats-row">
+                <div class="stat-card"><small>Lucro do Mês</small><b id="dash-lucro">R$ 0,00</b></div>
+                <div class="stat-card"><small>Novos Clientes</small><b id="dash-novos">0</b></div>
+            </div>
+            <div id="lista-dash"></div>
+        </div>
 
-    <div id="tab-dash" class="tab-content active-tab">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-            <h2 class="app-brand" style="margin-bottom:0;">OWERPLAY GESTOR <span class="version-tag">v2.0</span></h2>
-            <button onclick="handleLogout()" style="background:rgba(251,113,133,0.15);color:var(--saida);border:1px solid rgba(251,113,133,0.3);padding:8px 14px;border-radius:10px;font-size:0.6rem;font-weight:700;cursor:pointer;">Sair</button>
+        <!-- CLIENTES -->
+        <div class="tab" id="tab-cli">
+            <div class="app-title" style="margin-bottom:15px;">CLIENTES</div>
+            <div id="lista-cli"></div>
         </div>
-        <div class="mini-stats">
-            <div class="mini-card" style="border-color:var(--lucro);"><small>Lucro do Mês</small><b id="ds-lucro">R$ 0,00</b></div>
-            <div class="mini-card" style="border-color:var(--primary);"><small>Novos Clientes</small><b id="ds-novos">0</b></div>
+
+        <!-- PLANOS -->
+        <div class="tab" id="tab-pla">
+            <div class="app-title" style="margin-bottom:15px;">PLANOS</div>
+            <div id="lista-pla"></div>
         </div>
-        <div id="grid-home" class="item-grid"></div>
-    </div>
-    <div id="tab-cli" class="tab-content">
-        <h2 class="app-brand">CLIENTES</h2>
-        <div id="grid-cli" class="item-grid"></div>
-    </div>
-    <div id="tab-pla" class="tab-content">
-        <h2 class="app-brand">PLANOS</h2>
-        <div id="grid-pla" class="item-grid"></div>
-    </div>
-    <div id="tab-srv" class="tab-content">
-        <h2 class="app-brand">SERVIDORES</h2>
-        <div id="grid-srv" class="item-grid"></div>
-    </div>
-    <div id="tab-fin" class="tab-content">
-        <h2 class="app-brand">FINANCEIRO</h2>
-        <div id="grid-fin" class="item-grid"></div>
-    </div>
-</main></div>
+
+        <!-- SERVIDORES -->
+        <div class="tab" id="tab-srv">
+            <div class="app-title" style="margin-bottom:15px;">SERVIDORES</div>
+            <div id="lista-srv"></div>
+        </div>
+
+        <!-- FINANÇAS -->
+        <div class="tab" id="tab-fin">
+            <div class="app-title" style="margin-bottom:15px;">FINANCEIRO</div>
+            <div id="lista-fin"></div>
+        </div>
+    </main>
+
+    <nav>
+        <button class="ativo" data-tab="tab-dash" onclick="showTab('tab-dash')"><span class="nav-icon">🏠</span>Início</button>
+        <button data-tab="tab-cli" onclick="showTab('tab-cli')"><span class="nav-icon">👥</span>Clientes</button>
+        <button data-tab="tab-pla" onclick="showTab('tab-pla')"><span class="nav-icon">📦</span>Planos</button>
+        <button data-tab="tab-srv" onclick="showTab('tab-srv')"><span class="nav-icon">🖥️</span>Servidores</button>
+        <button data-tab="tab-fin" onclick="showTab('tab-fin')"><span class="nav-icon">💰</span>Finanças</button>
+    </nav>
+</div>
 
 <script>
-const SUPABASE_URL = 'https://jctfbwyftrdundxxgnwa.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_ZfiNQ7QhDCjzjnUTtyudEQ_u-FMmnU0';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ============================================
+// SUPABASE
+// ============================================
+var SUPABASE_URL = 'https://jctfbwyftrdundxxgnwa.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_ZfiNQ7QhDCjzjnUTtyudEQ_u-FMmnU0';
+var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let currentUser = null;
-let loginMode = 'login';
-let curTabId = 'tab-dash';
-let db = { clientes: [], planos: [], servidores: [], transacoes: [] };
+// ============================================
+// VARIÁVEIS
+// ============================================
+var user = null;
+var modo = 'login';
+var tabAtual = 'tab-dash';
+var clientes = [];
+var planos = [];
+var servidores = [];
+var transacoes = [];
 
-function toggleLoginMode() {
-    loginMode = loginMode === 'login' ? 'cadastro' : 'login';
-    document.getElementById('btn-login-action').textContent = loginMode === 'login' ? 'Entrar' : 'Criar conta';
-    document.getElementById('login-subtitle').textContent = loginMode === 'login' ? 'Faça login para acessar seu gestor' : 'Crie sua conta gratuita';
-    document.getElementById('login-toggle-text').textContent = loginMode === 'login' ? 'Não tem conta?' : 'Já tem conta?';
-    document.getElementById('login-toggle-btn').textContent = loginMode === 'login' ? 'Criar conta grátis' : 'Fazer login';
-    document.getElementById('login-error').textContent = '';
+// ============================================
+// TOAST
+// ============================================
+function toast(msg) {
+    var t = document.getElementById('toast');
+    t.innerText = msg;
+    t.className = 'toast mostrar';
+    setTimeout(function(){ t.className = 'toast'; }, 3000);
 }
 
-function showToast(msg, isAlert) {
-    const t = document.getElementById('toast');
-    t.innerText = msg;
-    t.className = isAlert ? 'show alert' : 'show';
-    setTimeout(function(){ t.className = ''; }, 3000);
+// ============================================
+// LOGIN
+// ============================================
+function toggleModo() {
+    modo = modo === 'login' ? 'cadastro' : 'login';
+    document.getElementById('btn-login').innerText = modo === 'login' ? 'Entrar' : 'Criar conta';
+    document.getElementById('login-sub').innerText = modo === 'login' ? 'Faça login para acessar seu gestor' : 'Crie sua conta gratuita';
+    document.getElementById('login-info').innerText = modo === 'login' ? 'Não tem conta?' : 'Já tem conta?';
+    document.getElementById('btn-toggle').innerText = modo === 'login' ? 'Criar conta grátis' : 'Fazer login';
+    document.getElementById('login-msg').innerText = '';
 }
 
 async function handleLogin() {
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value.trim();
-    const errorEl = document.getElementById('login-error');
-    if (!email || !password) { errorEl.textContent = 'Preencha todos os campos.'; return; }
-    if (password.length < 6) { errorEl.textContent = 'Senha deve ter pelo menos 6 caracteres.'; return; }
+    var email = document.getElementById('login-email').value.trim();
+    var senha = document.getElementById('login-senha').value.trim();
+    var msgEl = document.getElementById('login-msg');
+    var btn = document.getElementById('btn-login');
+    var spin = document.getElementById('spinner');
     
-    const btn = document.getElementById('btn-login-action');
-    const spinner = document.getElementById('login-spinner');
+    msgEl.innerText = '';
+    if (!email || !senha) { msgEl.innerText = 'Preencha todos os campos.'; return; }
+    if (senha.length < 6) { msgEl.innerText = 'Senha: mínimo 6 caracteres.'; return; }
+    
     btn.style.display = 'none';
-    spinner.style.display = 'block';
+    spin.style.display = 'block';
     
     try {
-        var result;
-        if (loginMode === 'cadastro') {
-            result = await supabase.auth.signUp({ email: email, password: password });
-            if (result.error) throw result.error;
-            showToast('Conta criada! Faça login.');
-            toggleLoginMode();
+        var res;
+        if (modo === 'cadastro') {
+            res = await supabase.auth.signUp({ email: email, password: senha });
+            if (res.error) throw res.error;
+            toast('Conta criada! Faça login.');
+            toggleModo();
             return;
         } else {
-            result = await supabase.auth.signInWithPassword({ email: email, password: password });
-            if (result.error) throw result.error;
+            res = await supabase.auth.signInWithPassword({ email: email, password: senha });
+            if (res.error) throw res.error;
         }
-        currentUser = result.data.user;
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        await carregarDados();
-        atualizar();
+        
+        user = res.data.user;
+        document.getElementById('tela-login').style.display = 'none';
+        document.getElementById('tela-app').style.display = 'flex';
+        await carregarTudo();
+        atualizarListas();
+        
     } catch(e) {
-        errorEl.textContent = loginMode === 'login' ? 'Email ou senha inválidos.' : 'Erro ao criar conta.';
+        msgEl.innerText = modo === 'login' ? 'Email ou senha inválidos.' : 'Erro ao criar conta.';
+        console.error(e);
     }
+    
     btn.style.display = 'block';
-    spinner.style.display = 'none';
+    spin.style.display = 'none';
 }
 
 async function handleLogout() {
     await supabase.auth.signOut();
-    currentUser = null;
-    document.getElementById('app-container').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
+    user = null;
+    clientes = [];
+    planos = [];
+    servidores = [];
+    transacoes = [];
+    document.getElementById('tela-app').style.display = 'none';
+    document.getElementById('tela-login').style.display = 'flex';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-senha').value = '';
 }
 
-async function carregarDados() {
-    if (!currentUser) return;
-    var resp = await supabase.from('clientes').select('*').eq('user_id', currentUser.id);
-    db.clientes = (resp.data || []).map(function(c){ return { id: c.id, nome: c.nome, venc: c.vencimento }; });
+// ============================================
+// CARREGAR DADOS
+// ============================================
+async function carregarTudo() {
+    if (!user) return;
+    try {
+        var resCli = await supabase.from('clientes').select('*').eq('user_id', user.id).order('vencimento');
+        clientes = (resCli.data || []).map(function(c){
+            return { id: c.id, nome: c.nome, venc: c.vencimento, plano: c.plano_nome, servidor: c.servidor_nome, plano_valor: parseFloat(c.plano_valor||0), servidor_custo: parseFloat(c.servidor_custo||0), desconto: parseFloat(c.desconto||0) };
+        });
+        
+        var resPla = await supabase.from('planos').select('*').eq('user_id', user.id);
+        planos = resPla.data || [];
+        
+        var resSrv = await supabase.from('servidores').select('*').eq('user_id', user.id);
+        servidores = resSrv.data || [];
+        
+        var resTra = await supabase.from('transacoes').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+        transacoes = resTra.data || [];
+    } catch(e) {
+        console.error('Erro ao carregar:', e);
+    }
 }
 
-function showTab(id) {
-    curTabId = id;
-    document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active-tab'); });
-    document.querySelectorAll('.menu-item').forEach(function(n){ n.classList.remove('active'); });
-    document.getElementById(id).classList.add('active-tab');
-    var el = document.querySelector('[data-tab="' + id + '"]');
-    if(el) el.classList.add('active');
-}
-
-function atualizar() {
-    var gh = document.getElementById('grid-home');
-    var gc = document.getElementById('grid-cli');
-    if(gh) gh.innerHTML = '';
-    if(gc) gc.innerHTML = '';
+// ============================================
+// ATUALIZAR LISTAS
+// ============================================
+function atualizarListas() {
+    // Dashboard
+    var dashHtml = '';
+    var hoje = new Date(); hoje.setHours(0,0,0,0);
+    var lucroMes = 0;
+    var mesAtual = new Date().toISOString().slice(0,7);
+    var novos = 0;
+    var primDia = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     
-    db.clientes.forEach(function(c, i){
-        var card = '<div class="item-card card-border-ativo"><b>' + c.nome + '</b><p>Venc: ' + (c.venc||'') + '</p></div>';
-        if(curTabId === 'tab-dash' && gh) gh.innerHTML += card;
-        if(curTabId === 'tab-cli' && gc) gc.innerHTML += card;
+    transacoes.forEach(function(t){
+        if (t.data_mes === mesAtual) lucroMes += (parseFloat(t.entrada||0) - parseFloat(t.saida||0));
     });
+    clientes.forEach(function(c){
+        var dc = new Date(c.data_cadastro || '2000-01-01');
+        if (dc >= primDia) novos++;
+    });
+    
+    document.getElementById('dash-lucro').innerText = 'R$ ' + lucroMes.toFixed(2);
+    document.getElementById('dash-novos').innerText = novos;
+    
+    clientes.forEach(function(c){
+        var p = c.venc.split('-');
+        var dv = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+        dv.setHours(0,0,0,0);
+        var diff = Math.round((dv.getTime() - hoje.getTime()) / (1000*60*60*24));
+        var status = 'Ativo';
+        var cor = '#10b981';
+        if (diff < 0) { status = 'Vencido'; cor = '#fb7185'; }
+        else if (diff === 0) { status = 'Hoje'; cor = '#fb7185'; }
+        else if (diff === 1) { status = 'Amanhã'; cor = '#f59e0b'; }
+        
+        dashHtml += '<div class="card" style="border-left: 3px solid ' + cor + '">' +
+            '<b>' + c.nome + ' <span style="font-size:0.6rem;color:' + cor + '">' + status + '</span></b>' +
+            '<p>Venc: ' + c.venc.split('-').reverse().join('/') + ' | ' + (c.plano||'—') + '</p>' +
+            '<p style="font-size:0.6rem;">Servidor: ' + (c.servidor||'—') + '</p>' +
+            '</div>';
+    });
+    document.getElementById('lista-dash').innerHTML = dashHtml || '<p style="color:#94a3b8;text-align:center;margin-top:20px;">Nenhum cliente cadastrado</p>';
+    
+    // Clientes
+    document.getElementById('lista-cli').innerHTML = dashHtml || '<p style="color:#94a3b8;text-align:center;margin-top:20px;">Nenhum cliente cadastrado</p>';
+    
+    // Planos
+    var plaHtml = '';
+    planos.forEach(function(p){
+        plaHtml += '<div class="card"><b>' + p.nome + '</b><p>Valor: R$ ' + parseFloat(p.valor||0).toFixed(2) + '</p></div>';
+    });
+    document.getElementById('lista-pla').innerHTML = plaHtml || '<p style="color:#94a3b8;text-align:center;margin-top:20px;">Nenhum plano cadastrado</p>';
+    
+    // Servidores
+    var srvHtml = '';
+    servidores.forEach(function(s){
+        srvHtml += '<div class="card"><b>' + s.nome + '</b><p>Custo: R$ ' + parseFloat(s.custo||0).toFixed(2) + '</p></div>';
+    });
+    document.getElementById('lista-srv').innerHTML = srvHtml || '<p style="color:#94a3b8;text-align:center;margin-top:20px;">Nenhum servidor cadastrado</p>';
+    
+    // Finanças
+    var finHtml = '';
+    var totalEnt = 0, totalSai = 0;
+    transacoes.forEach(function(t){
+        var ent = parseFloat(t.entrada||0);
+        var sai = parseFloat(t.saida||0);
+        totalEnt += ent;
+        totalSai += sai;
+        finHtml += '<div class="card"><b>' + t.cliente_nome + '</b>' +
+            '<p>Entrada: R$ ' + ent.toFixed(2) + ' | Saída: R$ ' + sai.toFixed(2) + ' | Lucro: R$ ' + (ent-sai).toFixed(2) + '</p></div>';
+    });
+    document.getElementById('lista-fin').innerHTML = 
+        '<div class="stats-row"><div class="stat-card"><small>Entrada Total</small><b>R$ ' + totalEnt.toFixed(2) + '</b></div>' +
+        '<div class="stat-card"><small>Saída Total</small><b>R$ ' + totalSai.toFixed(2) + '</b></div>' +
+        '<div class="stat-card"><small>Lucro</small><b>R$ ' + (totalEnt-totalSai).toFixed(2) + '</b></div></div>' +
+        finHtml || '<p style="color:#94a3b8;text-align:center;margin-top:20px;">Nenhuma transação</p>';
 }
 
-function abrirNovoManual() {
-    showToast('Funcionalidade em construção!');
+// ============================================
+// NAVEGAÇÃO
+// ============================================
+function showTab(id) {
+    tabAtual = id;
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('ativo'); });
+    document.getElementById(id).classList.add('ativo');
+    
+    document.querySelectorAll('nav button').forEach(function(b){ b.classList.remove('ativo'); });
+    var btn = document.querySelector('[data-tab="' + id + '"]');
+    if (btn) btn.classList.add('ativo');
 }
 
-// Verifica sessão
+// ============================================
+// VERIFICAR SESSÃO EXISTENTE
+// ============================================
 supabase.auth.getSession().then(function(res){
     if (res.data && res.data.session && res.data.session.user) {
-        currentUser = res.data.session.user;
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        carregarDados().then(atualizar);
+        user = res.data.session.user;
+        document.getElementById('tela-login').style.display = 'none';
+        document.getElementById('tela-app').style.display = 'flex';
+        carregarTudo().then(atualizarListas);
     }
 });
 </script>
