@@ -101,70 +101,7 @@
             100% { box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
         }
         
-        /* NOVA LINHA DE BUSCA - ALTURAS IGUAIS E ALINHADAS */
-        .search-filter-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            align-items: stretch;
-        }
-        .search-icon-btn {
-            width: 42px;
-            min-width: 42px;
-            background: var(--card);
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--text-dim);
-            transition: 0.2s;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        .search-icon-btn.active-search {
-            color: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
-        }
-        .search-input-inline {
-            flex: 1;
-            background: var(--card);
-            border: 1.5px solid var(--border);
-            padding: 10px 14px;
-            border-radius: 12px;
-            color: white;
-            outline: none;
-            font-size: 0.8rem;
-            font-family: inherit;
-            display: none;
-            box-sizing: border-box;
-            transition: 0.2s;
-        }
-        .search-input-inline.visible {
-            display: block;
-        }
-        .server-filter-inline {
-            flex: 1;
-            background: var(--card);
-            border: 1.5px solid var(--border);
-            padding: 10px 12px;
-            border-radius: 12px;
-            color: white;
-            outline: none;
-            font-size: 0.7rem;
-            font-family: inherit;
-            cursor: pointer;
-            min-width: 0;
-            box-sizing: border-box;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        
-        .server-filter-container {
-            display: none;
-        }
+        .server-filter-container { margin-bottom: 12px; }
         .server-filter {
             width: 100%; background: var(--card); border: 1.5px solid var(--border);
             padding: 10px 14px; border-radius: 12px; color: white; outline: none;
@@ -253,8 +190,8 @@
         .fab { position: fixed; bottom: 95px; right: 25px; width: 54px; height: 54px; background: var(--primary); border-radius: 18px; display: none; align-items: center; justify-content: center; color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.4); z-index: 5000; border: none; cursor: pointer; transition: 0.2s; }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
-        .modal { background: var(--card); width: 100%; max-width: 350px; padding: 22px; border-radius: 24px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
-        .modal h3 { margin-bottom: 12px; font-weight: 800; font-size: 1.1rem; }
+        .modal { background: var(--card); width: 100%; max-width: 350px; padding: 22px; border-radius: 24px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; position: relative; }
+        .modal h3 { margin-bottom: 12px; font-weight: 800; font-size: 1.1rem; padding-right: 30px; }
         .modal label { display: block; font-size: 0.7rem; color: var(--text-dim); margin: 10px 0 5px; text-transform: uppercase; font-weight: 800; }
         .modal input, .modal select, .modal textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); padding: 12px; border-radius: 12px; color: white; outline: none; margin-bottom: 4px; box-sizing: border-box; font-family: inherit; font-size: 0.85rem; }
         .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 700; margin-top: 12px; cursor: pointer; font-size: 0.85rem; }
@@ -280,6 +217,37 @@
         .msg-menu-info b { font-size: 0.8rem; display: block; margin-bottom: 2px; }
         .msg-menu-info span { font-size: 0.6rem; color: var(--text-dim); }
         .dias-restantes { font-size: 0.6rem; font-weight: 600; opacity: 0.9; margin-left: 4px; }
+        
+        /* BOTÃO VOLTAR */
+        .btn-voltar-modal {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.2s ease;
+        }
+        .btn-voltar-modal:active {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
+        }
+        .btn-voltar-modal svg {
+            width: 16px;
+            height: 16px;
+            color: var(--text-dim);
+            transition: color 0.2s ease;
+        }
+        .btn-voltar-modal:active svg {
+            color: var(--primary);
+        }
     </style>
 </head>
 <body onclick="if(event.target.classList.contains('overlay')) fecharModais()">
@@ -313,24 +281,14 @@
             <div class="mini-card" style="border-color: var(--lucro);"><small>Lucro do Mês</small><b id="ds-lucro">R$ 0,00</b><div style="position:absolute; right:12px; top:12px; cursor:pointer" onclick="togglePriv()"><i data-lucide="eye" id="eye-icon" size="14"></i></div></div>
             <div class="mini-card" style="border-color: var(--primary);"><small>Novos Clientes</small><b id="ds-novos">0</b></div>
         </div>
-        
-        <div class="search-filter-row">
-            <div class="search-icon-btn" id="search-icon-dash" onclick="toggleSearchDash()">
-                <i data-lucide="search" size="18"></i>
-            </div>
-            <input type="text" id="search-input-inline-dash" class="search-input-inline" placeholder="Buscar por nome..." oninput="atualizar()" autocomplete="off">
-            <select class="server-filter-inline" id="server-filter-inline-dash" onchange="filtrarServidor(this.value)">
-                <option value="">Todos os servidores</option>
-            </select>
-        </div>
-        
+        <div class="search-container"><input type="text" id="search-main" class="search-input" placeholder="Buscar por nome..." oninput="atualizar()" autocomplete="off"></div>
         <div class="filter-chips">
             <div class="chip" id="chip-ativo" onclick="filtrarStatus('ativo')">Ativos <div id="badge-ativo" class="chip-badge" style="background:var(--lucro)">0</div></div>
             <div class="chip" id="chip-hoje" onclick="filtrarStatus('hoje')">Hoje <div id="badge-hoje" class="chip-badge" style="background:var(--saida)">0</div></div>
             <div class="chip" id="chip-alerta" onclick="filtrarStatus('alerta')">A Vencer <div id="badge-alerta" class="chip-badge" style="background:var(--alerta)">0</div></div>
             <div class="chip" id="chip-vencido" onclick="filtrarStatus('vencido')">Vencidos <div id="badge-vencido" class="chip-badge" style="background:var(--saida)">0</div></div>
         </div>
-        <div class="server-filter-container" style="display:none;">
+        <div class="server-filter-container">
             <select class="server-filter" id="server-filter-dash" onchange="filtrarServidor(this.value)">
                 <option value="">Todos os servidores</option>
             </select>
@@ -342,24 +300,13 @@
         <div class="plan-header"><h2 class="app-brand" style="margin-bottom: 0;">CLIENTES</h2><div class="current-plan-badge" onclick="mostrarModalUpgrade()"><span id="plan-text-cli">FREE</span><span id="dias-restantes-cli" class="dias-restantes" style="display:none;"></span></div></div>
         <div id="free-slots-cli" class="free-slots-tip" style="display: none;"></div>
         <div class="config-btn-slim" onclick="abrirConfigMsgComValidacao()"><i data-lucide="message-square-text" size="14"></i><b>Configurar Mensagens</b><span class="premium-badge" id="msg-premium-badge">PREMIUM</span></div>
-        
-        <div class="search-filter-row">
-            <div class="search-icon-btn" id="search-icon-cli" onclick="toggleSearchCli()">
-                <i data-lucide="search" size="18"></i>
-            </div>
-            <input type="text" id="search-input-inline-cli" class="search-input-inline" placeholder="Buscar por nome..." oninput="atualizar()" autocomplete="off">
-            <select class="server-filter-inline" id="server-filter-inline-cli" onchange="filtrarServidor(this.value)">
-                <option value="">Todos os servidores</option>
-            </select>
-        </div>
-        
         <div class="filter-chips">
             <div class="chip" id="chip-cli-ativo" onclick="filtrarStatus('ativo')">Ativos <div id="badge-cli-ativo" class="chip-badge" style="background:var(--lucro)">0</div></div>
             <div class="chip" id="chip-cli-hoje" onclick="filtrarStatus('hoje')">Hoje <div id="badge-cli-hoje" class="chip-badge" style="background:var(--saida)">0</div></div>
             <div class="chip" id="chip-cli-alerta" onclick="filtrarStatus('alerta')">A Vencer <div id="badge-cli-alerta" class="chip-badge" style="background:var(--alerta)">0</div></div>
             <div class="chip" id="chip-cli-vencido" onclick="filtrarStatus('vencido')">Vencidos <div id="badge-cli-vencido" class="chip-badge" style="background:var(--saida)">0</div></div>
         </div>
-        <div class="server-filter-container" style="display:none;">
+        <div class="server-filter-container">
             <select class="server-filter" id="server-filter-cli" onchange="filtrarServidor(this.value)">
                 <option value="">Todos os servidores</option>
             </select>
@@ -380,30 +327,29 @@
     </div>
 </main>
 
-<!-- MODAIS -->
-<div class="overlay" id="modal-msg-chooser"><div class="modal" style="max-width: 340px;"><h3>📩 Enviar mensagem</h3><div class="msg-menu-item" onclick="enviarMsgTipo('cobranca')"><div class="msg-menu-icon" style="background: rgba(251, 113, 133, 0.15);">💰</div><div class="msg-menu-info"><b>Cobrança</b><span>Lembrete de vencimento</span></div><i data-lucide="chevron-right" style="color: var(--text-dim);"></i></div><div class="msg-menu-item" onclick="enviarMsgTipo('renovacao')"><div class="msg-menu-icon" style="background: rgba(56, 189, 248, 0.15);">🔄</div><div class="msg-menu-info"><b>Renovação</b><span>Confirmação de renovação</span></div><i data-lucide="chevron-right" style="color: var(--text-dim);"></i></div><button class="btn-save" style="background: var(--border); margin-top: 8px; padding: 10px;" onclick="fecharModais()">Cancelar</button></div></div>
-<div class="overlay" id="modal-config-msg"><div class="modal" style="max-width: 380px;"><h3>Configurar Mensagens</h3><p style="font-size:0.55rem; color:var(--text-dim); margin-bottom:12px">Use: {nome}, {sobrenome}, {vencimento}, {valor}</p><label>💰 Cobrança</label><textarea id="cfg-msg-cobranca" rows="3"></textarea><label>🔄 Renovação</label><textarea id="cfg-msg-renovacao" rows="3"></textarea><button class="btn-save" onclick="salvarConfigMsg()">Salvar Todas</button></div></div>
+<!-- MODAIS COM BOTÃO VOLTAR -->
+<div class="overlay" id="modal-msg-chooser"><div class="modal" style="max-width: 340px;"><button class="btn-voltar-modal" onclick="fecharModais()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><h3>📩 Enviar mensagem</h3><div class="msg-menu-item" onclick="enviarMsgTipo('cobranca')"><div class="msg-menu-icon" style="background: rgba(251, 113, 133, 0.15);">💰</div><div class="msg-menu-info"><b>Cobrança</b><span>Lembrete de vencimento</span></div><i data-lucide="chevron-right" style="color: var(--text-dim);"></i></div><div class="msg-menu-item" onclick="enviarMsgTipo('renovacao')"><div class="msg-menu-icon" style="background: rgba(56, 189, 248, 0.15);">🔄</div><div class="msg-menu-info"><b>Renovação</b><span>Confirmação de renovação</span></div><i data-lucide="chevron-right" style="color: var(--text-dim);"></i></div><button class="btn-save" style="background: var(--border); margin-top: 8px; padding: 10px;" onclick="fecharModais()">Cancelar</button></div></div>
+<div class="overlay" id="modal-config-msg"><div class="modal" style="max-width: 380px;"><button class="btn-voltar-modal" onclick="fecharModais()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><h3>Configurar Mensagens</h3><p style="font-size:0.55rem; color:var(--text-dim); margin-bottom:12px">Use: {nome}, {sobrenome}, {vencimento}, {valor}</p><label>💰 Cobrança</label><textarea id="cfg-msg-cobranca" rows="3"></textarea><label>🔄 Renovação</label><textarea id="cfg-msg-renovacao" rows="3"></textarea><button class="btn-save" onclick="salvarConfigMsg()">Salvar Todas</button></div></div>
 
 <div class="overlay" id="modal-upgrade">
-    <div class="modal" style="max-width: 340px; padding: 20px;">
+    <div class="modal" style="max-width: 340px; padding: 20px;"><button class="btn-voltar-modal" onclick="fecharModais()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         <div style="text-align: center; margin-bottom: 15px;"><i data-lucide="gem" class="diamond-icon" style="color: var(--premium-color); width: 48px; height: 48px; margin-bottom: 6px;"></i><h3 style="font-size: 1.1rem; background: linear-gradient(135deg, var(--premium-color), #C4B5FD); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 3px;">OWERPLAY PREMIUM</h3><p style="color: var(--text-dim); font-size: 0.7rem;">Desbloqueie todo o poder do seu gestor</p></div>
         <div class="plan-card" style="padding: 14px; margin-bottom: 14px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><h4 style="font-size: 1rem; font-weight: 700;">Plano PREMIUM</h4><div class="plan-price-container"><span class="plan-price-small">R$</span><span class="plan-price-big">19</span><span class="plan-price-cents">,90</span></div></div><p style="color: var(--text-dim); font-size: 0.6rem; margin-bottom: 12px; text-align: right;">/mês</p><div style="margin: 12px 0;"><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Clientes ilimitados</span></div><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Servidores ilimitados</span></div><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Backup e restauração de tokens</span></div><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Múltiplas mensagens</span></div><div style="display: flex; gap: 8px; margin-bottom: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Gráficos e relatórios avançados</span></div><div style="display: flex; gap: 8px;"><i data-lucide="check-circle" style="color: var(--lucro); width: 14px;"></i><span style="font-size: 0.7rem;">Histórico financeiro completo</span></div></div></div>
-        <div id="upgrade-code-section" style="margin-top: 12px;"><label style="font-size: 0.6rem;">Já tem um código PREMIUM?</label><div style="display: flex; gap: 6px;"><input type="text" id="pro-code-input" placeholder="Digite o código" style="flex: 1; text-transform: uppercase; padding: 10px; font-size: 0.8rem;" autocomplete="off"><button class="btn-save" style="margin: 0; width: auto; padding: 10px 16px; background: var(--premium-color); font-size: 0.8rem;" onclick="ativarCodigoPremium()">Ativar</button></div></div>
         <button class="btn-kiwify" onclick="abrirKiwify()">🛒 Assinar Premium</button>
         <button class="upgrade-btn" onclick="simularCompraPremium()">Assinar via WhatsApp</button>
         <button class="btn-save" style="background: var(--border); margin-top: 6px; padding: 10px; font-size: 0.8rem;" onclick="fecharModais()">Talvez depois</button>
     </div>
 </div>
 
-<div class="overlay" id="modal-cli"><div class="modal"><h3>Cliente</h3><input type="hidden" id="edit-idx-cli" value="-1"><label>Nome</label><input type="text" id="c-nome" autocomplete="off"><label>WhatsApp</label><input type="text" id="c-wpp" placeholder="Ex: +55 11 99999-8888" autocomplete="off"><small style="font-size:0.55rem; color:var(--text-dim); display:block; margin-top:-2px; margin-bottom:10px">Cole o número como está no WhatsApp</small><label>Vencimento</label><input type="date" id="c-venc"><label>Plano</label><select id="c-plano"></select><label>Desconto (R$)</label><input type="number" id="c-desconto" placeholder="0,00" autocomplete="off" step="0.01"><label>Servidor</label><select id="c-srv"></select><button class="btn-save" onclick="salvarCli()">Salvar</button></div></div>
-<div class="overlay" id="modal-pla"><div class="modal"><h3>Plano</h3><input type="hidden" id="edit-idx-pla" value="-1"><label>Nome</label><input type="text" id="p-nome" autocomplete="off"><label>Preço</label><input type="number" id="p-val" autocomplete="off"><button class="btn-save" onclick="salvarPla()">Salvar</button></div></div>
-<div class="overlay" id="modal-srv"><div class="modal"><h3>Servidor</h3><input type="hidden" id="edit-idx-srv" value="-1"><label>Nome</label><input type="text" id="s-nome" autocomplete="off"><label>Custo</label><input type="number" id="s-custo" autocomplete="off"><button class="btn-save" onclick="salvarSrvComValidacao()">Salvar</button></div></div>
-<div class="overlay" id="modal-renew"><div class="modal"><h3>Renovar</h3><input type="hidden" id="renew-idx"><button class="btn-save" onclick="calcularPrevia30()">Calcular +30 Dias</button><div style="margin-top:15px; border-top:1px solid var(--border); padding-top:15px;"><label>Nova Data:</label><input type="date" id="renew-custom-date"><button class="btn-save" style="background:var(--lucro); margin-top:10px;" onclick="confirmarRenovacaoFinal()">Confirmar</button></div></div></div>
+<div class="overlay" id="modal-cli"><div class="modal"><button class="btn-voltar-modal" onclick="fecharModais()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><h3>Cliente</h3><input type="hidden" id="edit-idx-cli" value="-1"><label>Nome</label><input type="text" id="c-nome" autocomplete="off"><label>WhatsApp</label><input type="text" id="c-wpp" placeholder="Ex: +55 11 99999-8888" autocomplete="off"><small style="font-size:0.55rem; color:var(--text-dim); display:block; margin-top:-2px; margin-bottom:10px">Cole o número como está no WhatsApp</small><label>Vencimento</label><input type="date" id="c-venc"><label>Plano</label><select id="c-plano"></select><label>Desconto (R$)</label><input type="number" id="c-desconto" placeholder="0,00" autocomplete="off" step="0.01"><label>Servidor</label><select id="c-srv"></select><button class="btn-save" onclick="salvarCli()">Salvar</button></div></div>
+<div class="overlay" id="modal-pla"><div class="modal"><button class="btn-voltar-modal" onclick="fecharModais()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><h3>Plano</h3><input type="hidden" id="edit-idx-pla" value="-1"><label>Nome</label><input type="text" id="p-nome" autocomplete="off"><label>Preço</label><input type="number" id="p-val" autocomplete="off"><button class="btn-save" onclick="salvarPla()">Salvar</button></div></div>
+<div class="overlay" id="modal-srv"><div class="modal"><button class="btn-voltar-modal" onclick="fecharModais()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><h3>Servidor</h3><input type="hidden" id="edit-idx-srv" value="-1"><label>Nome</label><input type="text" id="s-nome" autocomplete="off"><label>Custo</label><input type="number" id="s-custo" autocomplete="off"><button class="btn-save" onclick="salvarSrvComValidacao()">Salvar</button></div></div>
+<div class="overlay" id="modal-renew"><div class="modal"><button class="btn-voltar-modal" onclick="fecharModais()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><h3>Renovar</h3><input type="hidden" id="renew-idx"><button class="btn-save" onclick="calcularPrevia30()">Calcular +30 Dias</button><div style="margin-top:15px; border-top:1px solid var(--border); padding-top:15px;"><label>Nova Data:</label><input type="date" id="renew-custom-date"><button class="btn-save" style="background:var(--lucro); margin-top:10px;" onclick="confirmarRenovacaoFinal()">Confirmar</button></div></div></div>
 <div class="overlay" id="modal-opt-fin"><div class="modal" style="text-align:center"><h3>Opções</h3><div class="confirm-btns"><button class="btn-save" id="btn-opt-edit" style="background:var(--alerta); margin-top:0">Editar</button><button class="btn-save" id="btn-opt-del" style="background:var(--saida); margin-top:0">Excluir</button></div></div></div>
 <div class="overlay" id="modal-edit-fin"><div class="modal"><h3>Editar Venda</h3><input type="hidden" id="edit-fin-idx"><label>Venda</label><input type="number" id="ef-entrada" autocomplete="off"><label>Custo</label><input type="number" id="ef-saida" autocomplete="off"><button class="btn-save" onclick="salvarEditFin()">Salvar</button></div></div>
 <div class="overlay" id="modal-confirm"><div class="modal" style="text-align:center"><i data-lucide="trash-2" color="var(--saida)" size="48"></i><h3>Excluir?</h3><p style="color:var(--text-dim); font-size:0.8rem">Esta ação é permanente.</p><div class="confirm-btns"><button class="btn-cancel" onclick="fecharModais()">Não</button><button class="btn-confirm" id="btn-do-delete">Sim</button></div></div></div>
-<div class="overlay" id="modal-token"><div class="modal"><h3>Restaurar</h3><textarea id="token-input" rows="8" style="width:100%; background:var(--bg); color:white; border-radius:15px; padding:15px; border:1.5px solid var(--border); outline:none;" autocomplete="off"></textarea><button class="btn-save" onclick="confirmarToken()">Aplicar</button></div></div>
-<div class="overlay" id="modal-pos-renovacao"><div class="modal" style="max-width: 340px; text-align: center;"><i data-lucide="check-circle" style="color: var(--lucro); width: 48px; height: 48px; margin-bottom: 12px;"></i><h3>Renovado com sucesso!</h3><p style="font-size: 0.75rem; color: var(--text-dim); margin: 10px 0 20px;">Deseja enviar uma mensagem de renovação para <strong id="pos-renovacao-nome"></strong>?</p><div class="confirm-btns"><button class="btn-save" style="background: #22c55e; flex: 1;" onclick="enviarMsgRenovacaoAgora()">📩 Enviar WhatsApp</button><button class="btn-cancel" style="flex: 1;" onclick="fecharModais()">Agora não</button></div></div></div>
+<div class="overlay" id="modal-token"><div class="modal"><button class="btn-voltar-modal" onclick="fecharModais()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><h3>Restaurar</h3><textarea id="token-input" rows="8" style="width:100%; background:var(--bg); color:white; border-radius:15px; padding:15px; border:1.5px solid var(--border); outline:none;" autocomplete="off"></textarea><button class="btn-save" onclick="confirmarToken()">Aplicar</button></div></div>
+<div class="overlay" id="modal-pos-renovacao"><div class="modal" style="max-width: 340px; text-align: center;"><button class="btn-voltar-modal" onclick="fecharModais()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><i data-lucide="check-circle" style="color: var(--lucro); width: 48px; height: 48px; margin-bottom: 12px;"></i><h3>Renovado com sucesso!</h3><p style="font-size: 0.75rem; color: var(--text-dim); margin: 10px 0 20px;">Deseja enviar uma mensagem de renovação para <strong id="pos-renovacao-nome"></strong>?</p><div class="confirm-btns"><button class="btn-save" style="background: #22c55e; flex: 1;" onclick="enviarMsgRenovacaoAgora()">📩 Enviar WhatsApp</button><button class="btn-cancel" style="flex: 1;" onclick="fecharModais()">Agora não</button></div></div></div>
 
 <script>
     const JSONBIN_BIN_ID = '69ec4032aaba882197361318';
@@ -423,8 +369,6 @@
     let filtroServidorAtual = '';
 
     document.body.addEventListener('touchmove', function(e) { if (e.target.closest('main')) return; if (e.target.closest('.overlay')) return; e.preventDefault(); }, { passive: false });
-    document.addEventListener('focusin', function(e) { if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') { setTimeout(() => { window.scrollTo(0, 0); }, 300); } });
-    document.addEventListener('focusout', function() { setTimeout(() => { window.scrollTo(0, 0); }, 100); });
     
     function salvarDadosProtegidos(d) { try { const j = JSON.stringify(d); localStorage.setItem(STORAGE_KEY, j); localStorage.setItem(BACKUP_KEY, j); } catch(e) {} }
     function carregarDadosProtegidos() { let d = localStorage.getItem(STORAGE_KEY); if (!d) { d = localStorage.getItem(BACKUP_KEY); if (d) localStorage.setItem(STORAGE_KEY, d); } if (d) { try { return JSON.parse(d); } catch(e) { return null; } } return null; }
@@ -529,40 +473,8 @@
         }
     }
     
-    function toggleSearchDash() {
-        const input = document.getElementById('search-input-inline-dash');
-        const icon = document.getElementById('search-icon-dash');
-        if (input.classList.contains('visible')) {
-            input.classList.remove('visible');
-            icon.classList.remove('active-search');
-            input.value = '';
-            atualizar();
-        } else {
-            input.classList.add('visible');
-            icon.classList.add('active-search');
-            input.focus();
-        }
-    }
-    
-    function toggleSearchCli() {
-        const input = document.getElementById('search-input-inline-cli');
-        const icon = document.getElementById('search-icon-cli');
-        if (input.classList.contains('visible')) {
-            input.classList.remove('visible');
-            icon.classList.remove('active-search');
-            input.value = '';
-            atualizar();
-        } else {
-            input.classList.add('visible');
-            icon.classList.add('active-search');
-            input.focus();
-        }
-    }
-    
     function filtrarServidor(srvNome) {
         filtroServidorAtual = srvNome;
-        document.getElementById('server-filter-inline-dash').value = srvNome;
-        document.getElementById('server-filter-inline-cli').value = srvNome;
         document.getElementById('server-filter-dash').value = srvNome;
         document.getElementById('server-filter-cli').value = srvNome;
         atualizar();
@@ -570,7 +482,7 @@
     
     function atualizarDropdownsServidores() {
         const servidores = [...new Set(db.clientes.map(c => c.sNome).filter(Boolean))].sort();
-        ['server-filter-dash', 'server-filter-cli', 'server-filter-inline-dash', 'server-filter-inline-cli'].forEach(id => {
+        ['server-filter-dash', 'server-filter-cli'].forEach(id => {
             const sel = document.getElementById(id);
             if (!sel) return;
             const currentValue = sel.value;
@@ -697,15 +609,7 @@
 
     function atualizar() {
         const hojeISO = new Date().toISOString().split('T')[0];
-        const searchDash = document.getElementById('search-input-inline-dash');
-        const searchCli = document.getElementById('search-input-inline-cli');
-        let termo = '';
-        if (curTabId === 'tab-dash' && searchDash && searchDash.classList.contains('visible')) {
-            termo = searchDash.value.toLowerCase();
-        } else if (curTabId === 'tab-cli' && searchCli && searchCli.classList.contains('visible')) {
-            termo = searchCli.value.toLowerCase();
-        }
-        
+        const termo = (document.getElementById('search-main')?.value || '').toLowerCase();
         const planoSelect = document.getElementById('c-plano'), srvSelect = document.getElementById('c-srv');
         if(planoSelect) planoSelect.innerHTML = db.planos.map((p,i)=>`<option value="${i}">${p.nome}</option>`).join('');
         if(srvSelect) srvSelect.innerHTML = db.servidores.map((s,i)=>`<option value="${i}">${s.nome}</option>`).join('');
