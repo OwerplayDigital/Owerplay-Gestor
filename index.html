@@ -247,7 +247,7 @@
         <button class="bottom-nav-item" data-section="clientes"><i data-lucide="user-round" width="22" height="22"></i><span>Clientes</span></button>
         <button class="bottom-nav-item" data-section="planos"><i data-lucide="box" width="22" height="22"></i><span>Planos</span></button>
         <button class="bottom-nav-item" data-section="servidores"><i data-lucide="database" width="22" height="22"></i><span>Servidores</span></button>
-        <button class="bottom-nav-item" data-section="financas"><i data-lucide="wallet" width="22" height="22"></i><span>Finanças <span style="font-size:0.5rem;">⭐</span></span></button>
+        <button class="bottom-nav-item" data-section="financas"><i data-lucide="bar-chart-3" width="22" height="22"></i><span>Finanças</span></button>
       </div>
     </nav>
     <button class="fab" id="fabAdd"><i data-lucide="plus" width="20" height="20"></i></button>
@@ -310,8 +310,6 @@
       function atualizarIconesPro() {
         const ativo = planoPro;
         document.querySelectorAll('.pro-badge-lock').forEach(el => { el.style.display = ativo ? 'none' : 'inline'; });
-        const finBadge = document.querySelector('[data-section="financas"] span');
-        if (finBadge) finBadge.style.display = ativo ? 'none' : 'inline';
       }
       function exigePRO() { if (!planoPro) { showBannerPRO(); return false; } return true; }
 
