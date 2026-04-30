@@ -13,19 +13,19 @@
   
   <style>
     :root {
-      --accent: #DCC89B; --accent-light: #FFFEF8; --accent-dark: #B8A67A;
-      --accent-gradient: linear-gradient(135deg, #DCC89B 0%, #CBB888 50%, #B8A67A 100%);
-      --bg-primary: #FFFDF8; --bg-secondary: #FFFFFF; --bg-tertiary: #FFFEF5;
-      --text-primary: #1C1B1A; --text-secondary: #8E8278; --text-tertiary: #B5AAA0;
-      --success: #8DC98F; --success-light: #E8F5E9;
-      --info: #8BA4C2; --info-light: #EDF2F8;
-      --teal: #7CC4B4; --teal-light: #E8F6F2;
-      --warning: #D4A853;
-      --danger: #D9756B; --danger-light: #FCEAE8;
-      --separator: #E8E2D5; --separator-strong: #D8D0C0;
-      --shadow-xs: 0 1px 2px rgba(28,27,26,0.03); --shadow-sm: 0 2px 8px rgba(28,27,26,0.04);
-      --shadow-md: 0 8px 24px rgba(28,27,26,0.06); --shadow-lg: 0 16px 48px rgba(28,27,26,0.08);
-      --shadow-xl: 0 32px 64px rgba(28,27,26,0.10);
+      --accent: #0288D1; --accent-light: #E1F5FE; --accent-dark: #01579B;
+      --accent-gradient: linear-gradient(135deg, #03A9F4 0%, #0288D1 50%, #0277BD 100%);
+      --bg-primary: #F0F8FF; --bg-secondary: #FFFFFF; --bg-tertiary: #F5FAFF;
+      --text-primary: #0A1929; --text-secondary: #4A7A9E; --text-tertiary: #8AACC8;
+      --success: #4CAF50; --success-light: #E8F5E9;
+      --info: #03A9F4; --info-light: #E1F5FE;
+      --teal: #0097A7; --teal-light: #E0F7FA;
+      --warning: #FFA000;
+      --danger: #E53935; --danger-light: #FFEBEE;
+      --separator: #D8E8F5; --separator-strong: #B8D0E8;
+      --shadow-xs: 0 1px 2px rgba(10,25,41,0.03); --shadow-sm: 0 2px 8px rgba(10,25,41,0.04);
+      --shadow-md: 0 8px 24px rgba(10,25,41,0.06); --shadow-lg: 0 16px 48px rgba(10,25,41,0.08);
+      --shadow-xl: 0 32px 64px rgba(10,25,41,0.10);
       --glass-bg: rgba(255,255,255,0.72); --glass-border: rgba(255,255,255,0.6);
       --glass-blur: blur(40px) saturate(180%);
       --sidebar-width: 280px; --radius-xs: 6px; --radius-sm: 10px; --radius-md: 14px;
@@ -36,10 +36,10 @@
     }
 
     [data-theme="dark"] {
-      --bg-primary: #1C1A18; --bg-secondary: #2A2725; --bg-tertiary: #353230;
-      --text-primary: #F5F0EB; --text-secondary: #B5AAA0; --text-tertiary: #8E8278;
-      --separator: #3D3936; --separator-strong: #4D4945;
-      --glass-bg: rgba(42,39,37,0.72); --glass-border: rgba(255,255,255,0.08);
+      --bg-primary: #0A1929; --bg-secondary: #102A43; --bg-tertiary: #1A3A5C;
+      --text-primary: #E3F2FD; --text-secondary: #90CAF9; --text-tertiary: #64B5F6;
+      --separator: #1A3A5C; --separator-strong: #243B53;
+      --glass-bg: rgba(16,42,67,0.72); --glass-border: rgba(255,255,255,0.06);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -55,7 +55,7 @@
     }
 
     .app-container { display: flex; width: 100%; min-height: 100vh; position: relative; }
-    .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(28,27,26,0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 95; opacity: 0; transition: opacity var(--transition-smooth); pointer-events: none; }
+    .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(10,25,41,0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 95; opacity: 0; transition: opacity var(--transition-smooth); pointer-events: none; }
     .mobile-overlay.show { opacity: 1; pointer-events: auto; }
 
     .hamburger-btn { display: none; position: fixed; top: 16px; right: 16px; z-index: 110; background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--radius-md); width: 40px; height: 40px; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-md); color: var(--text-primary); transition: all var(--transition-fast); }
@@ -68,7 +68,7 @@
     .sidebar-section-title { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); font-weight: 700; padding: 6px 10px; margin-bottom: 2px; }
     .sidebar-divider { height: 1px; background: var(--separator); margin: 8px 0; }
     .logo-area { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; padding: 0 6px; }
-    .logo-icon { background: var(--accent-gradient); color: white; width: 36px; height: 36px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; box-shadow: 0 4px 16px rgba(220,200,155,0.35); }
+    .logo-icon { background: var(--accent-gradient); color: white; width: 36px; height: 36px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; box-shadow: 0 4px 16px rgba(2,136,209,0.35); }
     .logo-text { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.04em; color: var(--text-primary); }
     .nav-item, .sidebar-action { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--radius-sm); font-weight: 500; font-size: 0.83rem; color: var(--text-secondary); transition: all var(--transition-fast); cursor: pointer; background: transparent; border: none; width: 100%; text-align: left; letter-spacing: -0.02em; }
     .nav-item i, .sidebar-action i { width: 17px; height: 17px; stroke-width: 1.6; opacity: 0.7; flex-shrink: 0; }
@@ -85,7 +85,7 @@
     .bottom-nav-item.active { color: var(--accent-dark); background: var(--accent-light); font-weight: 600; }
     .bottom-nav-item i { width: 22px; height: 22px; stroke-width: 1.5; }
 
-    .fab { display: none; position: fixed; bottom: 120px; right: 20px; width: 48px; height: 48px; background: var(--accent-gradient); color: white; border-radius: 50%; box-shadow: 0 6px 24px rgba(220,200,155,0.4); align-items: center; justify-content: center; border: none; z-index: 105; cursor: pointer; font-size: 1.3rem; opacity: 0.85; transition: all var(--transition-smooth); }
+    .fab { display: none; position: fixed; bottom: 120px; right: 20px; width: 48px; height: 48px; background: var(--accent-gradient); color: white; border-radius: 50%; box-shadow: 0 6px 24px rgba(2,136,209,0.4); align-items: center; justify-content: center; border: none; z-index: 105; cursor: pointer; font-size: 1.3rem; opacity: 0.85; transition: all var(--transition-smooth); }
     .fab:active { transform: scale(0.9); }
     .fab.hidden { opacity: 0; transform: scale(0.5); pointer-events: none; }
 
@@ -115,10 +115,10 @@
     .stat-value.warning-color { color: var(--warning); } .stat-value.neutral { color: var(--text-primary); }
     .stat-value.info-color { color: var(--info); } .stat-value.teal-color { color: var(--teal); }
 
-    .lucro-destaque { background: var(--accent-gradient); color: white; border: none; border-left: none; box-shadow: 0 8px 32px rgba(220,200,155,0.35); cursor: pointer; }
+    .lucro-destaque { background: var(--accent-gradient); color: white; border: none; border-left: none; box-shadow: 0 8px 32px rgba(2,136,209,0.35); cursor: pointer; }
     .lucro-destaque .stat-label { color: rgba(255,255,255,0.85); }
     .lucro-destaque .stat-value { color: white; font-size: 2rem; }
-    .lucro-destaque:hover { box-shadow: 0 12px 40px rgba(220,200,155,0.5); transform: translateY(-3px); }
+    .lucro-destaque:hover { box-shadow: 0 12px 40px rgba(2,136,209,0.5); transform: translateY(-3px); }
     .lucro-destaque .card-arrow { color: rgba(255,255,255,0.8); }
 
     .client-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-xs); border: 1px solid var(--separator); transition: all var(--transition-fast); animation: fadeInCard 0.3s ease both; }
@@ -128,16 +128,16 @@
 
     .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; color: var(--accent-dark); flex-shrink: 0; }
     .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
-    .badge-success { background: var(--success-light); color: #4A7A4F; }
-    .badge-warning { background: #FFF5EB; color: #A87D3F; }
-    .badge-danger { background: var(--danger-light); color: #B55D55; }
+    .badge-success { background: var(--success-light); color: #2E7D32; }
+    .badge-warning { background: #FFF8E1; color: #E65100; }
+    .badge-danger { background: var(--danger-light); color: #C62828; }
 
     .search-input { width: 100%; padding: 12px 16px; border-radius: var(--radius-lg); border: 1px solid var(--separator-strong); background: var(--bg-secondary); font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; transition: all var(--transition-fast); box-shadow: var(--shadow-xs); color: var(--text-primary); }
-    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(220,200,155,0.15); }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(2,136,209,0.15); }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; transition: all var(--transition-fast); }
-    .btn-primary { background: var(--accent-gradient); color: white; box-shadow: 0 4px 16px rgba(220,200,155,0.35); }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(220,200,155,0.4); }
+    .btn-primary { background: var(--accent-gradient); color: white; box-shadow: 0 4px 16px rgba(2,136,209,0.35); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(2,136,209,0.4); }
     .btn-danger { background: var(--danger); color: white; }
     .btn-ghost { background: transparent; color: var(--accent-dark); }
     .btn-icon { padding: 8px; border-radius: var(--radius-sm); background: transparent; border: none; cursor: pointer; transition: all var(--transition-fast); display: flex; align-items: center; justify-content: center; position: relative; }
@@ -147,7 +147,7 @@
     .btn-icon.notes:hover { background: var(--accent-light); color: var(--accent-dark); }
     .btn-icon.has-note::after { content: ''; position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--info); border: 1px solid white; }
 
-    .modal-overlay { position: fixed; inset: 0; background: rgba(28,27,26,0.35); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; animation: fadeIn 0.2s ease; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10,25,41,0.35); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; animation: fadeIn 0.2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .modal-content { background: var(--bg-secondary); border-radius: var(--radius-2xl); padding: 24px; width: 100%; max-width: 400px; box-shadow: var(--shadow-xl); max-height: 90vh; overflow-y: auto; border: 1px solid var(--separator); animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -180,7 +180,7 @@
 
     .action-icons { display: flex; gap: 6px; align-items: center; }
     .textarea-input { width: 100%; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--separator-strong); background: var(--bg-secondary); font-family: 'Inter', sans-serif; font-size: 0.85rem; outline: none; resize: vertical; min-height: 120px; color: var(--text-primary); transition: all var(--transition-fast); }
-    .textarea-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(220,200,155,0.15); }
+    .textarea-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(2,136,209,0.15); }
 
     .chart-container { position: relative; width: 100%; height: 280px; margin: 0 auto; }
     .chart-container canvas { width: 100% !important; height: 100% !important; }
@@ -225,7 +225,7 @@
       <div class="sidebar-section"><div class="sidebar-section-title">Preferências</div>
         <button class="sidebar-action" id="sidebarDarkMode"><i data-lucide="moon"></i> <span id="darkModeText">Modo Escuro</span></button>
         <button class="sidebar-action pro-item" id="sidebarMensagens"><i data-lucide="message-square"></i> Mensagens <span class="pro-badge-lock">⭐ PRO</span></button>
-        <button class="sidebar-action" id="sidebarPlanoPRO"><i data-lucide="crown"></i> <span id="proBadgeText" style="color:#DCC89B;">Plano FREE</span></button>
+        <button class="sidebar-action" id="sidebarPlanoPRO"><i data-lucide="crown"></i> <span id="proBadgeText" style="color:var(--accent);">Plano FREE</span></button>
       </div>
     </aside>
     <main class="main-content" id="mainContent"></main>
@@ -263,7 +263,7 @@
       function savePro() { localStorage.setItem('owerplay_pro', JSON.stringify(planoPro)); atualizarBadgePro(); atualizarIconesPro(); }
       function atualizarBadgePro() {
         const badge = document.getElementById('proBadgeText'); if (!badge) return;
-        if (planoPro) { badge.textContent = 'Plano PRO ⭐'; badge.style.color = '#DCC89B'; }
+        if (planoPro) { badge.textContent = 'Plano PRO ⭐'; badge.style.color = 'var(--accent)'; }
         else { badge.textContent = 'Plano FREE'; badge.style.color = ''; }
       }
       function atualizarIconesPro() {
@@ -297,21 +297,21 @@
 
       function showBannerPRO() {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const bg = isDark ? 'linear-gradient(135deg, #1C1B1A 0%, #2A2725 100%)' : '#FFFFFF';
-        const cardBg = isDark ? '#2A2725' : '#FFFEF5';
-        const textColor = isDark ? '#F5F0EB' : '#1C1B1A';
-        const textSec = isDark ? '#B5AAA0' : '#8E8278';
-        const borderColor = isDark ? '#3D3936' : '#E8E2D5';
-        const dashBorder = isDark ? '#4D4945' : '#D8D0C0';
-        const inputBg = isDark ? '#1C1B1A' : '#FFFFFF';
-        const inputBorder = isDark ? '#4D4945' : '#E8E2D5';
-        const listColor = isDark ? '#D8D0C0' : '#1C1B1A';
-        const sectionTitle = isDark ? '#B5AAA0' : '#B5AAA0';
+        const bg = isDark ? 'linear-gradient(135deg, #0A1929 0%, #102A43 100%)' : '#FFFFFF';
+        const cardBg = isDark ? '#102A43' : '#F5FAFF';
+        const textColor = isDark ? '#E3F2FD' : '#0A1929';
+        const textSec = isDark ? '#90CAF9' : '#4A7A9E';
+        const borderColor = isDark ? '#1A3A5C' : '#D8E8F5';
+        const dashBorder = isDark ? '#243B53' : '#B8D0E8';
+        const inputBg = isDark ? '#0A1929' : '#FFFFFF';
+        const inputBorder = isDark ? '#243B53' : '#D8E8F5';
+        const listColor = isDark ? '#90CAF9' : '#0A1929';
+        const sectionTitle = isDark ? '#64B5F6' : '#64B5F6';
         
         const html = `<div class="modal-overlay" id="bannerProOverlay"><div class="modal-content" style="max-width:440px;padding:0;background:transparent;border:none;box-shadow:none;animation:none;">
-          <div style="background:${bg};border-radius:20px;padding:28px 24px;max-width:90%;margin:20px auto;border:1px solid ${borderColor};box-shadow:0 4px 24px rgba(28,27,26,0.08);">
+          <div style="background:${bg};border-radius:20px;padding:28px 24px;max-width:90%;margin:20px auto;border:1px solid ${borderColor};box-shadow:0 4px 24px rgba(10,25,41,0.08);">
             <div style="text-align:center;margin-bottom:20px;">
-              <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#DCC89B;font-weight:600;margin-bottom:4px;">Owerplay PRO</div>
+              <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:4px;">Owerplay PRO</div>
               <p style="color:${textSec};font-size:0.85rem;margin:0;">Desbloqueie todo o poder do seu gestor</p>
             </div>
             <div style="background:${cardBg};border-radius:16px;padding:18px;text-align:center;margin-bottom:16px;border:1px solid ${borderColor};">
@@ -408,7 +408,7 @@
       function showConfirmModal(title, msg, iconType, btnText, btnClass, cb) { const icons = { renew: { icon: 'refresh-cw', bg: 'var(--accent-light)', color: 'var(--accent-dark)' }, delete: { icon: 'trash', bg: 'var(--danger-light)', color: 'var(--danger)' } }; const ic = icons[iconType] || icons.delete; const h = `<div class="modal-overlay" id="confirmModalOverlay"><div class="modal-content confirm-modal"><div class="confirm-icon ${iconType}" style="background:${ic.bg};"><i data-lucide="${ic.icon}" width="28" height="28" style="color:${ic.color}"></i></div><h3 style="margin-bottom:8px;font-weight:700;">${title}</h3><p style="color:var(--text-secondary);margin-bottom:20px;font-size:0.9rem;">${msg}</p><div style="display:flex;gap:10px;"><button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('confirmModalOverlay').remove()">Cancelar</button><button class="btn ${btnClass}" style="flex:1;" id="confirmActionBtn">${btnText}</button></div></div></div>`; document.body.insertAdjacentHTML('beforeend', h); lucide.createIcons(); document.getElementById('confirmActionBtn').addEventListener('click', () => { document.getElementById('confirmModalOverlay').remove(); cb(); }); document.getElementById('confirmModalOverlay').addEventListener('click', (e) => { if (e.target.id === 'confirmModalOverlay') e.target.remove(); }); }
       function showRenewModal(cid) { const c = db.clientes.find(x => x.id === cid); if (!c) return; const p = db.planos.find(x => x.id === c.planoId); const s = db.servidores.find(x => x.id === c.servidorId); const vp = p ? p.valor - (c.desconto || 0) : 0; const da = new Date(c.vencimento + 'T12:00:00'); if (da < new Date()) da.setTime(Date.now()); da.setDate(da.getDate() + 30); const ds = da.toISOString().split('T')[0]; const h = `<div class="modal-overlay" id="renewModalOverlay"><div class="modal-content"><div style="text-align:center;margin-bottom:16px;"><div class="confirm-icon renew" style="background:var(--accent-light);"><i data-lucide="calendar-sync" width="28" height="28" style="color:var(--accent-dark)"></i></div><h3 style="font-weight:700;">Renovar Cliente</h3></div><div style="background:var(--bg-tertiary);border-radius:var(--radius-md);padding:14px;margin-bottom:16px;"><div style="display:flex;align-items:center;gap:10px;"><div class="avatar" style="width:36px;height:36px;font-size:0.9rem;">${c.nome.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase()}</div><div><div style="font-weight:600;font-size:0.95rem;">${c.nome}</div><div style="font-size:0.8rem;color:var(--text-secondary);">Vence em: ${new Date(c.vencimento+'T00:00:00').toLocaleDateString('pt-BR')}</div></div></div></div><label style="font-size:0.8rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">🗓️ Nova data:</label><input type="date" class="search-input" id="renewDate" value="${ds}" style="margin-bottom:12px;"><div style="background:var(--accent-light);border-radius:var(--radius-md);padding:10px 14px;text-align:center;margin-bottom:20px;"><span style="font-size:0.8rem;">💰 Valor:</span><span style="font-weight:700;font-size:1.1rem;color:var(--accent-dark);margin-left:6px;">R$ ${vp.toFixed(2)}</span></div><div style="display:flex;gap:10px;"><button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('renewModalOverlay').remove()">Cancelar</button><button class="btn btn-primary" style="flex:1;" id="confirmRenewBtn">Renovar</button></div></div></div>`; document.body.insertAdjacentHTML('beforeend', h); lucide.createIcons(); document.getElementById('confirmRenewBtn').addEventListener('click', () => { const nd = document.getElementById('renewDate').value; if (!nd) { showToast('Selecione uma data', 'error'); return; } c.vencimento = nd; const hoje = new Date(); const m = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`; db.transacoes.push({ id: 't_renov_' + c.id + '_' + Date.now(), descricao: 'Renovação ' + c.nome, valor: vp, tipo: 'entrada', data: m + '-01', clienteId: c.id }); if (s) { db.transacoes.push({ id: 'ts_renov_' + c.id + '_' + Date.now(), descricao: 'Servidor (' + c.nome + ')', valor: s.custo, tipo: 'saida', data: m + '-01', clienteId: c.id, servidorId: s.id }); } saveDB(); addLog(c.nome + ' renovado até ' + new Date(nd+'T00:00:00').toLocaleDateString('pt-BR')); document.getElementById('renewModalOverlay').remove(); renderSection(currentSection); showToast('Renovado com sucesso!'); try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch(e) {} }); document.getElementById('renewModalOverlay').addEventListener('click', (e) => { if (e.target.id === 'renewModalOverlay') e.target.remove(); }); }
       function showNotesModal(cid) { const c = db.clientes.find(x => x.id === cid); if (!c) return; const h = `<div class="modal-overlay" id="notesModalOverlay"><div class="modal-content"><h3>📝 Anotações</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:14px;">${c.nome}</p><textarea class="textarea-input" id="notesText">${c.anotacoes || ''}</textarea><div style="display:flex;gap:10px;margin-top:16px;"><button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('notesModalOverlay').remove()">Cancelar</button><button class="btn btn-primary" style="flex:1;" id="saveNotesBtn">Salvar</button></div></div></div>`; document.body.insertAdjacentHTML('beforeend', h); lucide.createIcons(); document.getElementById('saveNotesBtn').addEventListener('click', () => { c.anotacoes = document.getElementById('notesText').value; saveDB(); addLog('Anotações: ' + c.nome); document.getElementById('notesModalOverlay').remove(); renderSection(currentSection); showToast('Anotações salvas!'); }); document.getElementById('notesModalOverlay').addEventListener('click', (e) => { if (e.target.id === 'notesModalOverlay') e.target.remove(); }); }
-      function showRelatorio() { const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; const hoje = new Date(); const lb=[], ed=[], sd=[], ld=[]; for (let i=5;i>=0;i--) { const mes=new Date(hoje.getFullYear(),hoje.getMonth()-i,1); const ms=`${mes.getFullYear()}-${String(mes.getMonth()+1).padStart(2,'0')}`; lb.push(meses[mes.getMonth()]); ed.push(db.transacoes.filter(t=>t.tipo==='entrada'&&t.data.startsWith(ms)).reduce((s,t)=>s+t.valor,0)); sd.push(db.transacoes.filter(t=>t.tipo==='saida'&&t.data.startsWith(ms)).reduce((s,t)=>s+t.valor,0)); ld.push(ed[ed.length-1]-sd[sd.length-1]); } const h=`<div class="modal-overlay" id="relatorioOverlay"><div class="modal-content" style="max-width:520px;"><h3 style="margin-bottom:14px;font-weight:700;">📊 Relatório 6 Meses</h3><div class="chart-modal-container"><canvas id="relatorioChart"></canvas></div><button class="btn btn-ghost" style="width:100%;margin-top:16px;" onclick="document.getElementById('relatorioOverlay').remove()">Fechar</button></div></div>`; document.body.insertAdjacentHTML('beforeend',h); setTimeout(()=>{const ctx=document.getElementById('relatorioChart');if(ctx){new Chart(ctx,{type:'bar',data:{labels:lb,datasets:[{label:'Entradas',data:ed,backgroundColor:'#8BA4C2',borderRadius:8,borderSkipped:false},{label:'Saídas',data:sd,backgroundColor:'#D9756B',borderRadius:8,borderSkipped:false},{label:'Lucro',data:ld,backgroundColor:'#8DC98F',borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:18,font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.04)'}},x:{grid:{display:false}}}}});}},200);document.getElementById('relatorioOverlay').addEventListener('click',(e)=>{if(e.target.id==='relatorioOverlay')e.target.remove();});}
+      function showRelatorio() { const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; const hoje = new Date(); const lb=[], ed=[], sd=[], ld=[]; for (let i=5;i>=0;i--) { const mes=new Date(hoje.getFullYear(),hoje.getMonth()-i,1); const ms=`${mes.getFullYear()}-${String(mes.getMonth()+1).padStart(2,'0')}`; lb.push(meses[mes.getMonth()]); ed.push(db.transacoes.filter(t=>t.tipo==='entrada'&&t.data.startsWith(ms)).reduce((s,t)=>s+t.valor,0)); sd.push(db.transacoes.filter(t=>t.tipo==='saida'&&t.data.startsWith(ms)).reduce((s,t)=>s+t.valor,0)); ld.push(ed[ed.length-1]-sd[sd.length-1]); } const h=`<div class="modal-overlay" id="relatorioOverlay"><div class="modal-content" style="max-width:520px;"><h3 style="margin-bottom:14px;font-weight:700;">📊 Relatório 6 Meses</h3><div class="chart-modal-container"><canvas id="relatorioChart"></canvas></div><button class="btn btn-ghost" style="width:100%;margin-top:16px;" onclick="document.getElementById('relatorioOverlay').remove()">Fechar</button></div></div>`; document.body.insertAdjacentHTML('beforeend',h); setTimeout(()=>{const ctx=document.getElementById('relatorioChart');if(ctx){new Chart(ctx,{type:'bar',data:{labels:lb,datasets:[{label:'Entradas',data:ed,backgroundColor:'#4FC3F7',borderRadius:8,borderSkipped:false},{label:'Saídas',data:sd,backgroundColor:'#E57373',borderRadius:8,borderSkipped:false},{label:'Lucro',data:ld,backgroundColor:'#81C784',borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:18,font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.04)'}},x:{grid:{display:false}}}}});}},200);document.getElementById('relatorioOverlay').addEventListener('click',(e)=>{if(e.target.id==='relatorioOverlay')e.target.remove();});}
 
       function renderDashboard() { 
         const hoje = new Date().toISOString().split('T')[0]; 
@@ -441,7 +441,7 @@
       window._delServ = (id) => { const s = db.servidores.find(x => x.id===id); if (!s) return; showConfirmModal('Tem certeza?', 'Esta ação é <strong>irreversível</strong>.', 'delete', 'Sim, excluir', 'btn-danger', () => { db.servidores = db.servidores.filter(x => x.id!==id); sincronizarTransacoes(); addLog('Servidor ' + s.nome + ' excluído'); renderSection('servidores'); showToast('Excluído!'); }); };
       function abrirModalServidor(id = null) { const s = id ? db.servidores.find(x => x.id === id) : null; const h = `<div class="modal-overlay" id="modalServ"><div class="modal-content"><h2 style="margin-bottom:14px;">${id?'Editar':'Novo'} Servidor</h2><div style="display:flex;flex-direction:column;gap:12px;"><div><label class="field-label">Nome</label><input class="search-input" id="nomeServ" value="${s?.nome||''}"></div><div><label class="field-label">Custo (R$)</label><input type="number" class="search-input" id="custoServ" value="${s?.custo||''}"></div></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('modalServ').remove()">Cancelar</button><button class="btn btn-primary" style="flex:1;" id="saveServ">Salvar</button></div></div></div>`; document.body.insertAdjacentHTML('beforeend', h); document.getElementById('saveServ').addEventListener('click', () => { const n = document.getElementById('nomeServ').value.trim(); const c = parseFloat(document.getElementById('custoServ').value)||0; if (!n||c<=0) { showToast('Inválido', 'error'); return; } if (id) db.servidores = db.servidores.map(x => x.id===id ? {id,nome:n,custo:c} : x); else db.servidores.push({id:'s'+Date.now(),nome:n,custo:c}); if (id) sincronizarTransacoes(); saveDB(); addLog(id ? ('Servidor ' + n + ' atualizado') : ('Servidor ' + n + ' criado')); document.getElementById('modalServ').remove(); renderSection('servidores'); showToast('Servidor salvo!'); }); document.getElementById('modalServ').addEventListener('click', (e) => { if (e.target.id==='modalServ') e.target.remove(); }); }
 
-      function renderFinancas() { const hoje = new Date(); const m = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`; const ma = hoje.getMonth()===0?`${hoje.getFullYear()-1}-12`:`${hoje.getFullYear()}-${String(hoje.getMonth()).padStart(2,'0')}`; const ent = db.transacoes.filter(t=>t.tipo==='entrada'&&t.data.startsWith(m)).reduce((s,t)=>s+t.valor,0); const sai = db.transacoes.filter(t=>t.tipo==='saida'&&t.data.startsWith(m)).reduce((s,t)=>s+t.valor,0); const luc = ent-sai; const ea = db.transacoes.filter(t=>t.tipo==='entrada'&&t.data.startsWith(ma)).reduce((s,t)=>s+t.valor,0); const sa = db.transacoes.filter(t=>t.tipo==='saida'&&t.data.startsWith(ma)).reduce((s,t)=>s+t.valor,0); const la = ea-sa; const cresc = la!==0?((luc-la)/Math.abs(la))*100:(luc>0?100:0); const crescTxt = cresc>=0?'+'+cresc.toFixed(1)+'%':cresc.toFixed(1)+'%'; const clienteTransacoes = {}; db.clientes.forEach(c => { clienteTransacoes[c.id] = { nome: c.nome, entrada: 0, saida: 0 }; }); db.transacoes.forEach(t => { if (t.clienteId && clienteTransacoes[t.clienteId]) { if (t.tipo === 'entrada') clienteTransacoes[t.clienteId].entrada += t.valor; else clienteTransacoes[t.clienteId].saida += t.valor; } }); const clienteRows = Object.values(clienteTransacoes).slice(0, planoPro ? undefined : 10).map(ct => { const lucroCli = ct.entrada - ct.saida; return `<tr><td><strong>${ct.nome}</strong></td><td class="transaction-amount positive">+ R$ ${ct.entrada.toFixed(2)}</td><td class="transaction-amount negative">- R$ ${ct.saida.toFixed(2)}</td><td class="transaction-amount ${lucroCli>=0?'positive':'negative'}">${lucroCli>=0?'+':'-'} R$ ${Math.abs(lucroCli).toFixed(2)}</td></tr>`; }).join(''); mainContent.innerHTML=`<button class="back-btn" onclick="window.goBack()"><i data-lucide="chevron-left"></i> Voltar</button><h1 class="section-title">Finanças</h1><p class="section-subtitle">Receitas e despesas do mês${!planoPro?' · <small style="color:var(--warning);">Limitado a 10 transações</small>':''}</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:24px;"><div class="stat-card lucro"><div class="stat-label"><i data-lucide="wallet" width="14" height="14" style="color:var(--success)"></i> Lucro</div><div class="stat-value positive">R$ ${luc.toFixed(2)}</div></div><div class="stat-card entrada"><div class="stat-label"><i data-lucide="trending-up" width="14" height="14" style="color:var(--info)"></i> Entradas</div><div class="stat-value info-color">R$ ${ent.toFixed(2)}</div></div><div class="stat-card saida"><div class="stat-label"><i data-lucide="trending-down" width="14" height="14" style="color:var(--danger)"></i> Saídas</div><div class="stat-value negative">R$ ${sai.toFixed(2)}</div></div><div class="stat-card crescimento"><div class="stat-label"><i data-lucide="activity" width="14" height="14" style="color:var(--teal)"></i> Crescimento</div><div class="stat-value teal-color">${crescTxt}</div></div></div><div class="stat-card" style="margin-bottom:20px;"><h3 style="margin-bottom:12px;font-weight:600;">📊 Este Mês</h3><div class="chart-container"><canvas id="finChart"></canvas></div></div><div class="stat-card"><h3 style="margin-bottom:12px;font-weight:600;">Resumo por Cliente</h3><div class="table-wrapper"><table class="transaction-table"><thead><tr><th>Cliente</th><th>Entrada</th><th>Saída</th><th>Lucro</th></tr></thead><tbody>${clienteRows||'<tr><td colspan="4" style="text-align:center;padding:40px;">Nenhuma transação</td></tr>'}</tbody></table></div></div>`;lucide.createIcons();setTimeout(()=>{if(chartInstance)chartInstance.destroy();const ctx=document.getElementById('finChart');if(ctx){chartInstance=new Chart(ctx,{type:'bar',data:{labels:['Este Mês'],datasets:[{label:'Entradas',data:[ent],backgroundColor:'#8BA4C2',borderRadius:8,borderSkipped:false},{label:'Saídas',data:[sai],backgroundColor:'#D9756B',borderRadius:8,borderSkipped:false},{label:'Lucro',data:[luc],backgroundColor:'#8DC98F',borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:18,font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.04)'}},x:{grid:{display:false}}}}});}},200);}
+      function renderFinancas() { const hoje = new Date(); const m = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`; const ma = hoje.getMonth()===0?`${hoje.getFullYear()-1}-12`:`${hoje.getFullYear()}-${String(hoje.getMonth()).padStart(2,'0')}`; const ent = db.transacoes.filter(t=>t.tipo==='entrada'&&t.data.startsWith(m)).reduce((s,t)=>s+t.valor,0); const sai = db.transacoes.filter(t=>t.tipo==='saida'&&t.data.startsWith(m)).reduce((s,t)=>s+t.valor,0); const luc = ent-sai; const ea = db.transacoes.filter(t=>t.tipo==='entrada'&&t.data.startsWith(ma)).reduce((s,t)=>s+t.valor,0); const sa = db.transacoes.filter(t=>t.tipo==='saida'&&t.data.startsWith(ma)).reduce((s,t)=>s+t.valor,0); const la = ea-sa; const cresc = la!==0?((luc-la)/Math.abs(la))*100:(luc>0?100:0); const crescTxt = cresc>=0?'+'+cresc.toFixed(1)+'%':cresc.toFixed(1)+'%'; const clienteTransacoes = {}; db.clientes.forEach(c => { clienteTransacoes[c.id] = { nome: c.nome, entrada: 0, saida: 0 }; }); db.transacoes.forEach(t => { if (t.clienteId && clienteTransacoes[t.clienteId]) { if (t.tipo === 'entrada') clienteTransacoes[t.clienteId].entrada += t.valor; else clienteTransacoes[t.clienteId].saida += t.valor; } }); const clienteRows = Object.values(clienteTransacoes).slice(0, planoPro ? undefined : 10).map(ct => { const lucroCli = ct.entrada - ct.saida; return `<tr><td><strong>${ct.nome}</strong></td><td class="transaction-amount positive">+ R$ ${ct.entrada.toFixed(2)}</td><td class="transaction-amount negative">- R$ ${ct.saida.toFixed(2)}</td><td class="transaction-amount ${lucroCli>=0?'positive':'negative'}">${lucroCli>=0?'+':'-'} R$ ${Math.abs(lucroCli).toFixed(2)}</td></tr>`; }).join(''); mainContent.innerHTML=`<button class="back-btn" onclick="window.goBack()"><i data-lucide="chevron-left"></i> Voltar</button><h1 class="section-title">Finanças</h1><p class="section-subtitle">Receitas e despesas do mês${!planoPro?' · <small style="color:var(--warning);">Limitado a 10 transações</small>':''}</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:24px;"><div class="stat-card lucro"><div class="stat-label"><i data-lucide="wallet" width="14" height="14" style="color:var(--success)"></i> Lucro</div><div class="stat-value positive">R$ ${luc.toFixed(2)}</div></div><div class="stat-card entrada"><div class="stat-label"><i data-lucide="trending-up" width="14" height="14" style="color:var(--info)"></i> Entradas</div><div class="stat-value info-color">R$ ${ent.toFixed(2)}</div></div><div class="stat-card saida"><div class="stat-label"><i data-lucide="trending-down" width="14" height="14" style="color:var(--danger)"></i> Saídas</div><div class="stat-value negative">R$ ${sai.toFixed(2)}</div></div><div class="stat-card crescimento"><div class="stat-label"><i data-lucide="activity" width="14" height="14" style="color:var(--teal)"></i> Crescimento</div><div class="stat-value teal-color">${crescTxt}</div></div></div><div class="stat-card" style="margin-bottom:20px;"><h3 style="margin-bottom:12px;font-weight:600;">📊 Este Mês</h3><div class="chart-container"><canvas id="finChart"></canvas></div></div><div class="stat-card"><h3 style="margin-bottom:12px;font-weight:600;">Resumo por Cliente</h3><div class="table-wrapper"><table class="transaction-table"><thead><tr><th>Cliente</th><th>Entrada</th><th>Saída</th><th>Lucro</th></tr></thead><tbody>${clienteRows||'<tr><td colspan="4" style="text-align:center;padding:40px;">Nenhuma transação</td></tr>'}</tbody></table></div></div>`;lucide.createIcons();setTimeout(()=>{if(chartInstance)chartInstance.destroy();const ctx=document.getElementById('finChart');if(ctx){chartInstance=new Chart(ctx,{type:'bar',data:{labels:['Este Mês'],datasets:[{label:'Entradas',data:[ent],backgroundColor:'#4FC3F7',borderRadius:8,borderSkipped:false},{label:'Saídas',data:[sai],backgroundColor:'#E57373',borderRadius:8,borderSkipped:false},{label:'Lucro',data:[luc],backgroundColor:'#81C784',borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:18,font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.04)'}},x:{grid:{display:false}}}}});}},200);}
       function renderMensagens() { mainContent.innerHTML = `<button class="back-btn" onclick="window.goBack()"><i data-lucide="chevron-left"></i> Voltar</button><h1 class="section-title">Mensagens</h1><p class="section-subtitle">Comunique-se com seus clientes</p><div class="stat-card" style="margin-bottom:16px;"><h3>📋 Cobrança</h3><p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:8px;">Tags: {nome}, {sobrenome}, {vencimento}, {valor}, {plano}</p><textarea class="textarea-input" id="tplCobranca" style="min-height:140px;">${db.templates.cobranca}</textarea></div><div class="stat-card" style="margin-bottom:20px;"><h3>📋 Renovação</h3><p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:8px;">Tags: {nome}, {sobrenome}, {vencimento}</p><textarea class="textarea-input" id="tplRenovacao" style="min-height:100px;">${db.templates.renovacao}</textarea></div><div style="display:flex;gap:10px;"><button class="btn btn-ghost" style="flex:1;" id="resetTpl">Restaurar Padrão</button><button class="btn btn-primary" style="flex:1;" id="saveTpl">Salvar Templates</button></div>`; lucide.createIcons(); document.getElementById('saveTpl').onclick = () => { db.templates.cobranca = document.getElementById('tplCobranca').value; db.templates.renovacao = document.getElementById('tplRenovacao').value; saveDB(); addLog('Templates atualizados'); showToast('Templates salvos!'); }; document.getElementById('resetTpl').onclick = () => { db.templates.cobranca = defaultTemplates.cobranca; db.templates.renovacao = defaultTemplates.renovacao; saveDB(); renderMensagens(); showToast('Restaurado!','info'); }; }
 
       sincronizarTransacoes(); renderSection('dashboard');
