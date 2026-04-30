@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <title>Owerplay Gestor</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#0288D1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Owerplay Gestor">
+  <meta name="description" content="Gestor de clientes IPTV">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIk93ZXJwbGF5IEdlc3RvciIsCiAgInNob3J0X25hbWUiOiAiT3dlcnBsYXkiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI0YwRjhGRiIsCiAgInRoZW1lX2NvbG9yIjogIiMwMjg4RDEiLAogICJkZXNjcmlwdGlvbiI6ICJHZXN0b3IgZGUgY2xpZW50ZXMgSVBUViIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmclMjB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnJTIwdmlld0JveD0nMCAwJTIwMTAwJTIwMTAwJyUzRSUzQ2NpcmNsZSUyMGN4PSc1MCUnMjBjeT0nNTAlMjByPSc1MCUnMjBmaWxsPSclMjMwMjg4RDEnLyUzRSUzQ3RleHQlMjB4PSc1MCUnMjB5PSc1MCUnMjBkb21pbmFudC1iYXNlbGluZT0nY2VudHJhbCclMjB0ZXh0LWFuY2hvcj0nbWlkZGxlJyUyMGZpbGw9J3doaXRlJyUyMGZvbnQtc2l6ZT0nNTAnMjBmb250LWZhbWlseT0nc2Fucy1zZXJpZiclMjBmb250LXdlaWdodD0nYm9sZCclM0UlRTIlOUMlQTYlM0MvdGV4dCUzRSUzQy9zdmclM0UiLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLAogICAgICAicHVycG9zZSI6ICJhbnkiCiAgICB9CiAgXQp9">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50%25' cy='50%25' r='50%25' fill='%230288D1'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' fill='white' font-size='50' font-family='sans-serif' font-weight='bold'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
@@ -312,7 +322,7 @@
       transition: opacity var(--transition-smooth), transform var(--transition-smooth);
     }
 
-    .bottom-nav.hidden {
+    .bottom-nav.dock-hidden {
       opacity: 0;
       transform: translateX(-50%) translateY(20px);
       pointer-events: none;
@@ -380,7 +390,7 @@
       transform: scale(0.9);
     }
 
-    .fab.hidden {
+    .fab.dock-hidden {
       opacity: 0;
       transform: scale(0.5);
       pointer-events: none;
@@ -694,7 +704,6 @@
       background: #1ebe57;
     }
 
-    /* ÍCONES COM BORDA - MODO CLARO */
     .btn-icon {
       padding: 8px;
       border-radius: var(--radius-sm);
@@ -743,7 +752,6 @@
       border: 1px solid white;
     }
 
-    /* ÍCONES COM BORDA - MODO ESCURO */
     [data-theme="dark"] .btn-icon {
       color: #4FC3F7;
       border: 1px solid rgba(79, 195, 247, 0.3);
@@ -1082,7 +1090,6 @@
       gap: 10px;
     }
 
-    /* Dropdown menu */
     .dropdown-wrapper {
       position: relative;
       display: inline-block;
@@ -1105,6 +1112,14 @@
 
     .dropdown-menu.show {
       display: block;
+    }
+
+    /* Em telas menores, alinha à esquerda */
+    @media (max-width: 768px) {
+      .dropdown-menu {
+        right: auto;
+        left: 0;
+      }
     }
 
     .dropdown-item {
@@ -1291,6 +1306,62 @@
   </div>
 
   <script>
+    // ========== SERVICE WORKER (PWA) ==========
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'owerplay-v1';
+        const ASSETS = [
+          '/',
+          'https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap',
+          'https://unpkg.com/lucide@latest',
+          'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+          'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js'
+        ];
+
+        self.addEventListener('install', (event) => {
+          event.waitUntil(
+            caches.open(CACHE_NAME).then((cache) => {
+              return cache.addAll(ASSETS);
+            })
+          );
+          self.skipWaiting();
+        });
+
+        self.addEventListener('activate', (event) => {
+          event.waitUntil(
+            caches.keys().then((keys) => {
+              return Promise.all(
+                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+              );
+            })
+          );
+          self.clients.claim();
+        });
+
+        self.addEventListener('fetch', (event) => {
+          event.respondWith(
+            caches.match(event.request).then((cached) => {
+              return cached || fetch(event.request).then((response) => {
+                if (response && response.status === 200) {
+                  const clone = response.clone();
+                  caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, clone);
+                  });
+                }
+                return response;
+              });
+            }).catch(() => {
+              return caches.match(event.request);
+            })
+          );
+        });
+      `;
+
+      const swBlob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swUrl).catch(() => {});
+    }
+
     (function() {
       const STORAGE_KEY = 'owerplay_v5';
       const KIWIFY_LINK = 'https://pay.kiwify.com.br/a26pAg3';
@@ -1549,31 +1620,31 @@
           <div class="modal-content banner-pro-wrapper" style="max-width:90vw;padding:0;background:transparent;border:none;box-shadow:none;animation:none;">
             <div style="background:${bg};border-radius:18px;padding:20px 18px;max-width:100%;margin:20px auto;border:1px solid ${borderColor};box-shadow:0 4px 24px rgba(10,25,41,0.08);">
               <div style="text-align:center;margin-bottom:14px;">
-                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);font-weight:600;margin-bottom:2px;">Owerplay PRO</div>
-                <p style="color:${textSec};font-size:0.78rem;margin:0;">Desbloqueie todo o poder do seu gestor</p>
+                <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);font-weight:600;margin-bottom:2px;">Owerplay PRO</div>
+                <p style="color:${textSec};font-size:0.85rem;margin:0;">Desbloqueie todo o poder do seu gestor</p>
               </div>
               <div style="background:${cardBg};border-radius:14px;padding:14px;text-align:center;margin-bottom:14px;border:1px solid ${borderColor};">
-                <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.04em;color:${textSec};font-weight:600;margin-bottom:2px;">Plano PRO</div>
-                <div style="font-size:1.5rem;font-weight:800;color:${textColor};">R$ 19,90<span style="font-size:0.75rem;color:${textSec};font-weight:500;"> /mês</span></div>
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;color:${textSec};font-weight:600;margin-bottom:2px;">Plano PRO</div>
+                <div style="font-size:1.7rem;font-weight:800;color:${textColor};">R$ 19,90<span style="font-size:0.8rem;color:${textSec};font-weight:500;"> /mês</span></div>
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 10px;margin-bottom:14px;">
-                <div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:${listColor};">⭐ Clientes ilimitados</div>
-                <div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:${listColor};">⭐ Servidores ilimitados</div>
-                <div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:${listColor};">⭐ Backup e restauração</div>
-                <div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:${listColor};">⭐ Múltiplas mensagens</div>
-                <div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:${listColor};">⭐ Gráficos e relatórios</div>
-                <div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:${listColor};">⭐ Histórico financeiro</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:${listColor};">⭐ Clientes ilimitados</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:${listColor};">⭐ Servidores ilimitados</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:${listColor};">⭐ Backup e restauração</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:${listColor};">⭐ Múltiplas mensagens</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:${listColor};">⭐ Gráficos e relatórios</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:${listColor};">⭐ Histórico financeiro</div>
               </div>
               <div style="background:${cardBg};border-radius:12px;padding:10px;margin-bottom:14px;border:1px dashed ${dashBorder};">
-                <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.04em;color:${sectionTitle};font-weight:600;margin-bottom:6px;">Já tem um código PRO?</div>
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.04em;color:${sectionTitle};font-weight:600;margin-bottom:6px;">Já tem um código PRO?</div>
                 <div style="display:flex;gap:6px;">
-                  <input type="text" class="search-input" id="codigoPremiumInput" placeholder="Digite o código" style="flex:1;background:${inputBg};border-color:${inputBorder};color:${textColor};font-size:0.75rem;padding:8px 12px;">
-                  <button class="btn btn-primary" id="ativarCodigoBtn" style="white-space:nowrap;font-size:0.75rem;padding:8px 14px;">Ativar</button>
+                  <input type="text" class="search-input" id="codigoPremiumInput" placeholder="Digite o código" style="flex:1;background:${inputBg};border-color:${inputBorder};color:${textColor};font-size:0.8rem;padding:8px 12px;">
+                  <button class="btn btn-primary" id="ativarCodigoBtn" style="white-space:nowrap;font-size:0.8rem;padding:8px 14px;">Ativar</button>
                 </div>
               </div>
-              <button class="btn btn-primary" id="btnAssinarPRO" style="width:100%;margin-bottom:6px;padding:10px;">Quero ser PRO</button>
-              <button id="btnWhatsApp" style="width:100%;padding:10px;border-radius:12px;border:1px solid #25D366;background:transparent;color:#25D366;font-weight:600;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:8px;">💬 Assinar via WhatsApp</button>
-              <button id="btnTalvezDepois" style="width:100%;padding:8px;border-radius:12px;border:none;background:transparent;color:${textSec};font-weight:500;font-size:0.75rem;cursor:pointer;">Talvez depois</button>
+              <button class="btn btn-primary" id="btnAssinarPRO" style="width:100%;margin-bottom:6px;padding:10px;font-size:0.85rem;">Quero ser PRO</button>
+              <button id="btnWhatsApp" style="width:100%;padding:10px;border-radius:12px;border:1px solid #25D366;background:transparent;color:#25D366;font-weight:600;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:8px;">💬 Assinar via WhatsApp</button>
+              <button id="btnTalvezDepois" style="width:100%;padding:8px;border-radius:12px;border:none;background:transparent;color:${textSec};font-weight:500;font-size:0.8rem;cursor:pointer;">Talvez depois</button>
             </div>
           </div>
         </div>`;
@@ -1747,6 +1818,7 @@
         saveDB();
       }
 
+      // ========== FUNÇÃO ENVIAR WHATSAPP (compatível com APK) ==========
       function sendWhatsApp(cid, tipo, vencimentoOverride) {
         const c = db.clientes.find(x => x.id === cid);
         if (!c) return;
@@ -1758,7 +1830,29 @@
         const sobrenome = c.nome.split(' ').slice(1).join(' ');
         let msg = tpl.replace(/{nome}/g, nome).replace(/{sobrenome}/g, sobrenome).replace(/{nome_completo}/g, c.nome).replace(
           /{vencimento}/g, venc).replace(/{valor}/g, valor).replace(/{plano}/g, p?.nome || '');
-        window.open('https://wa.me/' + c.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
+        
+        const encodedMsg = encodeURIComponent(msg);
+        const waWeb = 'https://wa.me/' + c.whatsapp + '?text=' + encodedMsg;
+        
+        // Tenta detectar se está em WebView (APK)
+        const isWebView = navigator.userAgent.includes('wv') || navigator.userAgent.includes('WebView');
+        
+        if (isWebView) {
+          // Para APK, usa intent:// que funciona em WebView Android
+          const intent = 'intent://send?phone=' + c.whatsapp + '&text=' + encodedMsg + '#Intent;scheme=whatsapp;package=com.whatsapp;end';
+          try {
+            window.location.href = intent;
+            // Fallback após 1.5s se não abriu
+            setTimeout(() => {
+              window.open(waWeb, '_blank');
+            }, 1500);
+          } catch(e) {
+            window.open(waWeb, '_blank');
+          }
+        } else {
+          // Navegador normal
+          window.open(waWeb, '_blank');
+        }
       }
 
       let currentSection = 'dashboard',
@@ -1795,8 +1889,8 @@
       }
       window.addEventListener('scroll', () => {
         const cs = window.pageYOffset || document.documentElement.scrollTop;
-        if (cs > lastScrollY && cs > 100) fab.classList.add('hidden');
-        else if (cs < lastScrollY) fab.classList.remove('hidden');
+        if (cs > lastScrollY && cs > 100) fab.classList.add('dock-hidden');
+        else if (cs < lastScrollY) fab.classList.remove('dock-hidden');
         lastScrollY = cs <= 0 ? 0 : cs;
       }, { passive: true });
 
@@ -1869,12 +1963,52 @@
         }
         sw = false;
       });
-      document.addEventListener('focusin', (e) => { if (e.target.tagName === 'INPUT' || e.target.tagName ===
-          'TEXTAREA') { bottomNav.classList.add('hidden'); } });
-      document.addEventListener('focusout', (e) => { if (e.target.tagName === 'INPUT' || e.target.tagName ===
-          'TEXTAREA') { setTimeout(() => { bottomNav.classList.remove('hidden'); }, 100); } });
-      window.addEventListener('resize', () => { const h = window.innerHeight; if (h > 400) bottomNav.classList.remove(
-          'hidden'); });
+
+      // ========== CONTROLE DA DOCK (BOTTOM NAV + FAB) ==========
+      function hideDock() {
+        bottomNav.classList.add('dock-hidden');
+        fab.classList.add('dock-hidden');
+      }
+
+      function showDock() {
+        bottomNav.classList.remove('dock-hidden');
+        // Fab só reaparece se não estiver escondida por scroll
+        if (lastScrollY <= 100) fab.classList.remove('dock-hidden');
+        updateFab();
+      }
+
+      document.addEventListener('focusin', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+          hideDock();
+        }
+      });
+      document.addEventListener('focusout', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+          setTimeout(() => {
+            // Só mostra se nenhum input estiver focado
+            const focused = document.activeElement;
+            if (!focused || (focused.tagName !== 'INPUT' && focused.tagName !== 'TEXTAREA' && !focused.isContentEditable)) {
+              showDock();
+            }
+          }, 300);
+        }
+      });
+
+      // Reforço via resize (detecta teclado abrindo/fechando)
+      let lastHeight = window.innerHeight;
+      window.addEventListener('resize', () => {
+        const h = window.innerHeight;
+        if (h < lastHeight - 100) {
+          // Teclado abriu
+          hideDock();
+        } else if (h > lastHeight + 100) {
+          // Teclado fechou
+          showDock();
+        }
+        lastHeight = h;
+      });
+
+      // Fecha dropdown ao clicar fora
       window.addEventListener('click', (e) => {
         const dd = document.getElementById('finDropdown');
         if (dd && !e.target.closest('.dropdown-wrapper')) { dd.classList.remove('show'); }
