@@ -2483,7 +2483,7 @@
           return;
         }
         const h =
-          `<div class="modal-overlay" id="modalResetMes"><div class="modal-content confirm-modal" style="max-width:460px;"><div class="confirm-icon delete" style="background:var(--danger-light);"><i data-lucide="alert-triangle" width="32" height="32" style="color:var(--danger)"></i></div><h3 style="margin-bottom:6px;font-weight:700;">🔄 Resetar Mês Financeiro</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:6px;">Isso irá <strong style="color:var(--danger);">remover todas as transações</strong> do mês atual e recalculá-las com base nos clientes atuais.</p><p style="color:var(--text-secondary);font-size:0.75rem;margin-bottom:14px;">Um backup automático será salvo antes.</p><div style="text-align:left;margin-bottom:12px;"><label class="field-label">Digite <strong>RESETAR</strong> para confirmar</label><input type="text" class="search-input" id="confirmResetText" placeholder="RESETAR" style="text-transform:uppercase;"></div><div style="text-align:left;margin-bottom:6px;"><label class="field-label">Senha de segurança</label><input type="password" class="search-input" id="senhaResetInput" placeholder="Digite sua senha"></div><div style="display:flex;gap:10px;margin-top:16px;"><button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('modalResetMes').remove()">Cancelar</button><button class="btn btn-danger" style="flex:1;" id="btnResetConfirm" disabled>Resetar Mês</button></div></div></div>`;
+          `<div class="modal-overlay" id="modalResetMes"><div class="modal-content confirm-modal" style="max-width:460px;"><div class="confirm-icon delete" style="background:var(--danger-light);"><i data-lucide="alert-triangle" width="32" height="32" style="color:var(--danger)"></i></div><h3 style="margin-bottom:6px;font-weight:700;">🔄 Resetar Mês Financeiro</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:6px;">Isso irá <strong style="color:var(--danger);">remover todas as transações</strong> do mês atual e recalculá-las com base nos clientes atuais.</p><p style="color:var(--text-secondary);font-size:0.75rem;margin-bottom:14px;">Um backup automático será salvo antes.</p><div style="text-align:left;margin-bottom:12px;"><label class="field-label">Digite <strong>RESETAR</strong> para confirmar</label><input type="text" class="search-input" id="confirmResetText" placeholder="RESETAR" autocomplete="off" style="text-transform:uppercase;"></div><div style="text-align:left;margin-bottom:6px;"><label class="field-label">Senha de segurança</label><input type="password" class="search-input" id="senhaResetInput" placeholder="Digite sua senha"></div><div style="display:flex;gap:10px;margin-top:16px;"><button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('modalResetMes').remove()">Cancelar</button><button class="btn btn-danger" style="flex:1;" id="btnResetConfirm" disabled>Resetar Mês</button></div></div></div>`;
         document.body.insertAdjacentHTML('beforeend', h);
         lucide.createIcons();
 
@@ -2492,18 +2492,23 @@
         const btnReset = document.getElementById('btnResetConfirm');
 
         function verificarCampos() {
-          btnReset.disabled = !(txtConfirm.value.trim() === 'RESETAR' && senhaInput.value.length > 0);
+          const textoOk = txtConfirm.value.trim().toUpperCase() === 'RESETAR';
+          const senhaOk = senhaInput.value.length > 0;
+          btnReset.disabled = !(textoOk && senhaOk);
         }
         txtConfirm.addEventListener('input', verificarCampos);
         senhaInput.addEventListener('input', verificarCampos);
 
         btnReset.addEventListener('click', () => {
-          if (txtConfirm.value.trim() !== 'RESETAR') { showToast('Digite RESETAR corretamente', 'error'); return; }
+          if (txtConfirm.value.trim().toUpperCase() !== 'RESETAR') {
+            showToast('Digite RESETAR corretamente', 'error');
+            return;
+          }
           if (!verificarSenha(senhaInput.value)) return;
+          
           salvarBackupAutomatico();
           const hoje = new Date();
-          const m =
-          `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
+          const m = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
           db.transacoes = db.transacoes.filter(t => !t.data.startsWith(m));
           db.ajustesManuais = [];
           sincronizarTransacoes();
@@ -2512,8 +2517,10 @@
           renderSection('financas');
           showToast('Mês resetado com sucesso! Backup salvo.');
         });
-        document.getElementById('modalResetMes').addEventListener('click', (e) => { if (e.target.id === 'modalResetMes') e
-            .target.remove(); });
+
+        document.getElementById('modalResetMes').addEventListener('click', (e) => {
+          if (e.target.id === 'modalResetMes') e.target.remove();
+        });
       }
 
       function renderFinancas() {
