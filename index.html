@@ -433,23 +433,80 @@
       function atualizarDarkModeText() { const span = document.getElementById('darkModeText'); const isDark = document.documentElement.getAttribute('data-theme') === 'dark'; if(span) span.textContent = isDark ? 'Modo Claro' : 'Modo Escuro'; const icon = document.querySelector('#sidebarDarkMode i'); if(icon) { icon.setAttribute('data-lucide', isDark?'sun':'moon'); lucide.createIcons(); } }
       function atualizarNotificacoes() { const hoje = new Date().toISOString().split('T')[0]; const v = db.clientes.filter(c => c.vencimento < hoje).length; const badge = document.getElementById('notifBadge'); if(badge) { if(v>0) { badge.style.display = 'inline'; badge.textContent = v; } else { badge.style.display = 'none'; } } }
 
-      // Backup via WhatsApp (funciona no APK e navegador)
-      function backupArquivo() {
+      // Backup na Nuvem (JsonBin) + Download local
+      async function backupArquivo() {
         if(!exigePRO()) return;
-        const jsonStr = JSON.stringify(db, null, 2);
-        const fileName = 'owerplay_backup_' + new Date().toISOString().split('T')[0] + '.json';
-        const blob = new Blob([jsonStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(url);
-        addLog('Backup exportado (.json)');
-        showToast('Backup salvo! 📁');
+        const backupData = { app: 'Owerplay Gestor', versao: '5.0', data: new Date().toISOString(), dados: db };
+        try {
+          showToast('Salvando backup na nuvem...', 'info');
+          const resp = await fetch('https://api.jsonbin.io/v3/b', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_MASTER_KEY, 'X-Bin-Name': 'owerplay-backup-' + new Date().toISOString().split('T')[0], 'X-Bin-Private': 'true' }, body: JSON.stringify(backupData)
+          });
+          const data = await resp.json();
+          if (data.metadata && data.metadata.id) {
+            localStorage.setItem('owerplay_backup_cloud_id', data.metadata.id);
+            addLog('Backup salvo na nuvem (ID: ' + data.metadata.id + ')');
+            showToast('Backup salvo na nuvem! ☁️✅');
+          } else { throw new Error('Resposta inválida da API'); }
+        } catch(e) {
+          addLog('Erro ao salvar backup na nuvem: ' + e.message);
+          showToast('Falha na nuvem. Salvando localmente...', 'warning');
+        }
+        try {
+          const jsonStr = JSON.stringify(db, null, 2);
+          const blob = new Blob([jsonStr], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a'); a.href = url; a.download = 'owerplay_backup_' + new Date().toISOString().split('T')[0] + '.json'; a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+        } catch(e) {}
       }
 
-      function restaurarArquivo() { if(!exigePRO()) return; const input = document.createElement('input'); input.type = 'file'; input.accept = '.json'; input.onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (ev) => { try { const data = JSON.parse(ev.target.result); if(!data.clientes) throw new Error('Inválido'); db = data; if(!db.transacoes) db.transacoes=[]; if(!db.templates) db.templates=defaultTemplates; if(!db.log) db.log=[]; if(!db.transacoesRemovidas) db.transacoesRemovidas=[]; saveDB(); renderSection(currentSection); showToast('Backup restaurado! ✅'); addLog('Backup restaurado via arquivo'); } catch(err) { showToast('Arquivo inválido', 'error'); } }; reader.readAsText(file); }; input.click(); }
+      async function restaurarArquivo() {
+        if(!exigePRO()) return;
+        const cloudId = localStorage.getItem('owerplay_backup_cloud_id');
+        let restaurado = false;
+        if (cloudId) {
+          try {
+            showToast('Buscando backup na nuvem...', 'info');
+            const resp = await fetch('https://api.jsonbin.io/v3/b/' + cloudId + '/latest', { headers: { 'X-Master-Key': JSONBIN_MASTER_KEY } });
+            const data = await resp.json();
+            if (data.record && data.record.dados && data.record.dados.clientes) {
+              db = data.record.dados;
+              if(!db.transacoes) db.transacoes = []; if(!db.templates) db.templates = defaultTemplates; if(!db.log) db.log = []; if(!db.transacoesRemovidas) db.transacoesRemovidas = [];
+              saveDB(); renderSection(currentSection);
+              showToast('Backup restaurado da nuvem! ☁️✅');
+              addLog('Backup restaurado via nuvem (ID: ' + cloudId + ')');
+              restaurado = true;
+              try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch(e) {}
+            }
+          } catch(e) {
+            addLog('Erro ao restaurar da nuvem: ' + e.message);
+            showToast('Backup na nuvem indisponível...', 'warning');
+          }
+        }
+        if (!restaurado) {
+          const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+          input.onchange = (e) => {
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+              try {
+                const data = JSON.parse(ev.target.result);
+                if(!data.clientes && !data.dados) throw new Error('Inválido');
+                if (data.dados && data.dados.clientes) { db = data.dados; } else { db = data; }
+                if(!db.transacoes) db.transacoes = []; if(!db.templates) db.templates = defaultTemplates; if(!db.log) db.log = []; if(!db.transacoesRemovidas) db.transacoesRemovidas = [];
+                saveDB(); renderSection(currentSection);
+                showToast('Backup restaurado do arquivo! 📁✅');
+                addLog('Backup restaurado via arquivo local');
+                try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch(e) {}
+              } catch(err) { showToast('Arquivo de backup inválido! ❌', 'error'); }
+            };
+            reader.readAsText(file);
+          };
+          input.click();
+        }
+      }
+
       document.getElementById('sidebarBackup').addEventListener('click', () => { closeSidebar(); backupArquivo(); });
       document.getElementById('sidebarRestore').addEventListener('click', () => { closeSidebar(); restaurarArquivo(); });
       async function ativarCodigoPremium(codigoDigitado) { try { const resp = await fetch(JSONBIN_API_URL+'/latest',{headers:{'X-Master-Key':JSONBIN_MASTER_KEY}}); const data = await resp.json(); const codigos = data.record.codigos; const encontrado = codigos.find(c => c.codigo === codigoDigitado.trim()); if(!encontrado) { showToast('Código inválido! ❌', 'error'); return false; } if(encontrado.usado) { showToast('Código já utilizado! ❌', 'error'); return false; } if(encontrado.expiracao && new Date(encontrado.expiracao) < new Date()) { showToast('Código expirado! ❌', 'error'); return false; } encontrado.usado = true; encontrado.data_ativacao = new Date().toISOString(); await fetch(JSONBIN_API_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_MASTER_KEY},body:JSON.stringify({codigos:codigos})}); planoPro = true; savePro(); showToast('Código ativado! Bem-vindo ao PRO! 🎉'); try { confetti({particleCount:100,spread:80,origin:{y:0.5}}); } catch(e) {} return true; } catch(e) { showToast('Erro ao validar código. Tente novamente.', 'error'); return false; } }
