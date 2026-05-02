@@ -512,7 +512,7 @@
           saveDB();
         }
 
-        function sendWhatsApp(cid, tipo, vencimentoOverride) {
+                function sendWhatsApp(cid, tipo, vencimentoOverride) {
           var c = db.clientes.find(function(x) { return x.id === cid; }); 
           if(!c) return;
           var p = db.planos.find(function(x) { return x.id === c.planoId; }); 
@@ -520,15 +520,8 @@
           var venc = vencimentoOverride ? new Date(vencimentoOverride+'T00:00:00').toLocaleDateString('pt-BR') : new Date(c.vencimento+'T00:00:00').toLocaleDateString('pt-BR');
           var valor = ((p?.valor||0)-(c.desconto||0)).toFixed(2);
           var msg = tpl.replace(/{nome}/g, c.nome.split(' ')[0]).replace(/{sobrenome}/g, c.nome.split(' ').slice(1).join(' ')).replace(/{nome_completo}/g, c.nome).replace(/{vencimento}/g, venc).replace(/{valor}/g, valor).replace(/{plano}/g, p?.nome||'');
-          var waWeb = 'https://wa.me/'+c.whatsapp+'?text='+encodeURIComponent(msg);
-          var isWebView = navigator.userAgent.includes('wv')||navigator.userAgent.includes('WebView');
-          if(isWebView) {
-            var waApp = 'whatsapp://send?phone='+c.whatsapp+'&text='+encodeURIComponent(msg);
-            window.location.href = waApp;
-            setTimeout(function() { window.open(waWeb, '_blank'); }, 2000);
-          } else { 
-            window.open(waWeb, '_blank'); 
-          }
+          var waWeb = 'https://wa.me/' + c.whatsapp + '?text=' + encodeURIComponent(msg);
+          window.open(waWeb, '_blank');
         }
 
         var currentSection = 'dashboard', clientesFilter = null, chartInstance = null, lastScrollY = 0;
