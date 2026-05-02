@@ -20,6 +20,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
     :root {
@@ -51,13 +52,9 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     html { height: 100%; }
     body {
-      height: auto;
-      min-height: 100vh;
-      overflow-y: auto !important;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch !important;
-      font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary);
-      color:var(--text-primary); display:flex; line-height:1.47;
+      height: auto; min-height: 100vh; overflow-y: auto !important; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch !important; font-family:'Inter',-apple-system,sans-serif;
+      background:var(--bg-primary); color:var(--text-primary); display:flex; line-height:1.47;
       font-weight:400; -webkit-font-smoothing:antialiased;
       transition:background var(--transition-smooth),color var(--transition-smooth);
       touch-action:pan-y; position: relative;
@@ -234,6 +231,11 @@
   </div>
 
   <script>
+    // Configuração Supabase
+    const SUPABASE_URL = 'https://auepntbwueklrnqazkhs.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1ZXBudGJ3dWVrbHJucWF6a2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NjgzNjcsImV4cCI6MjA5MzI0NDM2N30.3Ux5eLRu2i6_tVDMxREUtcag4coGP6l29RHPippto3Q';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     if('serviceWorker' in navigator) {
       const swBlob = new Blob([`const CACHE_NAME='owerplay-v1';self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(['/','https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap','https://unpkg.com/lucide@latest','https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js','https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js'])));self.skipWaiting()});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim()});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{if(r&&r.status===200){let cl=r.clone();caches.open(CACHE_NAME).then(c=>c.put(e.request,cl))}return r})).catch(()=>caches.match(e.request)))})`], {type:'application/javascript'});
       navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
@@ -253,6 +255,7 @@
       };
       let db = { clientes:[], planos:[], servidores:[], transacoes:[], templates:defaultTemplates, log:[], transacoesRemovidas:[] };
       let planoPro = false;
+      
       try { const s = localStorage.getItem(STORAGE_KEY); if(s) { db = JSON.parse(s); if(!db.transacoes) db.transacoes=[]; if(!db.templates) db.templates=defaultTemplates; if(!db.log) db.log=[]; if(!db.transacoesRemovidas) db.transacoesRemovidas=[]; } } catch(e) { localStorage.removeItem(STORAGE_KEY); }
       try { planoPro = JSON.parse(localStorage.getItem('owerplay_pro') || 'false'); } catch(e) {}
 
@@ -261,7 +264,29 @@
       function atualizarIconesPro() { document.querySelectorAll('.pro-badge-lock').forEach(el => { el.style.display = planoPro ? 'none' : 'inline'; }); }
       function exigePRO() { if(!planoPro) { showBannerPRO(); return false; } return true; }
 
-      function saveDB() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); atualizarNotificacoes(); atualizarDarkModeText(); }
+      async function saveDB() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        atualizarNotificacoes();
+        atualizarDarkModeText();
+        try { await supabase.from('app_data').upsert({ id: 'default', dados: db, updated_at: new Date().toISOString() }); } catch(e) {}
+      }
+
+      async function carregarDaNuvem() {
+        try {
+          const { data, error } = await supabase.from('app_data').select('dados').eq('id', 'default').single();
+          if (data && data.dados && data.dados.clientes) {
+            db = data.dados;
+            if(!db.transacoes) db.transacoes = [];
+            if(!db.templates) db.templates = defaultTemplates;
+            if(!db.log) db.log = [];
+            if(!db.transacoesRemovidas) db.transacoesRemovidas = [];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+            return true;
+          }
+        } catch(e) {}
+        return false;
+      }
+
       function addLog(m) { db.log.unshift({ msg:m, data:new Date().toLocaleString('pt-BR') }); if(db.log.length > 50) db.log.pop(); saveDB(); }
       function showToast(m, t) { t = t || 'success'; const c = document.getElementById('toastContainer'); if(!c) return; const icons = { success:'check-circle', error:'alert-circle', warning:'alert-triangle', info:'info' }; const toast = document.createElement('div'); toast.className = 'toast'; toast.innerHTML = `<i data-lucide="${icons[t]}" width="18" height="18" style="color:var(--${t==='success'?'success':t==='error'?'danger':'warning'})"></i><span>${m}</span>`; c.appendChild(toast); lucide.createIcons(); setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-8px) scale(0.95)'; toast.style.transition = 'all 0.25s ease'; setTimeout(() => toast.remove(), 250); }, 2000); }
 
@@ -312,16 +337,11 @@
 
       function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('show'); document.body.style.overflow = 'hidden'; mainContent.style.overflow = 'hidden'; }
       function closeSidebar() { 
-        sidebar.classList.remove('open'); 
-        overlay.classList.remove('show'); 
-        document.body.style.overflow = 'auto';
-        document.body.style.overflowY = 'auto';
-        document.body.style.position = 'relative';
-        mainContent.style.overflow = 'auto';
-        mainContent.style.overflowY = 'auto';
-        mainContent.style.position = 'relative';
-        mainContent.style.height = 'auto';
-        mainContent.style.minHeight = '100vh';
+        sidebar.classList.remove('open'); overlay.classList.remove('show'); 
+        document.body.style.overflow = 'auto'; document.body.style.overflowY = 'auto';
+        document.body.style.position = 'relative'; mainContent.style.overflow = 'auto';
+        mainContent.style.overflowY = 'auto'; mainContent.style.position = 'relative';
+        mainContent.style.height = 'auto'; mainContent.style.minHeight = '100vh';
         window.scrollTo(0, window.scrollY || 0);
       }
       document.getElementById('hamburgerBtn').addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
@@ -356,11 +376,8 @@
           db.transacoes = db.transacoes.filter(t => !(t.clienteId === cid && t.data.startsWith(m)));
           if(!db.transacoesRemovidas) db.transacoesRemovidas = [];
           db.transacoesRemovidas.push({ clienteId:cid, mes:m });
-          saveDB();
-          addLog('Transações de ' + c.nome + ' removidas');
-          renderDashboard();
-          renderSection('financas');
-          showToast('Transações removidas!');
+          saveDB(); addLog('Transações de ' + c.nome + ' removidas');
+          renderDashboard(); renderSection('financas'); showToast('Transações removidas!');
         });
       };
 
@@ -394,18 +411,7 @@
           const lucroCli = ct.entrada - ct.saida;
           return `<tr><td><strong>${ct.nome}</strong></td><td class="transaction-amount entrada">+ R$ ${ct.entrada.toFixed(2)}</td><td class="transaction-amount negative">- R$ ${ct.saida.toFixed(2)}</td><td class="transaction-amount ${lucroCli>=0?'positive':'negative'}">${lucroCli>=0?'+':'-'} R$ ${Math.abs(lucroCli).toFixed(2)}</td><td style="text-align:center;"><button class="btn-delete-row" onclick="window._removerTransacoesCliente('${ct.id}')" title="Remover transações deste cliente"><i data-lucide="trash-2"></i></button></td></tr>`;
         }).join('');
-
-        mainContent.innerHTML = `<button class="back-btn" onclick="window.goBack()"><i data-lucide="chevron-left"></i> Voltar</button>
-        <h1 class="section-title">Finanças</h1>
-        <p class="section-subtitle">Receitas e despesas do mês${!planoPro?' · <small style="color:var(--warning);">Limitado a 10 transações</small>':''}</p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:24px;">
-          <div class="stat-card lucro"><div class="stat-label"><i data-lucide="wallet" width="14" height="14" style="color:var(--success)"></i> Lucro</div><div class="stat-value positive">R$ ${luc.toFixed(2)}</div></div>
-          <div class="stat-card entrada"><div class="stat-label"><i data-lucide="trending-up" width="14" height="14" style="color:var(--entrada)"></i> Entradas</div><div class="stat-value info-color">R$ ${ent.toFixed(2)}</div></div>
-          <div class="stat-card saida"><div class="stat-label"><i data-lucide="trending-down" width="14" height="14" style="color:var(--danger)"></i> Saídas</div><div class="stat-value negative">R$ ${sai.toFixed(2)}</div></div>
-          <div class="stat-card crescimento"><div class="stat-label"><i data-lucide="activity" width="14" height="14" style="color:var(--crescimento)"></i> Crescimento</div><div class="stat-value teal-color">${crescTxt}</div></div>
-        </div>
-        <div class="stat-card" style="margin-bottom:20px;"><h3 style="margin-bottom:12px;font-weight:600;">📊 Este Mês</h3><div class="chart-container"><canvas id="finChart"></canvas></div></div>
-        <div class="stat-card"><h3 style="margin-bottom:12px;font-weight:600;">Resumo por Cliente</h3><div class="table-wrapper"><table class="transaction-table"><thead><tr><th>Cliente</th><th>Entrada</th><th>Saída</th><th>Lucro</th><th style="width:50px;text-align:center;"></th></tr></thead><tbody>${clienteRows||'<tr><td colspan="5" style="text-align:center;padding:40px;">Nenhuma transação</td></tr>'}</tbody></table></div></div>`;
+        mainContent.innerHTML = `<button class="back-btn" onclick="window.goBack()"><i data-lucide="chevron-left"></i> Voltar</button><h1 class="section-title">Finanças</h1><p class="section-subtitle">Receitas e despesas do mês${!planoPro?' · <small style="color:var(--warning);">Limitado a 10 transações</small>':''}</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:24px;"><div class="stat-card lucro"><div class="stat-label"><i data-lucide="wallet" width="14" height="14" style="color:var(--success)"></i> Lucro</div><div class="stat-value positive">R$ ${luc.toFixed(2)}</div></div><div class="stat-card entrada"><div class="stat-label"><i data-lucide="trending-up" width="14" height="14" style="color:var(--entrada)"></i> Entradas</div><div class="stat-value info-color">R$ ${ent.toFixed(2)}</div></div><div class="stat-card saida"><div class="stat-label"><i data-lucide="trending-down" width="14" height="14" style="color:var(--danger)"></i> Saídas</div><div class="stat-value negative">R$ ${sai.toFixed(2)}</div></div><div class="stat-card crescimento"><div class="stat-label"><i data-lucide="activity" width="14" height="14" style="color:var(--crescimento)"></i> Crescimento</div><div class="stat-value teal-color">${crescTxt}</div></div></div><div class="stat-card" style="margin-bottom:20px;"><h3 style="margin-bottom:12px;font-weight:600;">📊 Este Mês</h3><div class="chart-container"><canvas id="finChart"></canvas></div></div><div class="stat-card"><h3 style="margin-bottom:12px;font-weight:600;">Resumo por Cliente</h3><div class="table-wrapper"><table class="transaction-table"><thead><tr><th>Cliente</th><th>Entrada</th><th>Saída</th><th>Lucro</th><th style="width:50px;text-align:center;"></th></tr></thead><tbody>${clienteRows||'<tr><td colspan="5" style="text-align:center;padding:40px;">Nenhuma transação</td></tr>'}</tbody></table></div></div>`;
         lucide.createIcons();
         setTimeout(() => { if(chartInstance) chartInstance.destroy(); const ctx = document.getElementById('finChart'); if(ctx) { chartInstance = new Chart(ctx, { type:'bar', data:{ labels:['Este Mês'], datasets:[{ label:'Entradas', data:[ent], backgroundColor:'#0288D1', borderRadius:8, borderSkipped:false },{ label:'Saídas', data:[sai], backgroundColor:'#EF5350', borderRadius:8, borderSkipped:false },{ label:'Lucro', data:[luc], backgroundColor:'#43A047', borderRadius:8, borderSkipped:false }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, padding:18, font:{ size:11 } } } }, scales:{ y:{ beginAtZero:true, grid:{ color:'rgba(0,0,0,0.04)' } }, x:{ grid:{ display:false } } } } }); } }, 200);
       }
@@ -433,78 +439,45 @@
       function atualizarDarkModeText() { const span = document.getElementById('darkModeText'); const isDark = document.documentElement.getAttribute('data-theme') === 'dark'; if(span) span.textContent = isDark ? 'Modo Claro' : 'Modo Escuro'; const icon = document.querySelector('#sidebarDarkMode i'); if(icon) { icon.setAttribute('data-lucide', isDark?'sun':'moon'); lucide.createIcons(); } }
       function atualizarNotificacoes() { const hoje = new Date().toISOString().split('T')[0]; const v = db.clientes.filter(c => c.vencimento < hoje).length; const badge = document.getElementById('notifBadge'); if(badge) { if(v>0) { badge.style.display = 'inline'; badge.textContent = v; } else { badge.style.display = 'none'; } } }
 
-      // Backup na Nuvem (JsonBin) + Download local
-      async function backupArquivo() {
+      function backupArquivo() {
         if(!exigePRO()) return;
-        const backupData = { app: 'Owerplay Gestor', versao: '5.0', data: new Date().toISOString(), dados: db };
-        try {
-          showToast('Salvando backup na nuvem...', 'info');
-          const resp = await fetch('https://api.jsonbin.io/v3/b', {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_MASTER_KEY, 'X-Bin-Name': 'owerplay-backup-' + new Date().toISOString().split('T')[0], 'X-Bin-Private': 'true' }, body: JSON.stringify(backupData)
-          });
-          const data = await resp.json();
-          if (data.metadata && data.metadata.id) {
-            localStorage.setItem('owerplay_backup_cloud_id', data.metadata.id);
-            addLog('Backup salvo na nuvem (ID: ' + data.metadata.id + ')');
-            showToast('Backup salvo na nuvem! ☁️✅');
-          } else { throw new Error('Resposta inválida da API'); }
-        } catch(e) {
-          addLog('Erro ao salvar backup na nuvem: ' + e.message);
-          showToast('Falha na nuvem. Salvando localmente...', 'warning');
-        }
-        try {
-          const jsonStr = JSON.stringify(db, null, 2);
-          const blob = new Blob([jsonStr], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = 'owerplay_backup_' + new Date().toISOString().split('T')[0] + '.json'; a.click();
-          setTimeout(() => URL.revokeObjectURL(url), 5000);
-        } catch(e) {}
+        const jsonStr = JSON.stringify(db, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'owerplay_backup_' + new Date().toISOString().split('T')[0] + '.json';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        addLog('Backup exportado (.json)');
+        showToast('Backup salvo! 📁');
       }
 
-      async function restaurarArquivo() {
+      function restaurarArquivo() {
         if(!exigePRO()) return;
-        const cloudId = localStorage.getItem('owerplay_backup_cloud_id');
-        let restaurado = false;
-        if (cloudId) {
-          try {
-            showToast('Buscando backup na nuvem...', 'info');
-            const resp = await fetch('https://api.jsonbin.io/v3/b/' + cloudId + '/latest', { headers: { 'X-Master-Key': JSONBIN_MASTER_KEY } });
-            const data = await resp.json();
-            if (data.record && data.record.dados && data.record.dados.clientes) {
-              db = data.record.dados;
-              if(!db.transacoes) db.transacoes = []; if(!db.templates) db.templates = defaultTemplates; if(!db.log) db.log = []; if(!db.transacoesRemovidas) db.transacoesRemovidas = [];
+        const input = document.createElement('input');
+        input.type = 'file'; input.accept = '.json';
+        input.onchange = (e) => {
+          const file = e.target.files[0]; if(!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const data = JSON.parse(ev.target.result);
+              if(!data.clientes && !data.dados) throw new Error('Inválido');
+              if (data.dados && data.dados.clientes) { db = data.dados; } else { db = data; }
+              if(!db.transacoes) db.transacoes = [];
+              if(!db.templates) db.templates = defaultTemplates;
+              if(!db.log) db.log = [];
+              if(!db.transacoesRemovidas) db.transacoesRemovidas = [];
               saveDB(); renderSection(currentSection);
-              showToast('Backup restaurado da nuvem! ☁️✅');
-              addLog('Backup restaurado via nuvem (ID: ' + cloudId + ')');
-              restaurado = true;
+              showToast('Backup restaurado! ✅');
+              addLog('Backup restaurado via arquivo');
               try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch(e) {}
-            }
-          } catch(e) {
-            addLog('Erro ao restaurar da nuvem: ' + e.message);
-            showToast('Backup na nuvem indisponível...', 'warning');
-          }
-        }
-        if (!restaurado) {
-          const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
-          input.onchange = (e) => {
-            const file = e.target.files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-              try {
-                const data = JSON.parse(ev.target.result);
-                if(!data.clientes && !data.dados) throw new Error('Inválido');
-                if (data.dados && data.dados.clientes) { db = data.dados; } else { db = data; }
-                if(!db.transacoes) db.transacoes = []; if(!db.templates) db.templates = defaultTemplates; if(!db.log) db.log = []; if(!db.transacoesRemovidas) db.transacoesRemovidas = [];
-                saveDB(); renderSection(currentSection);
-                showToast('Backup restaurado do arquivo! 📁✅');
-                addLog('Backup restaurado via arquivo local');
-                try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch(e) {}
-              } catch(err) { showToast('Arquivo de backup inválido! ❌', 'error'); }
-            };
-            reader.readAsText(file);
+            } catch(err) { showToast('Arquivo inválido!', 'error'); }
           };
-          input.click();
-        }
+          reader.readAsText(file);
+        };
+        input.click();
       }
 
       document.getElementById('sidebarBackup').addEventListener('click', () => { closeSidebar(); backupArquivo(); });
@@ -515,36 +488,33 @@
       document.documentElement.setAttribute('data-theme', localStorage.getItem('theme')||'light');
       function renderMensagens() { mainContent.innerHTML = `<button class="back-btn" onclick="window.goBack()"><i data-lucide="chevron-left"></i> Voltar</button><h1 class="section-title">Mensagens</h1><p class="section-subtitle">Comunique-se com seus clientes</p><div class="stat-card" style="margin-bottom:16px;"><h3>📋 Cobrança</h3><p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:8px;">Tags: {nome}, {sobrenome}, {vencimento}, {valor}, {plano}</p><textarea class="textarea-input" id="tplCobranca" style="min-height:140px;">${db.templates.cobranca}</textarea></div><div class="stat-card" style="margin-bottom:20px;"><h3>📋 Renovação</h3><p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:8px;">Tags: {nome}, {sobrenome}, {vencimento}</p><textarea class="textarea-input" id="tplRenovacao" style="min-height:100px;">${db.templates.renovacao}</textarea></div><div style="display:flex;gap:10px;"><button class="btn btn-ghost" style="flex:1;" id="resetTpl">Restaurar Padrão</button><button class="btn btn-primary" style="flex:1;" id="saveTpl">Salvar Templates</button></div>`; lucide.createIcons(); document.getElementById('saveTpl').onclick = () => { db.templates.cobranca = document.getElementById('tplCobranca').value; db.templates.renovacao = document.getElementById('tplRenovacao').value; saveDB(); addLog('Templates atualizados'); showToast('Templates salvos!'); }; document.getElementById('resetTpl').onclick = () => { db.templates.cobranca = defaultTemplates.cobranca; db.templates.renovacao = defaultTemplates.renovacao; saveDB(); renderMensagens(); showToast('Restaurado!', 'info'); }; }
 
-      sincronizarTransacoes(); renderSection('dashboard');
+      async function iniciarApp() {
+        await carregarDaNuvem();
+        sincronizarTransacoes();
+        renderSection('dashboard');
+        checkMobile();
+        atualizarDarkModeText();
+        atualizarBadgePro();
+        atualizarIconesPro();
+      }
+
       function checkMobile() { if(window.innerWidth >= 1024 && sidebar) closeSidebar(); updateFab(); }
-      window.addEventListener('resize', checkMobile); checkMobile();
-      atualizarDarkModeText(); atualizarBadgePro(); atualizarIconesPro();
+      window.addEventListener('resize', checkMobile);
+      iniciarApp();
 
       // Swipe navigation
       (function() {
         const sections = ['dashboard', 'clientes', 'planos', 'servidores', 'financas'];
-        let touchStartX = 0;
-        let touchStartY = 0;
-        
-        document.addEventListener('touchstart', function(e) {
-          touchStartX = e.touches[0].clientX;
-          touchStartY = e.touches[0].clientY;
-        }, { passive: false });
-        
+        let touchStartX = 0, touchStartY = 0;
+        document.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, { passive: false });
         document.addEventListener('touchend', function(e) {
-          const touchEndX = e.changedTouches[0].clientX;
-          const touchEndY = e.changedTouches[0].clientY;
-          const diffX = touchStartX - touchEndX;
-          const diffY = touchStartY - touchEndY;
-          
+          const touchEndX = e.changedTouches[0].clientX, touchEndY = e.changedTouches[0].clientY;
+          const diffX = touchStartX - touchEndX, diffY = touchStartY - touchEndY;
           if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
             e.preventDefault();
             const currentIndex = sections.indexOf(currentSection);
-            if (diffX > 0 && currentIndex < sections.length - 1) {
-              navigateTo(sections[currentIndex + 1]);
-            } else if (diffX < 0 && currentIndex > 0) {
-              navigateTo(sections[currentIndex - 1]);
-            }
+            if (diffX > 0 && currentIndex < sections.length - 1) { navigateTo(sections[currentIndex + 1]); }
+            else if (diffX < 0 && currentIndex > 0) { navigateTo(sections[currentIndex - 1]); }
           }
         }, { passive: false });
       })();
