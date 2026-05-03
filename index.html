@@ -234,9 +234,9 @@
       </div>
       <div style="text-align:left;margin-bottom:24px;">
         <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;">Senha</label>
-        <input type="password" id="loginSenha" class="search-input" placeholder="Sua senha" style="width:100%;">
+        <input type="password" id="loginSenha" class="search-input" placeholder="Sua senha" style="width:100%;" onkeydown="if(event.key==='Enter')fazerLogin()">
       </div>
-      <button class="btn btn-primary" style="width:100%;padding:12px;font-size:0.9rem;" onclick="fazerLogin()">Entrar</button>
+      <button class="btn btn-primary" id="loginBtn" style="width:100%;padding:12px;font-size:0.9rem;" onclick="fazerLogin()">Entrar</button>
       <p id="loginError" style="color:var(--danger);font-size:0.8rem;margin-top:12px;display:none;"></p>
     </div>
   </div>
@@ -298,45 +298,64 @@
       console.warn('Supabase não disponível');
     }
 
-    // ========== FUNÇÃO DE LOGIN (NOVO) ==========
+    // ========== FUNÇÃO DE LOGIN (via Supabase Auth) ==========
     function fazerLogin() {
       var email = document.getElementById('loginEmail').value.trim();
       var senha = document.getElementById('loginSenha').value.trim();
       var errorEl = document.getElementById('loginError');
-      
-      if (email === 'owertech82@gmail.com' && senha === 'owerplay2026') {
-        localStorage.setItem('owerplay_logado', 'true');
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('appContainer').style.display = 'flex';
-        if (errorEl) errorEl.style.display = 'none';
-        // Inicia o app após login
-        iniciarApp();
-      } else {
-        if (errorEl) {
-          errorEl.textContent = 'Email ou senha incorretos!';
-          errorEl.style.display = 'block';
+      var btn = document.getElementById('loginBtn');
+
+      if (!email || !senha) {
+        if (errorEl) { errorEl.textContent = 'Preencha email e senha.'; errorEl.style.display = 'block'; }
+        return;
+      }
+
+      if (!supabase) {
+        if (errorEl) { errorEl.textContent = 'Serviço de autenticação indisponível.'; errorEl.style.display = 'block'; }
+        return;
+      }
+
+      if (btn) { btn.disabled = true; btn.textContent = 'Entrando...'; }
+      if (errorEl) errorEl.style.display = 'none';
+
+      supabase.auth.signInWithPassword({ email: email, password: senha }).then(function(result) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+        if (result.error) {
+          if (errorEl) { errorEl.textContent = 'Email ou senha incorretos!'; errorEl.style.display = 'block'; }
+        } else {
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('appContainer').style.display = 'flex';
+          iniciarApp();
         }
+      });
+    }
+
+    // ========== FUNÇÃO DE LOGOUT ==========
+    function fazerLogout() {
+      if (supabase) {
+        supabase.auth.signOut().then(function() {
+          document.getElementById('loginScreen').style.display = 'flex';
+          document.getElementById('appContainer').style.display = 'none';
+          document.getElementById('loginEmail').value = '';
+          document.getElementById('loginSenha').value = '';
+          var errorEl = document.getElementById('loginError');
+          if (errorEl) errorEl.style.display = 'none';
+        });
+      } else {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('appContainer').style.display = 'none';
       }
     }
 
-    // ========== FUNÇÃO DE LOGOUT (NOVO) ==========
-    function fazerLogout() {
-      localStorage.removeItem('owerplay_logado');
-      document.getElementById('loginScreen').style.display = 'flex';
-      document.getElementById('appContainer').style.display = 'none';
-      document.getElementById('loginEmail').value = '';
-      document.getElementById('loginSenha').value = '';
-      var errorEl = document.getElementById('loginError');
-      if (errorEl) errorEl.style.display = 'none';
-      // Recarrega a página para limpar tudo
-      window.location.reload();
-    }
-
-    // ========== VERIFICA SE JÁ ESTÁ LOGADO AO CARREGAR (NOVO) ==========
-    if (localStorage.getItem('owerplay_logado') === 'true') {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('appContainer').style.display = 'flex';
-      iniciarApp();
+    // ========== VERIFICA SESSÃO ATIVA AO CARREGAR ==========
+    if (supabase) {
+      supabase.auth.getSession().then(function(result) {
+        if (result.data && result.data.session) {
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('appContainer').style.display = 'flex';
+          iniciarApp();
+        }
+      });
     }
 
     // ========== APP PRINCIPAL ==========
@@ -353,6 +372,11 @@
         var JSONBIN_BIN_ID = '69ec4032aaba882197361318';
         var JSONBIN_MASTER_KEY = '$2a$10$hPThmNbRFc4LJU8Lb39N0ufogEbkwasTJJJV4m3CCTq0DEzgcP.y2';
         var JSONBIN_API_URL = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
+
+        // ========== PROTEÇÃO XSS ==========
+        function escHtml(str) {
+          return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        }
 
         var defaultTemplates = {
           cobranca: "Olá {nome}, Bom dia!\nSeu plano de tv vence hoje *{vencimento}*\n\n⚠️ *Na data do vencimento, o sistema poderá bloquear automaticamente a qualquer momento, renove assim que possível!*\n\nDADOS PARA PAGAMENTO:\nValor: *R${valor}*\nPix:\nBanco:\n\n✅ *Favor enviar comprovante*",
@@ -378,22 +402,26 @@
           planoPro = JSON.parse(localStorage.getItem('owerplay_pro') || 'false'); 
         } catch(e) {}
 
-        // ========== SINCRONIZAÇÃO SUPABASE (NOVO) ==========
+        // ========== SINCRONIZAÇÃO SUPABASE com debounce ==========
+        var _supabaseTimer = null;
         function sincronizarSupabase() {
           if (!supabase) return;
-          try {
-            supabase.from('app_data').upsert({ 
-              id: 'default', 
-              dados: db, 
-              updated_at: new Date().toISOString() 
-            }).then(function(response) {
-              if (response.error) {
-                console.warn('Erro Supabase:', response.error);
-              }
-            });
-          } catch(e) {
-            console.warn('Falha Supabase:', e);
-          }
+          clearTimeout(_supabaseTimer);
+          _supabaseTimer = setTimeout(function() {
+            try {
+              supabase.from('app_data').upsert({ 
+                id: 'default', 
+                dados: db, 
+                updated_at: new Date().toISOString() 
+              }).then(function(response) {
+                if (response.error) {
+                  console.warn('Erro Supabase:', response.error);
+                }
+              });
+            } catch(e) {
+              console.warn('Falha Supabase:', e);
+            }
+          }, 1200);
         }
 
         function carregarDadosSupabase(callback) {
@@ -590,10 +618,12 @@
         
         document.getElementById('sidebarCloseBtn').addEventListener('click', closeSidebar);
         
-        // ========== BOTÃO SAIR (NOVO) ==========
+        // ========== BOTÃO SAIR com confirmação ==========
         document.getElementById('sidebarSair').addEventListener('click', function() {
           closeSidebar();
-          fazerLogout();
+          showConfirmModal('Sair do sistema?', 'Você será desconectado da sua conta.', 'delete', 'Sim, sair', 'btn-danger', function() {
+            fazerLogout();
+          });
         });
         
         document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(function(b) { 
@@ -756,11 +786,11 @@
           cont.innerHTML = clientes.sort(function(a,b) { return a.vencimento.localeCompare(b.vencimento); }).map(function(c,i) { 
             var p = db.planos.find(function(x) { return x.id === c.planoId; }) || {}; 
             var s = db.servidores.find(function(x) { return x.id === c.servidorId; }) || {}; 
-            var ini = c.nome.split(' ').map(function(n) { return n[0]; }).join('').substring(0,2).toUpperCase(); 
+            var ini = escHtml(c.nome).split(' ').map(function(n) { return n[0]; }).join('').substring(0,2).toUpperCase(); 
             var sc = 'badge-success', st = 'Ativo'; 
             if(c.vencimento < hoje) { sc = 'badge-danger'; st = 'Vencido'; } 
             else if(c.vencimento === hoje) { sc = 'badge-warning'; st = 'Hoje'; } 
-            return '<div class="client-card" style="animation-delay:' + (i*0.04) + 's"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><div class="avatar">' + ini + '</div><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:0.9rem;">' + c.nome + '</div><div style="font-size:0.7rem;color:var(--text-secondary);">' + (p.nome||'Sem plano') + ' · ' + (s.nome||'Sem servidor') + '</div></div><span class="badge ' + sc + '">' + st + '</span></div><div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--separator);font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px;"><span>📅 ' + new Date(c.vencimento+'T00:00:00').toLocaleDateString('pt-BR') + '</span><span>R$ ' + ((p.valor||0)-(c.desconto||0)).toFixed(2) + '</span></div><div class="action-icons"><button class="btn-icon whatsapp" onclick="window._wp(\'' + c.id + '\')"><i data-lucide="messages-square" width="18" height="18"></i></button><button class="btn-icon notes ' + (c.anotacoes?'has-note':'') + '" onclick="window._note(\'' + c.id + '\')"><i data-lucide="file-text" width="18" height="18"></i></button><button class="btn-icon" onclick="window._renovar(\'' + c.id + '\')"><i data-lucide="rotate-cw" width="18" height="18"></i></button><button class="btn-icon" onclick="window._editar(\'' + c.id + '\')"><i data-lucide="pencil" width="18" height="18"></i></button><button class="btn-icon danger" onclick="window._excluir(\'' + c.id + '\')"><i data-lucide="trash" width="18" height="18"></i></button></div></div>'; 
+            return '<div class="client-card" style="animation-delay:' + (i*0.04) + 's"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><div class="avatar">' + ini + '</div><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:0.9rem;">' + escHtml(c.nome) + '</div><div style="font-size:0.7rem;color:var(--text-secondary);">' + escHtml(p.nome||'Sem plano') + ' · ' + escHtml(s.nome||'Sem servidor') + '</div></div><span class="badge ' + sc + '">' + st + '</span></div><div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--separator);font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px;"><span>📅 ' + new Date(c.vencimento+'T00:00:00').toLocaleDateString('pt-BR') + '</span><span>R$ ' + ((p.valor||0)-(c.desconto||0)).toFixed(2) + '</span></div><div class="action-icons"><button class="btn-icon whatsapp" onclick="window._wp(\'' + escHtml(c.id) + '\')"><i data-lucide="messages-square" width="18" height="18"></i></button><button class="btn-icon notes ' + (c.anotacoes?'has-note':'') + '" onclick="window._note(\'' + escHtml(c.id) + '\')"><i data-lucide="file-text" width="18" height="18"></i></button><button class="btn-icon" onclick="window._renovar(\'' + escHtml(c.id) + '\')"><i data-lucide="rotate-cw" width="18" height="18"></i></button><button class="btn-icon" onclick="window._editar(\'' + escHtml(c.id) + '\')"><i data-lucide="pencil" width="18" height="18"></i></button><button class="btn-icon danger" onclick="window._excluir(\'' + escHtml(c.id) + '\')"><i data-lucide="trash" width="18" height="18"></i></button></div></div>'; 
           }).join(''); 
           lucide.createIcons(); 
         }
@@ -877,10 +907,22 @@
             html += '<div class="empty-state-card"><div class="empty-state-icon"><i data-lucide="users" width="32" height="32" style="color:var(--accent-dark)"></i></div><div class="empty-state-title">Nenhum cliente</div><div class="empty-state-desc">Cadastre primeiro <strong>Servidor</strong> e <strong>Plano</strong>.</div><button class="btn btn-primary" onclick="window.goBack()">Começar</button></div>'; 
           } else { 
             if(label) html += '<div class="active-filter-badge">🔍 ' + label + ' (' + cl.length + ') <button onclick="window.clearFilter()"><i data-lucide="x" width="14" height="14"></i></button></div>'; 
+            html += '<input type="text" class="search-input" placeholder="🔍 Buscar cliente por nome ou WhatsApp..." id="searchClientes" style="margin-bottom:16px;">';
             html += '<div class="card-grid" id="clientesList"></div>'; 
           } 
           mainContent.innerHTML = html; 
-          if(cl.length > 0 || db.planos.length > 0 || db.servidores.length > 0) { renderCards('clientesList', cl, hoje); } 
+          var clSnapshot = cl.slice();
+          if(cl.length > 0 || db.planos.length > 0 || db.servidores.length > 0) { renderCards('clientesList', clSnapshot, hoje); }
+          var searchInput = document.getElementById('searchClientes');
+          if(searchInput) {
+            searchInput.addEventListener('input', function() {
+              var q = this.value.trim().toLowerCase();
+              var filtered = q ? clSnapshot.filter(function(c) {
+                return c.nome.toLowerCase().includes(q) || (c.whatsapp && c.whatsapp.includes(q));
+              }) : clSnapshot;
+              renderCards('clientesList', filtered, hoje);
+            });
+          }
           clientesFilter = null; 
         }
 
@@ -909,12 +951,14 @@
           document.body.insertAdjacentHTML('beforeend', h); 
           document.getElementById('saveCli').addEventListener('click', function() { 
             var nome = document.getElementById('nomeCli').value.trim(); 
-            var venc = document.getElementById('vencCli').value; 
-            if(!nome || !venc) { showToast('Preencha nome e vencimento', 'error'); return; } 
+            var venc = document.getElementById('vencCli').value;
+            var whats = document.getElementById('whatsCli').value.replace(/\D/g,'');
+            if(!nome || !venc) { showToast('Preencha nome e vencimento', 'error'); return; }
+            if(whats && (whats.length < 10 || whats.length > 15)) { showToast('WhatsApp inválido (inclua DDD e código do país)', 'warning'); return; }
             var novo = { 
               id:id||'c'+Date.now(), 
               nome:nome, 
-              whatsapp:document.getElementById('whatsCli').value, 
+              whatsapp:whats, 
               vencimento:venc, 
               servidorId:document.getElementById('servCli').value, 
               planoId:document.getElementById('planoCli').value, 
@@ -1303,9 +1347,6 @@
 
         window.addEventListener('resize', checkMobile); 
         checkMobile();
-        atualizarDarkModeText(); 
-        atualizarBadgePro(); 
-        atualizarIconesPro();
 
         // Swipe navigation
         (function() {
