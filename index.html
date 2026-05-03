@@ -554,15 +554,42 @@
           var venc = vencimentoOverride ? new Date(vencimentoOverride+'T00:00:00').toLocaleDateString('pt-BR') : new Date(c.vencimento+'T00:00:00').toLocaleDateString('pt-BR');
           var valor = ((p?.valor||0)-(c.desconto||0)).toFixed(2);
           var msg = tpl.replace(/{nome}/g, c.nome.split(' ')[0]).replace(/{sobrenome}/g, c.nome.split(' ').slice(1).join(' ')).replace(/{nome_completo}/g, c.nome).replace(/{vencimento}/g, venc).replace(/{valor}/g, valor).replace(/{plano}/g, p?.nome||'');
-          var waWeb = 'https://wa.me/'+c.whatsapp+'?text='+encodeURIComponent(msg);
-          var isWebView = navigator.userAgent.includes('wv')||navigator.userAgent.includes('WebView');
+          // Limpa o número para garantir que só vai dígitos na URL
+          var numero = (c.whatsapp || '').replace(/\D/g, '');
+          if(!numero) { showToast('Cliente sem WhatsApp cadastrado', 'warning'); return; }
+          var waWeb = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(msg);
+          // Detecção de WebView/APK mais abrangente
+          var ua = navigator.userAgent;
+          var isWebView = ua.includes('wv') || ua.includes('WebView') || ua.includes('Version/') && ua.includes('Android') || window.Android || window.ReactNativeWebView;
           if(isWebView) {
-            var waApp = 'whatsapp://send?phone='+c.whatsapp+'&text='+encodeURIComponent(msg);
-            window.location.href = waApp;
-            setTimeout(function() { window.open(waWeb, '_blank'); }, 2000);
+            var waApp = 'whatsapp://send?phone=' + numero + '&text=' + encodeURIComponent(msg);
+            var link = document.createElement('a');
+            link.href = waApp;
+            link.click();
+            setTimeout(function() { window.open(waWeb, '_blank'); }, 2500);
           } else { 
             window.open(waWeb, '_blank'); 
           }
+        }
+
+        // Modal de seleção de mensagem WhatsApp
+        function showWhatsAppModal(cid) {
+          var c = db.clientes.find(function(x) { return x.id === cid; });
+          if(!c) return;
+          if(!c.whatsapp) { showToast('Cliente sem WhatsApp cadastrado', 'warning'); return; }
+          var ini = escHtml(c.nome).split(' ').map(function(n){return n[0];}).join('').substring(0,2).toUpperCase();
+          var h = '<div class="modal-overlay" id="wpModalOverlay"><div class="modal-content" style="max-width:360px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;"><div class="avatar">' + ini + '</div><div><div style="font-weight:600;">' + escHtml(c.nome) + '</div><div style="font-size:0.8rem;color:var(--text-secondary);">' + escHtml(c.whatsapp) + '</div></div></div><p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Qual mensagem deseja enviar?</p><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn btn-primary" id="btnEnviarCobranca" style="width:100%;justify-content:flex-start;gap:10px;padding:14px 16px;"><span style="font-size:1.1rem;">💰</span><div style="text-align:left;"><div style="font-weight:600;">Cobrança</div><div style="font-size:0.75rem;opacity:0.85;">Lembrar o cliente sobre o vencimento</div></div></button><button class="btn" id="btnEnviarRenovacaoWp" style="width:100%;justify-content:flex-start;gap:10px;padding:14px 16px;background:#25D366;color:white;box-shadow:0 4px 16px rgba(37,211,102,0.3);"><span style="font-size:1.1rem;">✅</span><div style="text-align:left;"><div style="font-weight:600;">Renovação</div><div style="font-size:0.75rem;opacity:0.85;">Confirmar a renovação do plano</div></div></button></div><button class="btn btn-ghost" style="width:100%;margin-top:12px;" onclick="document.getElementById(\'wpModalOverlay\').remove()">Cancelar</button></div></div>';
+          document.body.insertAdjacentHTML('beforeend', h);
+          lucide.createIcons();
+          document.getElementById('btnEnviarCobranca').addEventListener('click', function() {
+            document.getElementById('wpModalOverlay').remove();
+            sendWhatsApp(cid, 'cobranca');
+          });
+          document.getElementById('btnEnviarRenovacaoWp').addEventListener('click', function() {
+            document.getElementById('wpModalOverlay').remove();
+            sendWhatsApp(cid, 'renovacao');
+          });
+          document.getElementById('wpModalOverlay').addEventListener('click', function(e) { if(e.target.id === 'wpModalOverlay') e.target.remove(); });
         }
 
         var currentSection = 'dashboard', clientesFilter = null, chartInstance = null, lastScrollY = 0;
@@ -933,7 +960,7 @@
         }
 
         window.clearFilter = function() { clientesFilter = null; renderClientes(); };
-        window._wp = function(id) { sendWhatsApp(id, 'cobranca'); }; 
+        window._wp = function(id) { showWhatsAppModal(id); }; 
         window._note = function(id) { showNotesModal(id); }; 
         window._renovar = function(id) { showRenewModal(id); }; 
         window._editar = function(id) { abrirModalCliente(id); };
