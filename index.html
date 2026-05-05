@@ -23,18 +23,97 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
     #app{display:flex;height:100dvh;overflow:hidden}
-    .sidebar{position:fixed;inset:0;z-index:200;display:none;pointer-events:none}
-    .sidebar-backdrop{flex:1;background:rgba(0,0,0,.45);opacity:0;transition:opacity .25s}
-    .sidebar-panel{width:280px;background:var(--surface);height:100%;overflow-y:auto;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,16px)}
-    .sidebar.open{display:flex;pointer-events:all}.sidebar.open .sidebar-backdrop{opacity:1}.sidebar.open .sidebar-panel{transform:translateX(0)}
-    .sidebar-header{display:flex;align-items:center;gap:12px;padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+    
+    /* SIDEBAR REDESIGN - ESTILO GLASS iOS */
+    .sidebar{position:fixed;inset:0;z-index:200;display:flex;pointer-events:none}
+    .sidebar-backdrop{
+      position:absolute;inset:0;
+      background:rgba(0,0,0,0);
+      transition:background .4s cubic-bezier(.25,.1,.25,1);
+    }
+    .sidebar.open .sidebar-backdrop{
+      background:rgba(0,0,0,.45);
+      backdrop-filter:blur(2px);
+      -webkit-backdrop-filter:blur(2px);
+    }
+    .sidebar-panel{
+      width:285px;height:100%;overflow-y:auto;
+      background:rgba(255,255,255,.82);
+      backdrop-filter:blur(28px) saturate(180%);
+      -webkit-backdrop-filter:blur(28px) saturate(180%);
+      border-right:1px solid rgba(255,255,255,.5);
+      box-shadow:4px 0 40px rgba(0,0,0,.12),inset0 0 0 0 transparent;
+      display:flex;flex-direction:column;
+      padding-bottom:env(safe-area-inset-bottom,16px);
+      transform:translateX(-100%);
+      transition:transform .45s cubic-bezier(.32,.72,0,1);
+      will-change:transform;
+      position:relative;
+      z-index:1;
+    }
+    [data-theme="dark"] .sidebar-panel{
+      background:rgba(15,23,42,.88);
+      backdrop-filter:blur(28px) saturate(180%);
+      -webkit-backdrop-filter:blur(28px) saturate(180%);
+      border-right:1px solid rgba(255,255,255,.08);
+      box-shadow:4px 0 40px rgba(0,0,0,.35);
+    }
+    .sidebar.open{pointer-events:all}
+    .sidebar.open .sidebar-panel{
+      transform:translateX(0);
+      transition:transform .5s cubic-bezier(.16,1,.3,1);
+    }
+    
+    .sidebar-header{
+      display:flex;align-items:center;gap:12px;
+      padding:20px 20px 18px;
+      border-bottom:1px solid rgba(0,0,0,.06);
+      margin-bottom:4px;
+    }
+    [data-theme="dark"] .sidebar-header{border-bottom-color:rgba(255,255,255,.06)}
     .sidebar-logo{width:38px;height:38px;object-fit:contain;border-radius:10px}
     .sidebar-brand{font-size:.95rem;font-weight:800;color:var(--text)}
-    .sidebar-close{margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px}
+    .sidebar-close{
+      margin-left:auto;background:rgba(0,0,0,.04);
+      border:none;color:var(--text3);cursor:pointer;
+      padding:8px;border-radius:50%;display:flex;align-items:center;
+      transition:background .2s;
+    }
+    [data-theme="dark"] .sidebar-close{background:rgba(255,255,255,.06)}
+    .sidebar-close:active{background:rgba(0,0,0,.1)}
     .sidebar-section{padding:12px 12px 0}
-    .sidebar-section-label{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:4px}
-    .sidebar-item{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--text);cursor:pointer;padding:10px 12px;border-radius:var(--radius-sm);font-family:inherit;font-size:.88rem;font-weight:500;transition:background .15s;text-align:left}
-    .sidebar-item:hover,.sidebar-item:active{background:var(--surface2)}.sidebar-item.danger{color:var(--danger)}.sidebar-divider{height:1px;background:var(--border);margin:8px 20px}
+    .sidebar-section-label{
+      font-size:.65rem;font-weight:700;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--text3);
+      padding:0 10px;margin-bottom:6px;
+    }
+    .sidebar-item{
+      display:flex;align-items:center;gap:10px;
+      width:100%;background:none;border:none;
+      color:var(--text);cursor:pointer;
+      padding:11px 14px;border-radius:12px;
+      font-family:inherit;font-size:.88rem;font-weight:500;
+      transition:all .18s;text-align:left;
+      position:relative;overflow:hidden;
+    }
+    .sidebar-item:active{
+      background:rgba(0,0,0,.06);
+      transform:scale(.97);
+    }
+    [data-theme="dark"] .sidebar-item:active{background:rgba(255,255,255,.06)}
+    .sidebar-item.danger{color:var(--danger)}
+    .sidebar-divider{
+      height:1px;background:rgba(0,0,0,.06);
+      margin:8px 20px;
+    }
+    [data-theme="dark"] .sidebar-divider{background:rgba(255,255,255,.06)}
+    
+    /* SCROLLBAR DA SIDEBAR */
+    .sidebar-panel::-webkit-scrollbar{width:3px}
+    .sidebar-panel::-webkit-scrollbar-track{background:transparent}
+    .sidebar-panel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:2px}
+    [data-theme="dark"] .sidebar-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+
     .topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:56px;gap:12px}
     .topbar-menu{background:none;border:none;color:var(--text2);cursor:pointer;padding:6px;border-radius:8px;display:flex;align-items:center}
     .topbar-title{font-size:1rem;font-weight:800;flex:1}.topbar-actions{display:flex;gap:6px}
@@ -94,123 +173,44 @@
     .list-item-main{font-weight:700;font-size:.9rem}.list-item-sub{font-size:.75rem;color:var(--text3);margin-top:2px}.list-item-actions{display:flex;gap:6px}
     .icon-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px;cursor:pointer;color:var(--text2);display:flex}
     
-    /* Estilo para o alerta de vencimentos do dia */
-    .daily-alert-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 400;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      animation: fadeIn 0.3s ease;
-    }
-    .daily-alert {
-      background: var(--surface);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 420px;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      animation: alertBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    @keyframes alertBounce {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .alert-header {
-      background: linear-gradient(135deg, #E65100, #BF360C);
-      color: #fff;
-      padding: 20px 20px 16px;
-      border-radius: 20px 20px 0 0;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .alert-icon {
-      width: 42px;
-      height: 42px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .alert-title {
-      font-size: 1.1rem;
-      font-weight: 800;
-    }
-    .alert-subtitle {
-      font-size: 0.78rem;
-      opacity: 0.9;
-      margin-top: 2px;
-    }
-    .alert-body {
-      padding: 16px 20px;
-    }
-    .alert-client-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background 0.15s;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 4px;
-    }
-    .alert-client-item:hover {
-      background: var(--surface2);
-    }
-    .alert-client-item:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-    }
-    .alert-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--warning-bg);
-      color: var(--warning);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.75rem;
-      flex-shrink: 0;
-    }
-    .alert-client-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .alert-client-name {
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: var(--text);
-    }
-    .alert-client-plan {
-      font-size: 0.7rem;
-      color: var(--text3);
-      margin-top: 1px;
-    }
-    .alert-amount {
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--warning);
-      flex-shrink: 0;
-    }
-    .alert-footer {
-      padding: 16px 20px;
-      display: flex;
-      gap: 10px;
-    }
-    .alert-footer .btn {
-      flex: 1;
-    }
+    .daily-alert-overlay {position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .3s ease}
+    .daily-alert {background:var(--surface);border-radius:20px;width:100%;max-width:420px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:alertBounce .4s cubic-bezier(.175,.885,.32,1.275)}
+    @keyframes alertBounce{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+    .alert-header {background:linear-gradient(135deg,#E65100,#BF360C);color:#fff;padding:20px 20px 16px;border-radius:20px 20px 0 0;display:flex;align-items:center;gap:12px}
+    .alert-icon {width:42px;height:42px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .alert-title {font-size:1.1rem;font-weight:800}.alert-subtitle {font-size:.78rem;opacity:.9;margin-top:2px}
+    .alert-body {padding:16px 20px}
+    .alert-client-item {display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:8px;margin-bottom:4px}
+    .alert-client-item:hover{background:var(--surface2)}.alert-client-item:last-child{border-bottom:none;margin-bottom:0}
+    .alert-avatar {width:36px;height:36px;border-radius:50%;background:var(--warning-bg);color:var(--warning);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;flex-shrink:0}
+    .alert-client-info {flex:1;min-width:0}.alert-client-name {font-weight:600;font-size:.85rem;color:var(--text)}.alert-client-plan {font-size:.7rem;color:var(--text3);margin-top:1px}
+    .alert-amount {font-weight:700;font-size:.85rem;color:var(--warning);flex-shrink:0}
+    .alert-footer {padding:16px 20px;display:flex;gap:10px}.alert-footer .btn{flex:1}
+
+    .timeline {position:relative;padding-left:28px}
+    .timeline::before {content:'';position:absolute;left:11px;top:8px;bottom:8px;width:2px;background:var(--border)}
+    .timeline-item {position:relative;margin-bottom:16px}.timeline-item:last-child{margin-bottom:0}
+    .timeline-dot {position:absolute;left:-21px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--surface);z-index:1}
+    .timeline-dot.green{background:var(--success)}.timeline-dot.red{background:var(--danger)}.timeline-dot.orange{background:var(--warning)}.timeline-dot.blue{background:var(--accent)}
+    .timeline-content {background:var(--surface2);border-radius:10px;padding:10px 12px}
+    .timeline-date {font-size:.7rem;color:var(--text3);font-weight:600;margin-bottom:4px}
+    .timeline-info {font-size:.78rem;color:var(--text);font-weight:500}
+    .timeline-value {font-size:.75rem;color:var(--success);font-weight:700;margin-top:2px}
+    .timeline-badge {display:inline-block;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-top:4px}
+    .timeline-badge.first{background:var(--accent-light);color:var(--accent-dark)}.timeline-badge.late{background:var(--danger-bg);color:var(--danger)}
+    .inadim-summary {display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+    .inadim-summary-item {background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center}
+    .inadim-summary-value {font-size:1.3rem;font-weight:800;color:var(--text)}.inadim-summary-label {font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:2px}
+    .inadim-group-title {font-size:.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:16px;display:flex;align-items:center;gap:6px}
+    .inadim-group-title:first-child{margin-top:0}
+    .inadim-dot {width:8px;height:8px;border-radius:50%;display:inline-block}
+    .inadim-dot.critico{background:var(--danger)}.inadim-dot.atencao{background:var(--warning)}.inadim-dot.recente{background:#F59E0B}
+    .inadim-client-card {background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+    .inadim-client-info {flex:1;min-width:0}.inadim-client-name {font-weight:700;font-size:.85rem}.inadim-client-detail {font-size:.7rem;color:var(--text3);margin-top:2px}
+    .inadim-client-value {font-weight:700;font-size:.85rem;color:var(--danger);flex-shrink:0}
+    .inadim-actions {display:flex;gap:6px;margin-top:4px}
+    .inadim-btn {font-size:.65rem;padding:4px 10px;border-radius:6px;border:none;cursor:pointer;font-family:inherit;font-weight:600;display:flex;align-items:center;gap:4px}
+    .inadim-btn.cobrar{background:var(--success-bg);color:var(--success)}.inadim-btn.nota{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
   </style>
 </head>
@@ -273,112 +273,10 @@ var SECTION_TITLES={dashboard:'Início',clientes:'Clientes',planos:'Planos',serv
 function navigateTo(sec,filter){currentSec=sec;cliFilter=filter||null;closeSidebar();document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.sec===sec)});var title=document.getElementById('topbarTitle');if(title)title.textContent=SECTION_TITLES[sec]||sec;var fab=document.getElementById('fab');if(fab)fab.className=(sec==='financas')?'hidden':'';render(sec)}
 function render(sec){var mc=document.getElementById('mainContent');if(!mc)return;mc.scrollTop=0;if(sec==='dashboard')renderDashboard(mc);else if(sec==='clientes')renderClientes(mc);else if(sec==='planos')renderPlanos(mc);else if(sec==='servidores')renderServidores(mc);else if(sec==='financas')renderFinancas(mc);icons()}
 
-// Função para verificar e mostrar alerta de vencimentos do dia
-function verificarVencimentosHoje() {
-  var hoje = today();
-  var clientesHoje = db.clientes.filter(function(c) {
-    return c.vencimento === hoje;
-  });
-  
-  if (clientesHoje.length > 0) {
-    mostrarAlertaDiario(clientesHoje);
-  }
-}
-
-// Função para mostrar popup de alerta com clientes que vencem hoje
-function mostrarAlertaDiario(clientesHoje) {
-  var alertaAnterior = document.getElementById('dailyAlertOverlay');
-  if (alertaAnterior) alertaAnterior.remove();
-  
-  var clientesHtml = clientesHoje.map(function(c) {
-    var plano = db.planos.find(function(p) { return p.id === c.planoId }) || {};
-    var serv = db.servidores.find(function(s) { return s.id === c.servidorId }) || {};
-    var valor = (plano.valor || 0) - (c.desconto || 0);
-    var partes = (c.nome || '?').trim().split(' ').filter(function(n) { return n.length > 0 });
-    var ini = (partes.length >= 2 ? partes[0][0] + partes[partes.length-1][0] : (partes[0] || '?').substring(0, 2)).toUpperCase();
-    
-    return '<div class="alert-client-item" onclick="window._fecharAlertaDiario(); window._wp(\'' + esc(c.id) + '\')">' +
-      '<div class="alert-avatar">' + ini + '</div>' +
-      '<div class="alert-client-info">' +
-        '<div class="alert-client-name">' + esc(c.nome) + '</div>' +
-        '<div class="alert-client-plan">' + esc(plano.nome || 'Sem plano') + ' · ' + esc(serv.nome || 'Sem servidor') + '</div>' +
-      '</div>' +
-      '<div class="alert-amount">R$ ' + fmt(valor) + '</div>' +
-    '</div>';
-  }).join('');
-  
-  var totalValor = clientesHoje.reduce(function(soma, c) {
-    var plano = db.planos.find(function(p) { return p.id === c.planoId }) || {};
-    return soma + ((plano.valor || 0) - (c.desconto || 0));
-  }, 0);
-  
-  var overlay = document.createElement('div');
-  overlay.id = 'dailyAlertOverlay';
-  overlay.className = 'daily-alert-overlay';
-  overlay.innerHTML = 
-    '<div class="daily-alert">' +
-      '<div class="alert-header">' +
-        '<div class="alert-icon"><i data-lucide="bell" width="22" height="22" style="color:#fff"></i></div>' +
-        '<div>' +
-          '<div class="alert-title">Vencimentos Hoje!</div>' +
-          '<div class="alert-subtitle">' + clientesHoje.length + ' cliente' + (clientesHoje.length > 1 ? 's' : '') + ' · Total: R$ ' + fmt(totalValor) + '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="alert-body">' + clientesHtml + '</div>' +
-      '<div class="alert-footer">' +
-        '<button class="btn btn-ghost" onclick="window._fecharAlertaDiario()">Fechar</button>' +
-        (clientesHoje.some(function(c) { return c.whatsapp; }) ? 
-          '<button class="btn btn-primary" onclick="window._cobrarTodosAlerta()"><i data-lucide="send" width="14" height="14"></i> Cobrar Todos</button>' : '') +
-      '</div>' +
-    '</div>';
-  
-  document.body.appendChild(overlay);
-  
-  overlay.addEventListener('click', function(e) {
-    if (e.target === overlay) {
-      fecharAlertaDiario();
-    }
-  });
-  
-  icons();
-}
-
-// Função para fechar alerta diário
-function fecharAlertaDiario() {
-  var overlay = document.getElementById('dailyAlertOverlay');
-  if (overlay) {
-    overlay.style.opacity = '0';
-    overlay.style.transition = 'opacity 0.2s';
-    setTimeout(function() {
-      overlay.remove();
-    }, 200);
-  }
-}
-
-// Função para cobrar todos do alerta
-function cobrarTodosAlerta() {
-  var hoje = today();
-  var clientesHoje = db.clientes.filter(function(c) {
-    return c.vencimento === hoje && c.whatsapp;
-  });
-  
-  fecharAlertaDiario();
-  
-  if (clientesHoje.length === 0) {
-    toast('Nenhum cliente com WhatsApp', 'warning');
-    return;
-  }
-  
-  var delay = 0;
-  clientesHoje.forEach(function(c) {
-    setTimeout(function() {
-      sendWA(c, 'cobranca');
-    }, delay);
-    delay += 2500;
-  });
-  
-  toast('Abrindo WhatsApp para ' + clientesHoje.length + ' cliente(s)...', 'success');
-}
+function verificarVencimentosHoje(){var hoje=today();var clientesHoje=db.clientes.filter(function(c){return c.vencimento===hoje});if(clientesHoje.length>0){mostrarAlertaDiario(clientesHoje)}}
+function mostrarAlertaDiario(clientesHoje){var alertaAnterior=document.getElementById('dailyAlertOverlay');if(alertaAnterior)alertaAnterior.remove();var clientesHtml=clientesHoje.map(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId})||{};var serv=db.servidores.find(function(s){return s.id===c.servidorId})||{};var valor=(plano.valor||0)-(c.desconto||0);var partes=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0});var ini=(partes.length>=2?partes[0][0]+partes[partes.length-1][0]:(partes[0]||'?').substring(0,2)).toUpperCase();return'<div class="alert-client-item" onclick="window._fecharAlertaDiario(); window._wp(\''+esc(c.id)+'\')"><div class="alert-avatar">'+ini+'</div><div class="alert-client-info"><div class="alert-client-name">'+esc(c.nome)+'</div><div class="alert-client-plan">'+esc(plano.nome||'Sem plano')+' · '+esc(serv.nome||'Sem servidor')+'</div></div><div class="alert-amount">R$ '+fmt(valor)+'</div></div>'}).join('');var totalValor=clientesHoje.reduce(function(soma,c){var plano=db.planos.find(function(p){return p.id===c.planoId})||{};return soma+((plano.valor||0)-(c.desconto||0))},0);var overlay=document.createElement('div');overlay.id='dailyAlertOverlay';overlay.className='daily-alert-overlay';overlay.innerHTML='<div class="daily-alert"><div class="alert-header"><div class="alert-icon"><i data-lucide="bell" width="22" height="22" style="color:#fff"></i></div><div><div class="alert-title">Vencimentos Hoje!</div><div class="alert-subtitle">'+clientesHoje.length+' cliente'+(clientesHoje.length>1?'s':'')+' · Total: R$ '+fmt(totalValor)+'</div></div></div><div class="alert-body">'+clientesHtml+'</div><div class="alert-footer"><button class="btn btn-ghost" onclick="window._fecharAlertaDiario()">Fechar</button>'+(clientesHoje.some(function(c){return c.whatsapp})?'<button class="btn btn-primary" onclick="window._cobrarTodosAlerta()"><i data-lucide="send" width="14" height="14"></i> Cobrar Todos</button>':'')+'</div></div>';document.body.appendChild(overlay);overlay.addEventListener('click',function(e){if(e.target===overlay){fecharAlertaDiario()}});icons()}
+function fecharAlertaDiario(){var overlay=document.getElementById('dailyAlertOverlay');if(overlay){overlay.style.opacity='0';overlay.style.transition='opacity 0.2s';setTimeout(function(){overlay.remove()},200)}}
+function cobrarTodosAlerta(){var hoje=today();var clientesHoje=db.clientes.filter(function(c){return c.vencimento===hoje&&c.whatsapp});fecharAlertaDiario();if(clientesHoje.length===0){toast('Nenhum cliente com WhatsApp','warning');return}var delay=0;clientesHoje.forEach(function(c){setTimeout(function(){sendWA(c,'cobranca')},delay);delay+=2500});toast('Abrindo WhatsApp para '+clientesHoje.length+' cliente(s)...','success')}
 
 function renderDashboard(mc){var hoje=today(),mesAtual=hoje.slice(0,7);var ent=sumTrans('entrada',mesAtual),sai=sumTrans('saida',mesAtual),lucro=ent-sai;var ativos=db.clientes.filter(function(c){return c.vencimento>=hoje}).length;var venc=db.clientes.filter(function(c){return c.vencimento<hoje}).length;var hj=db.clientes.filter(function(c){return c.vencimento===hoje}).length;var lv=lucroOculto?'••••••':'R$ '+fmt(lucro);var eyeIcon=lucroOculto?'eye-off':'eye';mc.innerHTML='<div class="lucro-card"><button class="lucro-eye" onclick="window._toggleLucro()"><i data-lucide="'+eyeIcon+'" width="16" height="16"></i></button><div class="lucro-label">💰 Lucro do Mês</div><div class="lucro-value" id="lucroVal">'+lv+'</div></div><div class="stat-grid">'+statCard('✅ Ativos',ativos,'',"window._filter('active')")+statCard('⚠️ Vencidos',venc,'red',"window._filter('expired')")+statCard('📅 Hoje',hj,'orange',"window._filter('today')")+statCard('👥 Total',db.clientes.length,'',"window._filter('all')")+'</div><div style="margin-bottom:10px;"><div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="dashSearch" placeholder="Buscar cliente..." autocomplete="off"></div><div id="dashCards"></div></div>';renderCards('dashCards',db.clientes,hoje);var inp=document.getElementById('dashSearch');if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var list=q?db.clientes.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q))}):db.clientes;renderCards('dashCards',list,today())})}
 function statCard(label,val,color,onclick){return'<div class="stat-card" onclick="'+onclick+'"><div class="stat-label">'+label+'</div><div class="stat-value'+(color?' '+color:'')+'">'+val+'</div></div>'}
@@ -386,9 +284,7 @@ function renderClientes(mc){var hoje=today(),list=db.clientes.slice(),filterLabe
 function renderCards(containerId,list,hoje){var cont=document.getElementById(containerId);if(!cont)return;if(list.length===0){cont.innerHTML='<div class="empty-state"><i data-lucide="user-round" width="48" height="48"></i><p>Nenhum cliente encontrado</p></div>';icons();return}var sorted=list.slice().sort(function(a,b){return a.vencimento.localeCompare(b.vencimento)});cont.innerHTML=sorted.map(function(c,i){var plano=db.planos.find(function(p){return p.id===c.planoId})||{};var serv=db.servidores.find(function(s){return s.id===c.servidorId})||{};var partes=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0});var ini=(partes.length>=2?partes[0][0]+partes[partes.length-1][0]:(partes[0]||'?').substring(0,2)).toUpperCase();var badge=c.vencimento<hoje?'<span class="badge badge-exp">Vencido</span>':c.vencimento===hoje?'<span class="badge badge-today">Hoje</span>':'<span class="badge badge-ok">Ativo</span>';var valor=((plano.valor||0)-(c.desconto||0));var cid=esc(c.id);var notaIndicator=(c.anotacoes&&c.anotacoes.trim())?'<div style="position:absolute;top:12px;right:12px;width:8px;height:8px;background:#C62828;border-radius:50%;box-shadow:0 0 0 2px var(--surface);" title="Possui anotações"></div>':'';return'<div class="client-card" style="animation-delay:'+(i*0.035)+'s;position:relative;">'+notaIndicator+'<div class="client-card-header"><div class="avatar">'+ini+'</div><div style="flex:1;min-width:0"><div class="client-name">'+esc(c.nome)+'</div><div class="client-sub">'+esc(plano.nome||'Sem plano')+' · '+esc(serv.nome||'Sem servidor')+'</div></div>'+badge+'</div><div class="client-footer"><span>📅 '+fmtDate(c.vencimento)+'</span><span>R$ '+fmt(valor)+'</span></div><div class="client-actions">'+(c.whatsapp?'<button class="action-btn green" onclick="window._wp(\''+cid+'\')"><i data-lucide="message-circle" width="14" height="14"></i>WhatsApp</button>':'')+'<button class="action-btn blue" onclick="window._renovar(\''+cid+'\')"><i data-lucide="rotate-cw" width="14" height="14"></i>Renovar</button><button class="action-btn" onclick="window._nota(\''+cid+'\')"><i data-lucide="file-text" width="14" height="14"></i>Nota</button><button class="action-btn" onclick="window._editar(\''+cid+'\')"><i data-lucide="pencil" width="14" height="14"></i>Editar</button><button class="action-btn" onclick="window._excluir(\''+cid+'\')"><i data-lucide="trash-2" width="14" height="14"></i></button></div></div>'}).join('');icons()}
 function renderPlanos(mc){var html=db.planos.map(function(p){return'<div class="list-item"><div><div class="list-item-main">'+esc(p.nome)+'</div><div class="list-item-sub">R$ '+fmt(p.valor)+'</div></div><div class="list-item-actions"><button class="icon-btn" onclick="window._editPlano(\''+p.id+'\')"><i data-lucide="pencil" width="15" height="15"></i></button><button class="icon-btn" onclick="window._delPlano(\''+p.id+'\')"><i data-lucide="trash-2" width="15" height="15"></i></button></div></div>'}).join('');mc.innerHTML=(html||'<div class="empty-state"><i data-lucide="layers" width="48" height="48"></i><p>Nenhum plano cadastrado</p></div>')}
 function renderServidores(mc){var html=db.servidores.map(function(s){return'<div class="list-item"><div><div class="list-item-main">'+esc(s.nome)+'</div><div class="list-item-sub">'+(s.valor?'Custo: R$ '+fmt(s.valor):'Sem custo')+'</div></div><div class="list-item-actions"><button class="icon-btn" onclick="window._editServ(\''+s.id+'\')"><i data-lucide="pencil" width="15" height="15"></i></button><button class="icon-btn" onclick="window._delServ(\''+s.id+'\')"><i data-lucide="trash-2" width="15" height="15"></i></button></div></div>'}).join('');mc.innerHTML=(html||'<div class="empty-state"><i data-lucide="server" width="48" height="48"></i><p>Nenhum servidor cadastrado</p></div>')}
-function renderFinancas(mc){var m=monthStr(0),mant=monthStr(-1);var ent=sumTrans('entrada',m),sai=sumTrans('saida',m),luc=ent-sai;var entA=sumTrans('entrada',mant),saiA=sumTrans('saida',mant),lucA=entA-saiA;var cresc=lucA!==0?((luc-lucA)/Math.abs(lucA)*100):(luc>0?100:0);var crescTxt=(cresc>=0?'+':'')+cresc.toFixed(1)+'%';
-var recent=db.transacoes.slice().sort(function(a,b){if(a.data>b.data)return-1;if(a.data<b.data)return 1;if(a.id>b.id)return-1;if(a.id<b.id)return 1;return 0}).slice(0,20);
-var transHtml=recent.length?recent.map(function(t){var c=db.clientes.find(function(x){return x.id===t.clienteId});var nome=t.desc||(c?c.nome:'—');var cor=t.tipo==='entrada'?'#0288D1':'var(--danger)';return'<div class="trans-row"><div><div class="trans-desc">'+esc(nome)+'</div><div class="trans-date">'+fmtDate(t.data)+'</div></div><div class="trans-amount" style="color:'+cor+'">'+(t.tipo==='entrada'?'+':'-')+' R$ '+fmt(t.valor)+'</div></div>'}).join(''):'<p style="color:var(--text3);font-size:.85rem;padding:12px 0;">Nenhuma transação</p>';mc.innerHTML='<div class="finance-stat-row">'+finStat('Entradas','R$ '+fmt(ent),'var(--accent)')+finStat('Saídas','R$ '+fmt(sai),'var(--danger)')+finStat('Lucro','R$ '+fmt(luc),luc>=0?'var(--success)':'var(--danger)')+'</div><div class="card" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><div style="font-size:.8rem;font-weight:700;color:var(--text3);">vs mês anterior</div><div style="font-size:.85rem;font-weight:700;color:'+(cresc>=0?'var(--success)':'var(--danger)')+';">'+crescTxt+'</div></div><div style="position:relative;height:170px;"><canvas id="finChart"></canvas></div></div><div class="card" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-weight:700;">Transações Recentes</div><button onclick="window._addTrans()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;"><i data-lucide="plus" width="12" height="12"></i>Adicionar</button></div>'+transHtml+'</div><div style="display:flex;gap:8px;"><button class="btn btn-danger btn-full" onclick="window._resetFin()"><i data-lucide="trash-2" width="15" height="15"></i>Resetar Financeiro</button></div>';icons();renderChart()}
+function renderFinancas(mc){var m=monthStr(0),mant=monthStr(-1);var ent=sumTrans('entrada',m),sai=sumTrans('saida',m),luc=ent-sai;var entA=sumTrans('entrada',mant),saiA=sumTrans('saida',mant),lucA=entA-saiA;var cresc=lucA!==0?((luc-lucA)/Math.abs(lucA)*100):(luc>0?100:0);var crescTxt=(cresc>=0?'+':'')+cresc.toFixed(1)+'%';var recent=db.transacoes.slice().sort(function(a,b){if(a.data>b.data)return-1;if(a.data<b.data)return 1;if(a.id>b.id)return-1;if(a.id<b.id)return 1;return 0}).slice(0,20);var transHtml=recent.length?recent.map(function(t){var c=db.clientes.find(function(x){return x.id===t.clienteId});var nome=t.desc||(c?c.nome:'—');var cor=t.tipo==='entrada'?'#0288D1':'var(--danger)';return'<div class="trans-row"><div><div class="trans-desc">'+esc(nome)+'</div><div class="trans-date">'+fmtDate(t.data)+'</div></div><div class="trans-amount" style="color:'+cor+'">'+(t.tipo==='entrada'?'+':'-')+' R$ '+fmt(t.valor)+'</div></div>'}).join(''):'<p style="color:var(--text3);font-size:.85rem;padding:12px 0;">Nenhuma transação</p>';mc.innerHTML='<div class="finance-stat-row">'+finStat('Entradas','R$ '+fmt(ent),'var(--accent)')+finStat('Saídas','R$ '+fmt(sai),'var(--danger)')+finStat('Lucro','R$ '+fmt(luc),luc>=0?'var(--success)':'var(--danger)')+'</div><div class="card" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><div style="font-size:.8rem;font-weight:700;color:var(--text3);">vs mês anterior</div><div style="font-size:.85rem;font-weight:700;color:'+(cresc>=0?'var(--success)':'var(--danger)')+';">'+crescTxt+'</div></div><div style="position:relative;height:170px;"><canvas id="finChart"></canvas></div></div><div class="card" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-weight:700;">Transações Recentes</div><button onclick="window._addTrans()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;"><i data-lucide="plus" width="12" height="12"></i>Adicionar</button></div>'+transHtml+'</div><div style="display:flex;gap:8px;"><button class="btn btn-danger btn-full" onclick="window._resetFin()"><i data-lucide="trash-2" width="15" height="15"></i>Resetar Financeiro</button></div>';icons();renderChart()}
 function finStat(label,val,color){return'<div class="fin-stat"><div class="fin-stat-label">'+label+'</div><div class="fin-stat-value" style="color:'+color+'">'+val+'</div></div>'}
 function renderChart(){setTimeout(function(){var ctx=document.getElementById('finChart');if(!ctx||!window.Chart)return;if(chartInst){try{chartInst.destroy()}catch(e){}chartInst=null}var labels=[],ents=[],sais=[],lucs=[];for(var i=5;i>=0;i--){var ms=monthStr(-i);var d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);var lbl=d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'});var e=sumTrans('entrada',ms);var s=sumTrans('saida',ms);labels.push(lbl);ents.push(e);sais.push(s);lucs.push(e-s)}var isDark=darkMode;var gridColor=isDark?'rgba(255,255,255,.07)':'rgba(0,0,0,.06)';var textColor=isDark?'#94A3B8':'#718096';chartInst=new Chart(ctx,{type:'bar',data:{labels:labels,datasets:[{label:'Entradas',data:ents,backgroundColor:'#0288D1',borderRadius:5,borderSkipped:false},{label:'Saídas',data:sais,backgroundColor:'#EF5350',borderRadius:5,borderSkipped:false},{label:'Lucro',data:lucs,backgroundColor:'#43A047',borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:textColor,font:{size:10},boxWidth:10}}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:9}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:9},callback:function(v){return'R$'+v}}}}}})},80)}
 function showModal(id,title,body,actions){closeModal(id);var el=document.createElement('div');el.className='modal-overlay';el.id='mo_'+id;el.innerHTML='<div class="modal"><div class="modal-handle"></div><div class="modal-title">'+title+'</div>'+body+'<div class="modal-actions">'+actions+'</div></div>';document.body.appendChild(el);el.addEventListener('click',function(e){if(e.target===el)closeModal(id)});icons();return el}
@@ -396,13 +292,15 @@ function closeModal(id){var el=document.getElementById('mo_'+id);if(el)el.remove
 function confirmModal(title,msg,onConfirm){var el=showModal('confirm',title,'<p style="color:var(--text2);font-size:.9rem;margin-bottom:0;">'+msg+'</p>','<button class="btn btn-ghost" onclick="window._closeModal(\'confirm\')">Cancelar</button><button class="btn btn-danger" id="confirmOk">Confirmar</button>');document.getElementById('confirmOk').addEventListener('click',function(){closeModal('confirm');onConfirm()})}
 function modalCliente(id){if(db.planos.length===0&&!id){toast('Cadastre um plano primeiro!','warning');return}if(db.servidores.length===0&&!id){toast('Cadastre um servidor primeiro!','warning');return}var c=id?db.clientes.find(function(x){return x.id===id}):null;var planOpts=db.planos.map(function(p){return'<option value="'+p.id+'"'+((c&&c.planoId===p.id)?' selected':'')+'>'+esc(p.nome)+' — R$'+fmt(p.valor)+'</option>'}).join('');var servOpts=db.servidores.map(function(s){return'<option value="'+s.id+'"'+((c&&c.servidorId===s.id)?' selected':'')+'>'+esc(s.nome)+'</option>'}).join('');var body='<div class="field"><label class="field-label">Nome *</label><input class="input" id="cliNome" value="'+esc(c?c.nome:'')+'" placeholder="Nome do cliente"></div><div class="field"><label class="field-label">WhatsApp</label><input class="input" id="cliWa" value="'+esc(c?c.whatsapp||'':'')+'" placeholder="55119..." inputmode="numeric"></div><div class="field"><label class="field-label">Vencimento *</label><input type="date" class="input" id="cliVenc" value="'+(c?c.vencimento:'')+'"></div><div class="field"><label class="field-label">Plano</label><select class="input" id="cliPlano"><option value="">— selecione —</option>'+planOpts+'</select></div><div class="field"><label class="field-label">Servidor</label><select class="input" id="cliServ"><option value="">— selecione —</option>'+servOpts+'</select></div><div class="field"><label class="field-label">Desconto (R$)</label><input type="number" class="input" id="cliDesc" value="'+(c?c.desconto||'':'')+'" placeholder="0"></div>';var el=showModal('cli',id?'Editar Cliente':'Novo Cliente',body,'<button class="btn btn-ghost" onclick="window._closeModal(\'cli\')">Cancelar</button><button class="btn btn-primary" id="cliSave">Salvar</button>');document.getElementById('cliSave').addEventListener('click',function(){var nome=document.getElementById('cliNome').value.trim();var wa=document.getElementById('cliWa').value.replace(/\D/g,'');var venc=document.getElementById('cliVenc').value;var plano=document.getElementById('cliPlano').value;var serv=document.getElementById('cliServ').value;var desc=parseFloat(document.getElementById('cliDesc').value)||0;if(!nome||!venc){toast('Preencha nome e vencimento','error');return}if(wa&&(wa.length<10||wa.length>15)){toast('WhatsApp inválido (inclua DDD)','warning');return}var novo={id:id||'c'+Date.now(),nome:nome,whatsapp:wa,vencimento:venc,planoId:plano,servidorId:serv,desconto:desc,anotacoes:c?c.anotacoes||'':'',cadastradoEm:c?c.cadastradoEm||today():today(),renovacoes:c?c.renovacoes||[]:[]};if(id){db.clientes=db.clientes.map(function(x){return x.id===id?novo:x})}else{db.clientes.push(novo)}addLog(nome+(id?' atualizado':' cadastrado'));saveDB();autoSincTrans();saveDB();closeModal('cli');render(currentSec);toast(id?'Atualizado!':'Cadastrado!','success')})}
 function modalRenovar(id){var c=db.clientes.find(function(x){return x.id===id});if(!c)return;var p=db.planos.find(function(x){return x.id===c.planoId});var val=p?(p.valor-(c.desconto||0)):0;var base=new Date(c.vencimento+'T12:00:00');if(base<new Date())base=new Date();base.setDate(base.getDate()+30);var novaData=base.toISOString().split('T')[0];var body='<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;"><div style="font-weight:700;">'+esc(c.nome)+'</div><div style="font-size:.8rem;color:var(--text3);margin-top:2px;">Vence: '+fmtDate(c.vencimento)+' · R$ '+fmt(val)+'</div></div><div class="field"><label class="field-label">Nova data de vencimento</label><input type="date" class="input" id="renData" value="'+novaData+'"></div><div class="field"><label class="field-label">Valor recebido (R$)</label><input type="number" class="input" id="renValor" value="'+fmt(val)+'" step="0.01"></div>';var el=showModal('ren','Renovar Cliente',body,'<button class="btn btn-ghost" onclick="window._closeModal(\'ren\')">Cancelar</button><button class="btn btn-primary" id="renSave">Renovar</button>');document.getElementById('renSave').addEventListener('click',function(){var nd=document.getElementById('renData').value;var nv=parseFloat(document.getElementById('renValor').value)||0;if(!nd){toast('Informe a nova data','error');return}c.vencimento=nd;if(!c.renovacoes)c.renovacoes=[];c.renovacoes.unshift({data:today(),novoVencimento:nd,valor:nv});db.transacoes.push({id:'t'+Date.now(),clienteId:c.id,tipo:'entrada',valor:nv,data:today(),desc:'Renovação '+c.nome});var serv=db.servidores.find(function(x){return x.id===c.servidorId});if(serv&&serv.valor){db.transacoes.push({id:'t'+Date.now()+'_s',clienteId:c.id,servId:serv.id,tipo:'saida',valor:serv.valor,data:today(),desc:'Servidor: '+serv.nome+' ('+c.nome+')'})}addLog(c.nome+' renovado');saveDB();closeModal('ren');render(currentSec);toast('Renovado!','success')})}
-function modalNota(id){var c=db.clientes.find(function(x){return x.id===id});if(!c)return;var histHtml='';if(c.renovacoes&&c.renovacoes.length){histHtml='<div style="margin-top:14px;"><div style="font-size:.75rem;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase;">Histórico de Renovações</div>'+c.renovacoes.slice(0,5).map(function(r){return'<div style="display:flex;justify-content:space-between;padding:7px 10px;background:var(--surface2);border-radius:8px;margin-bottom:4px;font-size:.78rem;"><span style="color:var(--text3);">'+fmtDate(r.data)+'</span><span style="color:var(--accent-dark);font-weight:700;">→ '+fmtDate(r.novoVencimento)+'</span><span style="color:var(--success);font-weight:700;">R$ '+fmt(r.valor||0)+'</span></div>'}).join('')+'</div>'}var cadastroHtml=c.cadastradoEm?'<div style="font-size:.75rem;color:var(--text3);margin-bottom:12px;">📆 Cliente desde: '+fmtDate(c.cadastradoEm)+'</div>':'';var body=cadastroHtml+'<div class="field"><label class="field-label">Anotações</label><textarea class="input" id="notaText" rows="4" placeholder="Escreva suas anotações aqui..." style="resize:vertical;">'+esc(c.anotacoes||'')+'</textarea></div>'+histHtml;var el=showModal('nota','📝 '+esc(c.nome),body,'<button class="btn btn-ghost" onclick="window._closeModal(\'nota\')">Fechar</button><button class="btn btn-primary" id="notaSave">Salvar</button>');document.getElementById('notaSave').addEventListener('click',function(){c.anotacoes=document.getElementById('notaText').value;saveDB();closeModal('nota');toast('Anotação salva!','success')})}
+function construirTimeline(renovacoes,cadastradoEm,nome,planoNome,servNome){if(!renovacoes||renovacoes.length===0){return'<div class="timeline"><div class="timeline-item"><div class="timeline-dot blue"></div><div class="timeline-content"><div class="timeline-date">'+fmtDate(cadastradoEm)+'</div><div class="timeline-info">Primeira assinatura</div><div style="font-size:0.7rem;color:var(--text3);margin-top:2px;">Plano: '+esc(planoNome||'—')+' · Servidor: '+esc(servNome||'—')+'</div><span class="timeline-badge first">CLIENTE NOVO</span></div></div></div>'}var items='';var hoje=today();var sorted=renovacoes.slice().sort(function(a,b){return a.data.localeCompare(b.data)});for(var i=0;i<sorted.length;i++){var r=sorted[i];var dataRen=r.data;var novoVenc=r.novoVencimento;var valor=r.valor||0;var diasAtraso=0;if(i>0){var vencAnterior=sorted[i-1].novoVencimento;if(vencAnterior&&dataRen>vencAnterior){diasAtraso=Math.floor((new Date(dataRen)-new Date(vencAnterior))/86400000)}}else if(cadastradoEm){var primeiroVenc=new Date(cadastradoEm);primeiroVenc.setDate(primeiroVenc.getDate()+30);var primeiroVencStr=primeiroVenc.toISOString().split('T')[0];if(dataRen>primeiroVencStr){diasAtraso=Math.floor((new Date(dataRen)-new Date(primeiroVencStr))/86400000)}}var dotColor=diasAtraso>3?'red':(diasAtraso>0?'orange':'green');var statusText=diasAtraso>0?' ('+diasAtraso+' dia'+(diasAtraso>1?'s':'')+' de atraso)':'';items+='<div class="timeline-item"><div class="timeline-dot '+dotColor+'"></div><div class="timeline-content"><div class="timeline-date">📅 Renovado em '+fmtDate(dataRen)+statusText+'</div><div class="timeline-info">Próximo vencimento: <strong>'+fmtDate(novoVenc)+'</strong></div><div class="timeline-value">💰 R$ '+fmt(valor)+'</div>'+(diasAtraso>0?'<span class="timeline-badge late">ATRASO</span>':'')+'</div></div>'}items+='<div class="timeline-item"><div class="timeline-dot blue"></div><div class="timeline-content"><div class="timeline-date">'+fmtDate(cadastradoEm)+'</div><div class="timeline-info">Primeira assinatura</div><div style="font-size:0.7rem;color:var(--text3);margin-top:2px;">Plano: '+esc(planoNome||'—')+' · Servidor: '+esc(servNome||'—')+'</div><span class="timeline-badge first">INÍCIO</span></div></div>';return'<div class="timeline" style="margin-top:16px;">'+items+'</div>'}
+function modalNota(id){var c=db.clientes.find(function(x){return x.id===id});if(!c)return;var plano=db.planos.find(function(p){return p.id===c.planoId})||{};var serv=db.servidores.find(function(s){return s.id===c.servidorId})||{};var cadastroHtml=c.cadastradoEm?'<div style="font-size:.75rem;color:var(--text3);margin-bottom:12px;">📆 Cliente desde: '+fmtDate(c.cadastradoEm)+'</div>':'';var timelineHtml=(c.renovacoes&&c.renovacoes.length>0)||c.cadastradoEm?construirTimeline(c.renovacoes||[],c.cadastradoEm,c.nome,plano.nome,serv.nome):'';var body=cadastroHtml+'<div class="field"><label class="field-label">Anotações</label><textarea class="input" id="notaText" rows="4" placeholder="Escreva suas anotações aqui..." style="resize:vertical;">'+esc(c.anotacoes||'')+'</textarea></div>'+(timelineHtml?'<div style="font-size:.75rem;font-weight:700;color:var(--text3);margin-top:16px;margin-bottom:8px;text-transform:uppercase;">📋 Histórico de Renovações</div>'+timelineHtml:'');var el=showModal('nota','📝 '+esc(c.nome),body,'<button class="btn btn-ghost" onclick="window._closeModal(\'nota\')">Fechar</button><button class="btn btn-primary" id="notaSave">Salvar</button>');document.getElementById('notaSave').addEventListener('click',function(){c.anotacoes=document.getElementById('notaText').value;saveDB();closeModal('nota');toast('Anotação salva!','success')})}
 function modalWhatsApp(id){var c=db.clientes.find(function(x){return x.id===id});if(!c||!c.whatsapp){toast('Cliente sem WhatsApp cadastrado','warning');return}var p=db.planos.find(function(x){return x.id===c.planoId});var val=p?(p.valor-(c.desconto||0)):0;var body='<p style="color:var(--text2);font-size:.88rem;margin-bottom:14px;">Qual mensagem deseja enviar para <strong>'+esc(c.nome)+'</strong>?</p><button class="btn btn-ghost btn-full" id="btnCob" style="justify-content:flex-start;gap:12px;margin-bottom:8px;padding:14px;"><span style="font-size:1.2rem;">💰</span><div style="text-align:left"><div style="font-weight:700;">Cobrança</div><div style="font-size:.75rem;color:var(--text3);">Lembrar sobre vencimento</div></div></button><button class="btn btn-ghost btn-full" id="btnRen" style="justify-content:flex-start;gap:12px;padding:14px;"><span style="font-size:1.2rem;">✅</span><div style="text-align:left"><div style="font-weight:700;">Renovação confirmada</div><div style="font-size:.75rem;color:var(--text3);">Avisar que foi renovado</div></div></button>';showModal('wa','Enviar WhatsApp',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'wa\')">Cancelar</button>');document.getElementById('btnCob').addEventListener('click',function(){closeModal('wa');sendWA(c,'cobranca')});document.getElementById('btnRen').addEventListener('click',function(){closeModal('wa');sendWA(c,'renovacao')})}
 function sendWA(c,tipo){var p=db.planos.find(function(x){return x.id===c.planoId});var val=p?(p.valor-(c.desconto||0)):0;var tpl=db.templates[tipo]||'';var primeiroNome=c.nome.trim().split(' ')[0];var msg=tpl.replace(/{primeiro_nome}/g,primeiroNome).replace(/{nome}/g,c.nome).replace(/{vencimento}/g,fmtDate(c.vencimento)).replace(/{valor}/g,fmt(val));var url='https://wa.me/'+c.whatsapp+'?text='+encodeURIComponent(msg);window.open(url,'_blank')}
 function modalPlano(id){var p=id?db.planos.find(function(x){return x.id===id}):null;var body='<div class="field"><label class="field-label">Nome do plano *</label><input class="input" id="plNome" value="'+esc(p?p.nome:'')+'" placeholder="Ex: Mensal HD"></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="plValor" value="'+(p?p.valor:'')+'" placeholder="0.00" step="0.01"></div>';var el=showModal('plano',id?'Editar Plano':'Novo Plano',body,'<button class="btn btn-ghost" onclick="window._closeModal(\'plano\')">Cancelar</button><button class="btn btn-primary" id="plSave">Salvar</button>');document.getElementById('plSave').addEventListener('click',function(){var nome=document.getElementById('plNome').value.trim();var valor=parseFloat(document.getElementById('plValor').value)||0;if(!nome){toast('Informe o nome do plano','error');return}if(id){db.planos=db.planos.map(function(x){return x.id===id?{id:id,nome:nome,valor:valor}:x})}else{db.planos.push({id:'p'+Date.now(),nome:nome,valor:valor})}addLog('Plano '+(id?'atualizado':'criado')+': '+nome);saveDB();closeModal('plano');render(currentSec);toast(id?'Plano atualizado!':'Plano criado!','success')})}
 function modalServ(id){var s=id?db.servidores.find(function(x){return x.id===id}):null;var body='<div class="field"><label class="field-label">Nome do servidor *</label><input class="input" id="servNome" value="'+esc(s?s.nome:'')+'" placeholder="Ex: Servidor Alpha"></div><div class="field"><label class="field-label">Custo mensal (R$)</label><input type="number" class="input" id="servValor" value="'+(s?s.valor||'':'')+'" placeholder="0.00" step="0.01"></div>';var el=showModal('serv',id?'Editar Servidor':'Novo Servidor',body,'<button class="btn btn-ghost" onclick="window._closeModal(\'serv\')">Cancelar</button><button class="btn btn-primary" id="servSave">Salvar</button>');document.getElementById('servSave').addEventListener('click',function(){var nome=document.getElementById('servNome').value.trim();if(!nome){toast('Informe o nome','error');return}if(id){var sval=parseFloat(document.getElementById('servValor').value)||0;db.servidores=db.servidores.map(function(x){return x.id===id?{id:id,nome:nome,valor:sval}:x})}else{var sval=parseFloat(document.getElementById('servValor').value)||0;db.servidores.push({id:'s'+Date.now(),nome:nome,valor:sval})}addLog('Servidor '+(id?'atualizado':'criado')+': '+nome);saveDB();autoSincTrans();saveDB();closeModal('serv');render(currentSec);toast(id?'Servidor atualizado!':'Servidor criado!','success')})}
 function modalTrans(){var body='<div class="field"><label class="field-label">Tipo</label><select class="input" id="transType"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="transVal" placeholder="0.00" step="0.01"></div><div class="field"><label class="field-label">Descrição</label><input class="input" id="transDesc" placeholder="Ex: Mensalidade extra"></div><div class="field"><label class="field-label">Data</label><input type="date" class="input" id="transData" value="'+today()+'"></div>';showModal('trans','Adicionar Transação',body,'<button class="btn btn-ghost" onclick="window._closeModal(\'trans\')">Cancelar</button><button class="btn btn-primary" id="transSave">Salvar</button>');document.getElementById('transSave').addEventListener('click',function(){var tipo=document.getElementById('transType').value;var val=parseFloat(document.getElementById('transVal').value)||0;var desc=document.getElementById('transDesc').value.trim();var data=document.getElementById('transData').value;if(!val||!data){toast('Informe valor e data','error');return}db.transacoes.push({id:'t'+Date.now(),tipo:tipo,valor:val,data:data,desc:desc});addLog('Transação manual: '+tipo+' R$'+fmt(val));saveDB();closeModal('trans');render('financas');toast('Transação salva!','success')})}
-function modalInadimplencia(){var hoje=today();var venc=db.clientes.filter(function(c){return c.vencimento<hoje}).sort(function(a,b){return a.vencimento.localeCompare(b.vencimento)});var rows=venc.map(function(c){var p=db.planos.find(function(x){return x.id===c.planoId})||{};var val=(p.valor||0)-(c.desconto||0);var dias=Math.floor((new Date(hoje)-new Date(c.vencimento))/86400000);return'<div class="trans-row"><div><div class="trans-desc">'+esc(c.nome)+'</div><div class="trans-date">'+dias+' dias em atraso · Venceu '+fmtDate(c.vencimento)+'</div></div><div class="trans-amount saida">R$ '+fmt(val)+'</div></div>'}).join('');var total=venc.reduce(function(s,c){var p=db.planos.find(function(x){return x.id===c.planoId})||{};return s+(p.valor||0)-(c.desconto||0)},0);var body=venc.length?'<div style="font-size:.8rem;color:var(--text3);margin-bottom:12px;">'+venc.length+' cliente(s) · Total em aberto: <strong style="color:var(--danger)">R$ '+fmt(total)+'</strong></div>'+rows:'<div class="empty-state"><i data-lucide="check-circle" width="40" height="40" style="color:var(--success)"></i><p>Nenhum cliente inadimplente! 🎉</p></div>';showModal('inadim','⚠️ Inadimplência',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'inadim\')">Fechar</button>')}
+function modalInadimplencia(){var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje}).sort(function(a,b){return a.vencimento.localeCompare(b.vencimento)});if(vencidos.length===0){var body='<div class="empty-state"><i data-lucide="check-circle" width="40" height="40" style="color:var(--success)"></i><p>Nenhum cliente inadimplente! 🎉</p></div>';showModal('inadim','⚠️ Inadimplência',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'inadim\')">Fechar</button>');return}var totalEmAberto=0;var somaDias=0;var criticos=[];var atencao=[];var recentes=[];vencidos.forEach(function(c){var p=db.planos.find(function(x){return x.id===c.planoId})||{};var valor=(p.valor||0)-(c.desconto||0);totalEmAberto+=valor;var dias=Math.floor((new Date(hoje)-new Date(c.vencimento))/86400000);somaDias+=dias;var clienteInfo={id:c.id,nome:c.nome,dias:dias,valor:valor,vencimento:c.vencimento,whatsapp:c.whatsapp};if(dias>7){criticos.push(clienteInfo)}else if(dias>=3){atencao.push(clienteInfo)}else{recentes.push(clienteInfo)}});var mediaDias=Math.round(somaDias/vencidos.length);function criarCardCliente(cli){return'<div class="inadim-client-card"><div class="inadim-client-info"><div class="inadim-client-name">'+esc(cli.nome)+'</div><div class="inadim-client-detail">'+cli.dias+' dia'+(cli.dias>1?'s':'')+' em atraso · Venceu '+fmtDate(cli.vencimento)+'</div><div class="inadim-actions">'+(cli.whatsapp?'<button class="inadim-btn cobrar" onclick="window._closeModal(\'inadim\'); window._wp(\''+esc(cli.id)+'\')"><i data-lucide="message-circle" width="11" height="11"></i> Cobrar</button>':'')+'<button class="inadim-btn nota" onclick="window._closeModal(\'inadim\'); window._nota(\''+esc(cli.id)+'\')"><i data-lucide="file-text" width="11" height="11"></i> Nota</button></div></div><div class="inadim-client-value">R$ '+fmt(cli.valor)+'</div></div>'}var sectionsHtml='';if(criticos.length>0){sectionsHtml+='<div class="inadim-group-title"><span class="inadim-dot critico"></span> 🔴 CRÍTICO (+7 dias)</div>';sectionsHtml+=criticos.map(criarCardCliente).join('')}if(atencao.length>0){sectionsHtml+='<div class="inadim-group-title"><span class="inadim-dot atencao"></span> 🟠 ATENÇÃO (3-7 dias)</div>';sectionsHtml+=atencao.map(criarCardCliente).join('')}if(recentes.length>0){sectionsHtml+='<div class="inadim-group-title"><span class="inadim-dot recente"></span> 🟡 RECENTE (1-2 dias)</div>';sectionsHtml+=recentes.map(criarCardCliente).join('')}var temWhatsApp=vencidos.some(function(c){return c.whatsapp});var body='<div class="inadim-summary"><div class="inadim-summary-item"><div class="inadim-summary-value" style="color:var(--danger)">'+vencidos.length+'</div><div class="inadim-summary-label">Em Atraso</div></div><div class="inadim-summary-item"><div class="inadim-summary-value">R$ '+fmt(totalEmAberto)+'</div><div class="inadim-summary-label">Total Aberto</div></div><div class="inadim-summary-item"><div class="inadim-summary-value">'+mediaDias+'d</div><div class="inadim-summary-label">Média Atraso</div></div></div>'+sectionsHtml;var actions='<button class="btn btn-ghost" onclick="window._closeModal(\'inadim\')">Fechar</button>'+(temWhatsApp?'<button class="btn btn-primary" onclick="window._cobrancaInadimplencia()"><i data-lucide="send" width="14" height="14"></i> Cobrar Todos</button>':'');showModal('inadim','⚠️ Central de Cobrança',body,actions)}
+function cobrancaInadimplencia(){closeModal('inadim');var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje&&c.whatsapp});if(vencidos.length===0){toast('Nenhum cliente com WhatsApp','warning');return}var delay=0;vencidos.forEach(function(c){setTimeout(function(){sendWA(c,'cobranca')},delay);delay+=2500});toast('Abrindo WhatsApp para '+vencidos.length+' cliente(s)...','success')}
 function modalCobrancaMassa(){var hoje=today();var hoje_clientes=db.clientes.filter(function(c){return c.vencimento===hoje&&c.whatsapp});if(!hoje_clientes.length){toast('Nenhum cliente com WhatsApp vence hoje','warning');return}var checks=hoje_clientes.map(function(c){return'<label style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;"><input type="checkbox" class="massa-check" data-id="'+esc(c.id)+'" checked style="width:18px;height:18px;accent-color:var(--accent);"><span style="font-size:.88rem;font-weight:600;">'+esc(c.nome)+'</span></label>'}).join('');var body='<div style="margin-bottom:12px;font-size:.85rem;color:var(--text2);">'+hoje_clientes.length+' cliente(s) vencem hoje com WhatsApp:</div>'+checks;showModal('massa','📲 Cobrança em Massa',body,'<button class="btn btn-ghost" onclick="window._closeModal(\'massa\')">Cancelar</button><button class="btn btn-primary" id="massaSend">Enviar para todos</button>');document.getElementById('massaSend').addEventListener('click',function(){var ids=[];document.querySelectorAll('.massa-check:checked').forEach(function(ch){ids.push(ch.dataset.id)});closeModal('massa');var delay=0;ids.forEach(function(cid){var c=db.clientes.find(function(x){return x.id===cid});if(c)setTimeout(function(){sendWA(c,'cobranca')},delay);delay+=2500});toast('Abrindo WhatsApp para '+ids.length+' cliente(s)...','success')})}
 function modalRelatorio(){var hoje=today();var rows=db.clientes.map(function(c){var p=db.planos.find(function(x){return x.id===c.planoId})||{};var s=db.servidores.find(function(x){return x.id===c.servidorId})||{};var status=c.vencimento<hoje?'Vencido':c.vencimento===hoje?'Hoje':'Ativo';return'<tr><td>'+esc(c.nome)+'</td><td>'+esc(p.nome||'—')+'</td><td>'+esc(s.nome||'—')+'</td><td>'+fmtDate(c.vencimento)+'</td><td>R$ '+fmt((p.valor||0)-(c.desconto||0))+'</td><td>'+status+'</td></tr>'}).join('');var body='<div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Plano</th><th>Servidor</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:var(--text3)">Nenhum cliente</td></tr>')+'</tbody></table></div>';showModal('rel','📊 Relatório de Clientes',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'rel\')">Fechar</button>')}
 function modalLog(){var rows=db.log.slice(0,50).map(function(l){return'<div class="log-row"><div class="log-dot"></div><div class="log-msg">'+esc(l.msg)+'</div><div class="log-date">'+(l.ts||'')+'</div></div>'}).join('')||'<p style="color:var(--text3);font-size:.85rem;">Nenhuma atividade</p>';showModal('log','📋 Log de Atividades',rows,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'log\')">Fechar</button>')}
@@ -430,8 +328,9 @@ window._editPlano=function(id){modalPlano(id)};
 window._delPlano=function(id){var p=db.planos.find(function(x){return x.id===id});if(!p)return;confirmModal('Excluir plano?','Clientes vinculados perderão o plano.',function(){db.planos=db.planos.filter(function(x){return x.id!==id});addLog('Plano excluído: '+p.nome);saveDB();render('planos');toast('Plano excluído','success')})};
 window._editServ=function(id){modalServ(id)};
 window._delServ=function(id){var s=db.servidores.find(function(x){return x.id===id});if(!s)return;confirmModal('Excluir servidor?','Clientes vinculados perderão o servidor.',function(){db.servidores=db.servidores.filter(function(x){return x.id!==id});addLog('Servidor excluído: '+s.nome);saveDB();render('servidores');toast('Servidor excluído','success')})};
-window._fecharAlertaDiario = fecharAlertaDiario;
-window._cobrarTodosAlerta = cobrarTodosAlerta;
+window._fecharAlertaDiario=fecharAlertaDiario;
+window._cobrarTodosAlerta=cobrarTodosAlerta;
+window._cobrancaInadimplencia=cobrancaInadimplencia;
 
 var SECS=['dashboard','clientes','planos','servidores','financas'],swX=0,swY=0;
 var mc=document.getElementById('mainContent');
@@ -456,11 +355,7 @@ function exportarBackup(){try{var blob=new Blob([JSON.stringify(db,null,2)],{typ
 function restaurarBackup(file){if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);if(!data.clientes)throw new Error();db=data;if(!db.templates)db.templates=Object.assign({},DEFAULT_TEMPLATES);saveDB();render(currentSec);toast('Backup restaurado!','success')}catch(ex){toast('Arquivo inválido','error')}};reader.readAsText(file)}
 function ativarNotifs(){if(!('Notification' in window)){toast('Notificações não suportadas','warning');return}Notification.requestPermission().then(function(p){if(p==='granted'){toast('Notificações ativadas!','success')}else toast('Permissão negada','warning')})}
 
-loadDB();
-autoSincTrans();
-saveDB();
-navigateTo('dashboard');
-verificarVencimentosHoje();
+loadDB();autoSincTrans();saveDB();navigateTo('dashboard');verificarVencimentosHoje();
 })();
 </script>
 </body>
