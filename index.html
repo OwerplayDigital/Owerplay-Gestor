@@ -56,9 +56,8 @@
     .sidebar-panel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:2px}
     [data-theme="dark"] .sidebar-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
 
-    .topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:62px;gap:10px}
+    .topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:62px;gap:12px}
     .topbar-menu{background:none;border:none;color:var(--text2);cursor:pointer;padding:6px;border-radius:8px;display:flex;align-items:center;flex-shrink:0}
-    .topbar-icon-right{width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0}
     .topbar-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
     .topbar-brand{font-family:'Poppins',sans-serif;font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;letter-spacing:-0.5px}
     [data-theme="dark"] .topbar-brand{background:linear-gradient(135deg,#38BDF8,#0EA5E9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -206,7 +205,7 @@
         <div class="topbar-brand">Owerplay Gestor</div>
         <div class="topbar-slogan">Conectando você ao lucro</div>
       </div>
-      <img class="topbar-icon-right" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display='none';var fb=document.createElement('span');fb.style.cssText='width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;flex-shrink:0';fb.textContent='✦';this.parentNode.replaceChild(fb,this)">
+      <div style="width:34px;flex-shrink:0"></div>
     </div>
     <div id="mainContent"></div>
     <nav class="bottom-nav" id="bottomNav">
