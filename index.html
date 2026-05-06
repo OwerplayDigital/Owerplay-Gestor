@@ -4,12 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#FFFFFF">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Owerplay Gestor</title>
   
   <link rel="icon" type="image/png" href="IMG_20260501_113710.png">
   <link rel="apple-touch-icon" href="IMG_20260501_113710.png">
-  <meta name="apple-mobile-web-app-status-bar-style" content="#0288D1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -185,6 +184,24 @@
     .lembrete-del:active{background:rgba(0,0,0,.05);color:var(--danger)}
     .lembrete-input-wrap{width:100%;padding:10px 12px;border-radius:10px;border:2px dashed var(--border);background:none;font-family:inherit;font-size:.85rem;outline:none;transition:border-color .15s;margin-bottom:14px;color:var(--text)}
     .lembrete-input-wrap:focus{border-color:var(--accent)}
+
+    /* RELATÓRIO DIÁRIO */
+    .report-summary {display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px}
+    .report-summary-item {background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center}
+    .report-summary-value {font-size:1.1rem;font-weight:800}
+    .report-summary-value.green{color:var(--success)}.report-summary-value.red{color:var(--danger)}.report-summary-value.blue{color:var(--accent)}
+    .report-summary-label {font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:2px}
+    .report-section-title {font-size:.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:14px;display:flex;align-items:center;gap:6px}
+    .report-section-title:first-of-type{margin-top:0}
+    .report-dot{width:8px;height:8px;border-radius:50%}
+    .report-dot.green{background:var(--success)}.report-dot.blue{background:var(--accent)}
+    .report-client-mini {display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:10px;margin-bottom:6px}
+    .report-client-left {display:flex;align-items:center;gap:10px}
+    .report-mini-avatar {width:32px;height:32px;border-radius:50%;background:var(--accent-light);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.65rem}
+    .report-mini-name {font-weight:600;font-size:.8rem;color:var(--text)}
+    .report-mini-plan {font-size:.62rem;color:var(--text3);margin-top:1px}
+    .report-mini-value {font-weight:700;font-size:.8rem;color:var(--success)}
+    .report-mini-value.new{color:var(--accent)}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
   </style>
 </head>
@@ -200,6 +217,7 @@
     <div class="sidebar-section" style="margin-top:8px;"><div class="sidebar-section-label">Ferramentas</div>
       <button class="sidebar-item" id="btnBackup"><i data-lucide="download" width="17" height="17"></i> Backup</button>
       <button class="sidebar-item" id="btnInadimplencia"><i data-lucide="alert-triangle" width="17" height="17"></i> Inadimplência</button>
+      <button class="sidebar-item" id="btnRelatorio"><i data-lucide="bar-chart-3" width="17" height="17"></i> Relatório Diário</button>
       <button class="sidebar-item" id="btnLembretes"><i data-lucide="sticky-note" width="17" height="17"></i> Lembretes</button>
       <button class="sidebar-item" id="btnLog"><i data-lucide="list-checks" width="17" height="17"></i> Log de Atividades</button>
     </div>
@@ -295,27 +313,67 @@ function executarRenovacao(c,nd,nv){c.vencimento=nd;if(!c.renovacoes)c.renovacoe
 function construirTimeline(renovacoes,cadastradoEm,nome,planoNome,servNome){if(!renovacoes||renovacoes.length===0){return'<div class="timeline"><div class="timeline-item"><div class="timeline-dot blue"></div><div class="timeline-content"><div class="timeline-date">'+fmtDate(cadastradoEm)+'</div><div class="timeline-info">Primeira assinatura</div><div style="font-size:0.7rem;color:var(--text3);margin-top:2px;">Plano: '+esc(planoNome||'—')+' · Servidor: '+esc(servNome||'—')+'</div><span class="timeline-badge first">CLIENTE NOVO</span></div></div></div>'}var items='';var hoje=today();var sorted=renovacoes.slice().sort(function(a,b){return a.data.localeCompare(b.data)});for(var i=0;i<sorted.length;i++){var r=sorted[i];var dataRen=r.data;var novoVenc=r.novoVencimento;var valor=r.valor||0;var diasAtraso=0;if(i>0){var vencAnterior=sorted[i-1].novoVencimento;if(vencAnterior&&dataRen>vencAnterior){diasAtraso=Math.floor((new Date(dataRen)-new Date(vencAnterior))/86400000)}}else if(cadastradoEm){var primeiroVenc=new Date(cadastradoEm);primeiroVenc.setDate(primeiroVenc.getDate()+30);var primeiroVencStr=primeiroVenc.toISOString().split('T')[0];if(dataRen>primeiroVencStr){diasAtraso=Math.floor((new Date(dataRen)-new Date(primeiroVencStr))/86400000)}}var dotColor=diasAtraso>3?'red':(diasAtraso>0?'orange':'green');var statusText=diasAtraso>0?' ('+diasAtraso+' dia'+(diasAtraso>1?'s':'')+' de atraso)':'';items+='<div class="timeline-item"><div class="timeline-dot '+dotColor+'"></div><div class="timeline-content"><div class="timeline-date">📅 Renovado em '+fmtDate(dataRen)+statusText+'</div><div class="timeline-info">Próximo vencimento: <strong>'+fmtDate(novoVenc)+'</strong></div><div class="timeline-value">💰 R$ '+fmt(valor)+'</div>'+(diasAtraso>0?'<span class="timeline-badge late">ATRASO</span>':'')+'</div></div>'}items+='<div class="timeline-item"><div class="timeline-dot blue"></div><div class="timeline-content"><div class="timeline-date">'+fmtDate(cadastradoEm)+'</div><div class="timeline-info">Primeira assinatura</div><div style="font-size:0.7rem;color:var(--text3);margin-top:2px;">Plano: '+esc(planoNome||'—')+' · Servidor: '+esc(servNome||'—')+'</div><span class="timeline-badge first">INÍCIO</span></div></div>';return'<div class="timeline" style="margin-top:16px;">'+items+'</div>'}
 function modalNota(id){var c=db.clientes.find(function(x){return x.id===id});if(!c)return;var plano=db.planos.find(function(p){return p.id===c.planoId})||{};var serv=db.servidores.find(function(s){return s.id===c.servidorId})||{};var cadastroHtml=c.cadastradoEm?'<div style="font-size:.75rem;color:var(--text3);margin-bottom:12px;">📆 Cliente desde: '+fmtDate(c.cadastradoEm)+'</div>':'';var timelineHtml=(c.renovacoes&&c.renovacoes.length>0)||c.cadastradoEm?construirTimeline(c.renovacoes||[],c.cadastradoEm,c.nome,plano.nome,serv.nome):'';var body=cadastroHtml+'<div class="field"><label class="field-label">Anotações</label><textarea class="input" id="notaText" rows="4" placeholder="Escreva suas anotações aqui..." style="resize:vertical;">'+esc(c.anotacoes||'')+'</textarea></div>'+(timelineHtml?'<div style="font-size:.75rem;font-weight:700;color:var(--text3);margin-top:16px;margin-bottom:8px;text-transform:uppercase;">📋 Histórico de Renovações</div>'+timelineHtml:'');var el=showModal('nota','📝 '+esc(c.nome),body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'nota\')">Fechar</button><button class="btn btn-primary btn-full" id="notaSave">Salvar</button>');document.getElementById('notaSave').addEventListener('click',function(){c.anotacoes=document.getElementById('notaText').value;saveDB();closeModal('nota');toast('Anotação salva!','success')})}
 function modalWhatsApp(id){var c=db.clientes.find(function(x){return x.id===id});if(!c||!c.whatsapp){toast('Cliente sem WhatsApp cadastrado','warning');return}var p=db.planos.find(function(x){return x.id===c.planoId});var val=p?(p.valor-(c.desconto||0)):0;var body='<p style="color:var(--text2);font-size:.88rem;margin-bottom:14px;">Qual mensagem deseja enviar para <strong>'+esc(c.nome)+'</strong>?</p><button class="btn btn-ghost btn-full" id="btnCob" style="justify-content:flex-start;gap:12px;margin-bottom:8px;padding:14px;"><span style="font-size:1.2rem;">💰</span><div style="text-align:left"><div style="font-weight:700;">Cobrança</div><div style="font-size:.75rem;color:var(--text3);">Lembrar sobre vencimento</div></div></button><button class="btn btn-ghost btn-full" id="btnRen" style="justify-content:flex-start;gap:12px;padding:14px;"><span style="font-size:1.2rem;">✅</span><div style="text-align:left"><div style="font-weight:700;">Renovação confirmada</div><div style="font-size:.75rem;color:var(--text3);">Avisar que foi renovado</div></div></button>';showModal('wa','Enviar WhatsApp',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'wa\')">Cancelar</button>');document.getElementById('btnCob').addEventListener('click',function(){closeModal('wa');sendWA(c,'cobranca')});document.getElementById('btnRen').addEventListener('click',function(){closeModal('wa');sendWA(c,'renovacao')})}
-
-// FUNÇÃO WHATSAPP CORRIGIDA PARA APK + EMOJIS
-function sendWA(c,tipo){
-  var p=db.planos.find(function(x){return x.id===c.planoId});
-  var val=p?(p.valor-(c.desconto||0)):0;
-  var tpl=db.templates[tipo]||'';
-  var primeiroNome=c.nome.trim().split(' ')[0];
-  var msg=tpl.replace(/{primeiro_nome}/g,primeiroNome).replace(/{nome}/g,c.nome).replace(/{vencimento}/g,fmtDate(c.vencimento)).replace(/{valor}/g,fmt(val));
-  // Substitui emojis por texto simples
-  
-  var num=c.whatsapp.replace(/\D/g,'');
-  var url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(msg);
-  window.open(url,'_blank');
-}
-
+function sendWA(c,tipo){var p=db.planos.find(function(x){return x.id===c.planoId});var val=p?(p.valor-(c.desconto||0)):0;var tpl=db.templates[tipo]||'';var primeiroNome=c.nome.trim().split(' ')[0];var msg=tpl.replace(/{primeiro_nome}/g,primeiroNome).replace(/{nome}/g,c.nome).replace(/{vencimento}/g,fmtDate(c.vencimento)).replace(/{valor}/g,fmt(val));var num=c.whatsapp.replace(/\D/g,'');var url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(msg);window.open(url,'_blank')}
 function modalPlano(id){var p=id?db.planos.find(function(x){return x.id===id}):null;var body='<div class="field"><label class="field-label">Nome do plano *</label><input class="input" id="plNome" value="'+esc(p?p.nome:'')+'" placeholder="Ex: Mensal HD"></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="plValor" value="'+(p?p.valor:'')+'" placeholder="0.00" step="0.01"></div>';var el=showModal('plano',id?'Editar Plano':'Novo Plano',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'plano\')">Cancelar</button><button class="btn btn-primary btn-full" id="plSave">Salvar</button>');document.getElementById('plSave').addEventListener('click',function(){var nome=document.getElementById('plNome').value.trim();var valor=parseFloat(document.getElementById('plValor').value)||0;if(!nome){toast('Informe o nome do plano','error');return}if(id){db.planos=db.planos.map(function(x){return x.id===id?{id:id,nome:nome,valor:valor}:x})}else{db.planos.push({id:'p'+Date.now(),nome:nome,valor:valor})}addLog('Plano '+(id?'atualizado':'criado')+': '+nome);saveDB();closeModal('plano');render(currentSec);toast(id?'Plano atualizado!':'Plano criado!','success')})}
 function modalServ(id){var s=id?db.servidores.find(function(x){return x.id===id}):null;var body='<div class="field"><label class="field-label">Nome do servidor *</label><input class="input" id="servNome" value="'+esc(s?s.nome:'')+'" placeholder="Ex: Servidor Alpha"></div><div class="field"><label class="field-label">Custo mensal (R$)</label><input type="number" class="input" id="servValor" value="'+(s?s.valor||'':'')+'" placeholder="0.00" step="0.01"></div>';var el=showModal('serv',id?'Editar Servidor':'Novo Servidor',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'serv\')">Cancelar</button><button class="btn btn-primary btn-full" id="servSave">Salvar</button>');document.getElementById('servSave').addEventListener('click',function(){var nome=document.getElementById('servNome').value.trim();if(!nome){toast('Informe o nome','error');return}if(id){var sval=parseFloat(document.getElementById('servValor').value)||0;db.servidores=db.servidores.map(function(x){return x.id===id?{id:id,nome:nome,valor:sval}:x})}else{var sval=parseFloat(document.getElementById('servValor').value)||0;db.servidores.push({id:'s'+Date.now(),nome:nome,valor:sval})}addLog('Servidor '+(id?'atualizado':'criado')+': '+nome);saveDB();autoSincTrans();saveDB();closeModal('serv');render(currentSec);toast(id?'Servidor atualizado!':'Servidor criado!','success')})}
 function modalTrans(){var body='<div class="field"><label class="field-label">Tipo</label><select class="input" id="transType"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="transVal" placeholder="0.00" step="0.01"></div><div class="field"><label class="field-label">Descrição</label><input class="input" id="transDesc" placeholder="Ex: Mensalidade extra"></div><div class="field"><label class="field-label">Data</label><input type="date" class="input" id="transData" value="'+today()+'"></div>';showModal('trans','Adicionar Transação',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'trans\')">Cancelar</button><button class="btn btn-primary btn-full" id="transSave">Salvar</button>');document.getElementById('transSave').addEventListener('click',function(){var tipo=document.getElementById('transType').value;var val=parseFloat(document.getElementById('transVal').value)||0;var desc=document.getElementById('transDesc').value.trim();var data=document.getElementById('transData').value;if(!val||!data){toast('Informe valor e data','error');return}db.transacoes.push({id:'t'+Date.now(),tipo:tipo,valor:val,data:data,desc:desc});addLog('Transação manual: '+tipo+' R$'+fmt(val));saveDB();closeModal('trans');render('financas');toast('Transação salva!','success')})}
 function modalInadimplencia(){var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje}).sort(function(a,b){return a.vencimento.localeCompare(b.vencimento)});if(vencidos.length===0){var body='<div class="empty-state"><i data-lucide="check-circle" width="40" height="40" style="color:var(--success)"></i><p>Nenhum cliente inadimplente! 🎉</p></div>';showModal('inadim','⚠️ Inadimplência',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'inadim\')">Fechar</button>');return}var totalEmAberto=0;var somaDias=0;var criticos=[];var atencao=[];var recentes=[];vencidos.forEach(function(c){var p=db.planos.find(function(x){return x.id===c.planoId})||{};var valor=(p.valor||0)-(c.desconto||0);totalEmAberto+=valor;var dias=Math.floor((new Date(hoje)-new Date(c.vencimento))/86400000);somaDias+=dias;var clienteInfo={id:c.id,nome:c.nome,dias:dias,valor:valor,vencimento:c.vencimento,whatsapp:c.whatsapp};if(dias>7){criticos.push(clienteInfo)}else if(dias>=3){atencao.push(clienteInfo)}else{recentes.push(clienteInfo)}});var mediaDias=Math.round(somaDias/vencidos.length);function criarCardCliente(cli){return'<div class="inadim-client-card"><div class="inadim-client-info"><div class="inadim-client-name">'+esc(cli.nome)+'</div><div class="inadim-client-detail">'+cli.dias+' dia'+(cli.dias>1?'s':'')+' em atraso · Venceu '+fmtDate(cli.vencimento)+'</div><div class="inadim-actions">'+(cli.whatsapp?'<button class="inadim-btn cobrar" onclick="window._closeModal(\'inadim\'); window._wp(\''+esc(cli.id)+'\')"><i data-lucide="message-circle" width="11" height="11"></i> Cobrar</button>':'')+'<button class="inadim-btn nota" onclick="window._closeModal(\'inadim\'); window._nota(\''+esc(cli.id)+'\')"><i data-lucide="file-text" width="11" height="11"></i> Nota</button></div></div><div class="inadim-client-value">R$ '+fmt(cli.valor)+'</div></div>'}var sectionsHtml='';if(criticos.length>0){sectionsHtml+='<div class="inadim-group-title"><span class="inadim-dot critico"></span> 🔴 CRÍTICO (+7 dias)</div>';sectionsHtml+=criticos.map(criarCardCliente).join('')}if(atencao.length>0){sectionsHtml+='<div class="inadim-group-title"><span class="inadim-dot atencao"></span> 🟠 ATENÇÃO (3-7 dias)</div>';sectionsHtml+=atencao.map(criarCardCliente).join('')}if(recentes.length>0){sectionsHtml+='<div class="inadim-group-title"><span class="inadim-dot recente"></span> 🟡 RECENTE (1-2 dias)</div>';sectionsHtml+=recentes.map(criarCardCliente).join('')}var temWhatsApp=vencidos.some(function(c){return c.whatsapp});var body='<div class="inadim-summary"><div class="inadim-summary-item"><div class="inadim-summary-value" style="color:var(--danger)">'+vencidos.length+'</div><div class="inadim-summary-label">Em Atraso</div></div><div class="inadim-summary-item"><div class="inadim-summary-value">R$ '+fmt(totalEmAberto)+'</div><div class="inadim-summary-label">Total Aberto</div></div><div class="inadim-summary-item"><div class="inadim-summary-value">'+mediaDias+'d</div><div class="inadim-summary-label">Média Atraso</div></div></div>'+sectionsHtml;var actions='<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'inadim\')">Fechar</button>'+(temWhatsApp?'<button class="btn btn-primary btn-full" onclick="window._cobrancaInadimplencia()"><i data-lucide="send" width="14" height="14"></i> Cobrar Todos</button>':'');showModal('inadim','⚠️ Central de Cobrança',body,actions)}
 function cobrancaInadimplencia(){closeModal('inadim');var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje&&c.whatsapp});if(vencidos.length===0){toast('Nenhum cliente com WhatsApp','warning');return}var delay=0;vencidos.forEach(function(c){setTimeout(function(){sendWA(c,'cobranca')},delay);delay+=2500});toast('Abrindo WhatsApp para '+vencidos.length+' cliente(s)...','success')}
 function modalCobrancaMassa(){var hoje=today();var hoje_clientes=db.clientes.filter(function(c){return c.vencimento===hoje&&c.whatsapp});if(!hoje_clientes.length){toast('Nenhum cliente com WhatsApp vence hoje','warning');return}var checks=hoje_clientes.map(function(c){return'<label style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;"><input type="checkbox" class="massa-check" data-id="'+esc(c.id)+'" checked style="width:18px;height:18px;accent-color:var(--accent);"><span style="font-size:.88rem;font-weight:600;">'+esc(c.nome)+'</span></label>'}).join('');var body='<div style="margin-bottom:12px;font-size:.85rem;color:var(--text2);">'+hoje_clientes.length+' cliente(s) vencem hoje com WhatsApp:</div>'+checks;showModal('massa','📲 Cobrança em Massa',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'massa\')">Cancelar</button><button class="btn btn-primary btn-full" id="massaSend">Enviar para todos</button>');document.getElementById('massaSend').addEventListener('click',function(){var ids=[];document.querySelectorAll('.massa-check:checked').forEach(function(ch){ids.push(ch.dataset.id)});closeModal('massa');var delay=0;ids.forEach(function(cid){var c=db.clientes.find(function(x){return x.id===cid});if(c)setTimeout(function(){sendWA(c,'cobranca')},delay);delay+=2500});toast('Abrindo WhatsApp para '+ids.length+' cliente(s)...','success')})}
+function modalRelatorioDiario(){
+  var hoje=today();
+  var entradas=db.transacoes.filter(function(t){return t.tipo==='entrada'&&t.data===hoje});
+  var saidas=db.transacoes.filter(function(t){return t.tipo==='saida'&&t.data===hoje});
+  var totalEnt=entradas.reduce(function(s,t){return s+t.valor},0);
+  var totalSai=saidas.reduce(function(s,t){return s+t.valor},0);
+  var lucroDia=totalEnt-totalSai;
+  
+  // Clientes renovados hoje
+  var renovadosHoje=db.clientes.filter(function(c){
+    return c.renovacoes&&c.renovacoes.some(function(r){return r.data===hoje});
+  });
+  
+  // Clientes novos cadastrados hoje
+  var novosHoje=db.clientes.filter(function(c){
+    return c.cadastradoEm===hoje;
+  });
+  
+  var body='<div class="report-summary">'+
+    '<div class="report-summary-item"><div class="report-summary-value green">R$ '+fmt(totalEnt)+'</div><div class="report-summary-label">Entradas</div></div>'+
+    '<div class="report-summary-item"><div class="report-summary-value red">R$ '+fmt(totalSai)+'</div><div class="report-summary-label">Saídas</div></div>'+
+    '<div class="report-summary-item"><div class="report-summary-value blue">R$ '+fmt(lucroDia)+'</div><div class="report-summary-label">Lucro</div></div>'+
+    '</div>';
+  
+  if(renovadosHoje.length===0&&novosHoje.length===0){
+    body+='<div class="empty-state" style="padding:20px"><p style="font-size:.85rem">✨ Nenhuma movimentação hoje.</p></div>';
+  }
+  
+  if(renovadosHoje.length>0){
+    body+='<div class="report-section-title"><span class="report-dot green"></span> Renovados Hoje</div>';
+    body+=renovadosHoje.map(function(c){
+      var plano=db.planos.find(function(p){return p.id===c.planoId})||{};
+      var serv=db.servidores.find(function(s){return s.id===c.servidorId})||{};
+      var valor=(plano.valor||0)-(c.desconto||0);
+      var partes=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0});
+      var ini=(partes.length>=2?partes[0][0]+partes[partes.length-1][0]:(partes[0]||'?').substring(0,2)).toUpperCase();
+      return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-avatar">'+ini+'</div><div><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+esc(serv.nome||'—')+'</div></div></div><div class="report-mini-value">R$ '+fmt(valor)+'</div></div>';
+    }).join('');
+  }
+  
+  if(novosHoje.length>0){
+    body+='<div class="report-section-title"><span class="report-dot blue"></span> Novos Clientes Hoje</div>';
+    body+=novosHoje.map(function(c){
+      var plano=db.planos.find(function(p){return p.id===c.planoId})||{};
+      var serv=db.servidores.find(function(s){return s.id===c.servidorId})||{};
+      var valor=(plano.valor||0)-(c.desconto||0);
+      var partes=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0});
+      var ini=(partes.length>=2?partes[0][0]+partes[partes.length-1][0]:(partes[0]||'?').substring(0,2)).toUpperCase();
+      return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-avatar">'+ini+'</div><div><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+esc(serv.nome||'—')+'</div></div></div><div class="report-mini-value new">R$ '+fmt(valor)+'</div></div>';
+    }).join('');
+  }
+  
+  showModal('relatorio','📊 Relatório Diário — '+fmtDate(hoje),body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relatorio\')">Fechar</button>');
+}
 function modalLembretes(){var body='<div><input class="lembrete-input-wrap" id="lembreteInput" placeholder="Escreva um lembrete..."></div><div id="lembretesLista"></div>';var el=showModal('lembretes','📝 Lembretes',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'lembretes\')">Fechar</button><button class="btn btn-primary btn-full" id="lembreteAdd">Adicionar</button>');renderLembretesLista();document.getElementById('lembreteAdd').addEventListener('click',function(){var texto=document.getElementById('lembreteInput').value.trim();if(!texto){toast('Escreva algo','warning');return}db.lembretes.push({id:'l'+Date.now(),texto:texto,feito:false,data:today()});saveDB();document.getElementById('lembreteInput').value='';renderLembretesLista();toast('Lembrete salvo!','success')})}
 function renderLembretesLista(){var container=document.getElementById('lembretesLista');if(!container)return;if(db.lembretes.length===0){container.innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--text3);font-size:.85rem;">✨<br>Nenhum lembrete ainda.<br>Comece a anotar suas tarefas!</div>';return}var html='';for(var i=db.lembretes.length-1;i>=0;i--){var l=db.lembretes[i];var feitoClass=l.feito?' feito':'';html+='<div class="lembrete-item-ui"><div class="lembrete-check'+feitoClass+'" onclick="window._toggleLembrete(\''+l.id+'\')">'+(l.feito?'✓':'')+'</div><span class="lembrete-texto'+feitoClass+'" onclick="window._editarLembrete(\''+l.id+'\')">'+esc(l.texto)+'</span><button class="lembrete-del" onclick="window._delLembrete(\''+l.id+'\')"><i data-lucide="trash-2" width="14" height="14"></i></button></div>'}container.innerHTML=html;icons()}
 function toggleLembrete(id){var l=db.lembretes.find(function(x){return x.id===id});if(!l)return;l.feito=!l.feito;saveDB();renderLembretesLista()}
@@ -364,6 +422,7 @@ document.querySelectorAll('.nav-btn').forEach(function(btn){btn.addEventListener
 document.getElementById('fab').addEventListener('click',function(){if(currentSec==='clientes')modalCliente();else if(currentSec==='planos')modalPlano();else if(currentSec==='servidores')modalServ();else if(currentSec==='dashboard')modalCliente()});
 document.getElementById('btnBackup').addEventListener('click',function(){closeSidebar();exportarBackup()});
 document.getElementById('btnInadimplencia').addEventListener('click',function(){closeSidebar();modalInadimplencia()});
+document.getElementById('btnRelatorio').addEventListener('click',function(){closeSidebar();modalRelatorioDiario()});
 document.getElementById('btnLembretes').addEventListener('click',function(){closeSidebar();modalLembretes()});
 document.getElementById('btnLog').addEventListener('click',function(){closeSidebar();modalLog()});
 document.getElementById('btnDarkMode').addEventListener('click',function(){darkMode=!darkMode;applyDark()});
