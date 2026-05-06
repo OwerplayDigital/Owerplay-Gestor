@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#FFFFFF">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Owerplay Gestor</title>
   
   <link rel="icon" type="image/png" href="IMG_20260501_113710.png">
@@ -78,7 +79,7 @@
     .stat-value{font-size:1.5rem;font-weight:800;color:var(--text)}.stat-value.green{color:var(--success)}.stat-value.red{color:var(--danger)}.stat-value.orange{color:var(--warning)}
     .lucro-card{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-dark) 100%);border-radius:var(--radius);padding:20px;color:#fff;margin-bottom:14px;cursor:default;box-shadow:0 6px 24px rgba(2,136,209,.35);transition:transform .12s;position:relative}
     .lucro-label{font-size:.75rem;font-weight:600;opacity:.8;margin-bottom:4px}.lucro-value{font-size:2rem;font-weight:800}
-    .lucro-eye{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px;cursor:pointer;display:flex}
+    .lucro-eye{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:10px;cursor:pointer;display:flex}
     .client-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:12px;margin-bottom:10px;box-shadow:var(--shadow);animation:fadeUp .2s ease both}
     @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .client-card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -185,7 +186,6 @@
     .lembrete-input-wrap{width:100%;padding:10px 12px;border-radius:10px;border:2px dashed var(--border);background:none;font-family:inherit;font-size:.85rem;outline:none;transition:border-color .15s;margin-bottom:14px;color:var(--text)}
     .lembrete-input-wrap:focus{border-color:var(--accent)}
 
-    /* RELATÓRIO DIÁRIO */
     .report-summary {display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px}
     .report-summary-item {background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center}
     .report-summary-value {font-size:1.1rem;font-weight:800}
@@ -327,27 +327,14 @@ function modalRelatorioDiario(){
   var totalEnt=entradas.reduce(function(s,t){return s+t.valor},0);
   var totalSai=saidas.reduce(function(s,t){return s+t.valor},0);
   var lucroDia=totalEnt-totalSai;
-  
-  // Clientes renovados hoje
-  var renovadosHoje=db.clientes.filter(function(c){
-    return c.renovacoes&&c.renovacoes.some(function(r){return r.data===hoje});
-  });
-  
-  // Clientes novos cadastrados hoje
-  var novosHoje=db.clientes.filter(function(c){
-    return c.cadastradoEm===hoje;
-  });
-  
+  var renovadosHoje=db.clientes.filter(function(c){return c.renovacoes&&c.renovacoes.some(function(r){return r.data===hoje})});
+  var novosHoje=db.clientes.filter(function(c){return c.cadastradoEm===hoje});
   var body='<div class="report-summary">'+
     '<div class="report-summary-item"><div class="report-summary-value green">R$ '+fmt(totalEnt)+'</div><div class="report-summary-label">Entradas</div></div>'+
     '<div class="report-summary-item"><div class="report-summary-value red">R$ '+fmt(totalSai)+'</div><div class="report-summary-label">Saídas</div></div>'+
     '<div class="report-summary-item"><div class="report-summary-value blue">R$ '+fmt(lucroDia)+'</div><div class="report-summary-label">Lucro</div></div>'+
     '</div>';
-  
-  if(renovadosHoje.length===0&&novosHoje.length===0){
-    body+='<div class="empty-state" style="padding:20px"><p style="font-size:.85rem">✨ Nenhuma movimentação hoje.</p></div>';
-  }
-  
+  if(renovadosHoje.length===0&&novosHoje.length===0){body+='<div class="empty-state" style="padding:20px"><p style="font-size:.85rem">✨ Nenhuma movimentação hoje.</p></div>'}
   if(renovadosHoje.length>0){
     body+='<div class="report-section-title"><span class="report-dot green"></span> Renovados Hoje</div>';
     body+=renovadosHoje.map(function(c){
@@ -359,7 +346,6 @@ function modalRelatorioDiario(){
       return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-avatar">'+ini+'</div><div><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+esc(serv.nome||'—')+'</div></div></div><div class="report-mini-value">R$ '+fmt(valor)+'</div></div>';
     }).join('');
   }
-  
   if(novosHoje.length>0){
     body+='<div class="report-section-title"><span class="report-dot blue"></span> Novos Clientes Hoje</div>';
     body+=novosHoje.map(function(c){
@@ -371,7 +357,6 @@ function modalRelatorioDiario(){
       return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-avatar">'+ini+'</div><div><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+esc(serv.nome||'—')+'</div></div></div><div class="report-mini-value new">R$ '+fmt(valor)+'</div></div>';
     }).join('');
   }
-  
   showModal('relatorio','📊 Relatório Diário — '+fmtDate(hoje),body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relatorio\')">Fechar</button>');
 }
 function modalLembretes(){var body='<div><input class="lembrete-input-wrap" id="lembreteInput" placeholder="Escreva um lembrete..."></div><div id="lembretesLista"></div>';var el=showModal('lembretes','📝 Lembretes',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'lembretes\')">Fechar</button><button class="btn btn-primary btn-full" id="lembreteAdd">Adicionar</button>');renderLembretesLista();document.getElementById('lembreteAdd').addEventListener('click',function(){var texto=document.getElementById('lembreteInput').value.trim();if(!texto){toast('Escreva algo','warning');return}db.lembretes.push({id:'l'+Date.now(),texto:texto,feito:false,data:today()});saveDB();document.getElementById('lembreteInput').value='';renderLembretesLista();toast('Lembrete salvo!','success')})}
