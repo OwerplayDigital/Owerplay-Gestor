@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
   <style>
     :root {
       --accent:       #0288D1; --accent-light: #E1F5FE; --accent-dark:  #01579B;
@@ -111,7 +112,7 @@
     .empty-state{text-align:center;padding:48px 24px;color:var(--text3)}.empty-state i{margin-bottom:12px;opacity:.4}.empty-state p{font-size:.9rem;margin-bottom:16px}
     .filter-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent-dark);font-size:.75rem;font-weight:700;padding:5px 10px;border-radius:99px;margin-bottom:12px}
     .filter-badge button{background:none;border:none;cursor:pointer;color:var(--accent-dark);display:flex;padding:0}
-    .backup-json-box{width:100%;height:200px;padding:12px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);font-family:monospace;font-size:.7rem;color:var(--text);resize:none;outline:none;margin-bottom:8px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+    .backup-code-box{width:100%;padding:12px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);font-family:monospace;font-size:.75rem;color:var(--text);outline:none;margin-bottom:8px;word-break:break-all;text-align:center}
     
     #toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--surface);color:var(--text);padding:14px 18px;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.15);font-size:.85rem;font-weight:600;z-index:9999;opacity:0;transition:all .35s cubic-bezier(.175,.885,.32,1.275);white-space:nowrap;pointer-events:none;display:flex;align-items:center;gap:12px;border-left:4px solid var(--border);max-width:90vw}
     [data-theme="dark"] #toast{box-shadow:0 8px 32px rgba(0,0,0,.4)}
@@ -276,19 +277,7 @@ function verificarVencimentosHoje(){var hoje=today();var clientesHoje=db.cliente
 function mostrarAlertaDiario(clientesHoje){var alertaAnterior=document.getElementById('dailyAlertOverlay');if(alertaAnterior)alertaAnterior.remove();var clientesHtml=clientesHoje.map(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId})||{};var serv=db.servidores.find(function(s){return s.id===c.servidorId})||{};var valor=(plano.valor||0)-(c.desconto||0);var partes=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0});var ini=(partes.length>=2?partes[0][0]+partes[partes.length-1][0]:(partes[0]||'?').substring(0,2)).toUpperCase();return'<div class="alert-client-item" onclick="window._fecharAlertaDiario(); window._wp(\''+esc(c.id)+'\')"><div class="alert-avatar">'+ini+'</div><div class="alert-client-info"><div class="alert-client-name">'+esc(c.nome)+'</div><div class="alert-client-plan">'+esc(plano.nome||'Sem plano')+' · '+esc(serv.nome||'Sem servidor')+'</div></div><div class="alert-amount">R$ '+fmt(valor)+'</div></div>'}).join('');var totalValor=clientesHoje.reduce(function(soma,c){var plano=db.planos.find(function(p){return p.id===c.planoId})||{};return soma+((plano.valor||0)-(c.desconto||0))},0);var overlay=document.createElement('div');overlay.id='dailyAlertOverlay';overlay.className='daily-alert-overlay';overlay.innerHTML='<div class="daily-alert"><div class="alert-header"><div class="alert-icon-alert"><i data-lucide="bell" width="22" height="22" style="color:#fff"></i></div><div><div class="alert-title">Vencimentos Hoje!</div><div class="alert-subtitle">'+clientesHoje.length+' cliente'+(clientesHoje.length>1?'s':'')+' · Total: R$ '+fmt(totalValor)+'</div></div></div><div class="alert-body">'+clientesHtml+'</div><div class="alert-footer"><button class="btn btn-ghost" onclick="window._fecharAlertaDiario()">Fechar</button>'+(clientesHoje.some(function(c){return c.whatsapp})?'<button class="btn btn-primary" onclick="window._cobrarTodosAlerta()"><i data-lucide="send" width="14" height="14"></i> Cobrar Todos</button>':'')+'</div></div>';document.body.appendChild(overlay);overlay.addEventListener('click',function(e){if(e.target===overlay){fecharAlertaDiario()}});icons()}
 function fecharAlertaDiario(){var overlay=document.getElementById('dailyAlertOverlay');if(overlay){overlay.style.opacity='0';overlay.style.transition='opacity 0.2s';setTimeout(function(){overlay.remove()},200)}}
 function cobrarTodosAlerta(){var hoje=today();var clientesHoje=db.clientes.filter(function(c){return c.vencimento===hoje&&c.whatsapp});fecharAlertaDiario();if(clientesHoje.length===0){toast('Nenhum cliente com WhatsApp','warning');return}var delay=0;clientesHoje.forEach(function(c){setTimeout(function(){sendWA(c,'cobranca')},delay);delay+=2500});toast('Abrindo WhatsApp para '+clientesHoje.length+' cliente(s)...','success')}
-function renderDashboard(mc){
-  var hoje=today(),mesAtual=hoje.slice(0,7);
-  var ent=sumTrans('entrada',mesAtual),sai=sumTrans('saida',mesAtual),lucro=ent-sai;
-  var ativos=db.clientes.filter(function(c){return c.vencimento>=hoje}).length;
-  var venc=db.clientes.filter(function(c){return c.vencimento<hoje}).length;
-  var hj=db.clientes.filter(function(c){return c.vencimento===hoje}).length;
-  var lv=lucroOculto?'••••••':'R$ '+fmt(lucro);
-  var eyeIcon=lucroOculto?'eye-off':'eye';
-  mc.innerHTML='<div class="lucro-card"><button class="lucro-eye" onclick="window._toggleLucro()"><i data-lucide="'+eyeIcon+'" width="16" height="16"></i></button><div class="lucro-label">💰 Lucro do Mês</div><div class="lucro-value" id="lucroVal">'+lv+'</div></div><div class="stat-grid">'+statCard('✅ Ativos',ativos,'',"window._filter('active')")+statCard('⚠️ Vencidos',venc,'red',"window._filter('expired')")+statCard('📅 Hoje',hj,'orange',"window._filter('today')")+statCard('👥 Total',db.clientes.length,'',"window._filter('all')")+'</div><div style="margin-bottom:10px;"><div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="dashSearch" placeholder="Buscar cliente..." autocomplete="off"></div><div id="dashCards"></div></div>';
-  renderCards('dashCards',db.clientes,hoje);
-  var inp=document.getElementById('dashSearch');
-  if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var list=q?db.clientes.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q))}):db.clientes;renderCards('dashCards',list,today())})
-}
+function renderDashboard(mc){var hoje=today(),mesAtual=hoje.slice(0,7);var ent=sumTrans('entrada',mesAtual),sai=sumTrans('saida',mesAtual),lucro=ent-sai;var ativos=db.clientes.filter(function(c){return c.vencimento>=hoje}).length;var venc=db.clientes.filter(function(c){return c.vencimento<hoje}).length;var hj=db.clientes.filter(function(c){return c.vencimento===hoje}).length;var lv=lucroOculto?'••••••':'R$ '+fmt(lucro);var eyeIcon=lucroOculto?'eye-off':'eye';mc.innerHTML='<div class="lucro-card"><button class="lucro-eye" onclick="window._toggleLucro()"><i data-lucide="'+eyeIcon+'" width="16" height="16"></i></button><div class="lucro-label">💰 Lucro do Mês</div><div class="lucro-value" id="lucroVal">'+lv+'</div></div><div class="stat-grid">'+statCard('✅ Ativos',ativos,'',"window._filter('active')")+statCard('⚠️ Vencidos',venc,'red',"window._filter('expired')")+statCard('📅 Hoje',hj,'orange',"window._filter('today')")+statCard('👥 Total',db.clientes.length,'',"window._filter('all')")+'</div><div style="margin-bottom:10px;"><div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="dashSearch" placeholder="Buscar cliente..." autocomplete="off"></div><div id="dashCards"></div></div>';renderCards('dashCards',db.clientes,hoje);var inp=document.getElementById('dashSearch');if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var list=q?db.clientes.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q))}):db.clientes;renderCards('dashCards',list,today())})}
 function statCard(label,val,color,onclick){return'<div class="stat-card" onclick="'+onclick+'"><div class="stat-label">'+label+'</div><div class="stat-value'+(color?' '+color:'')+'">'+val+'</div></div>'}
 function renderClientes(mc){var hoje=today(),list=db.clientes.slice(),filterLabel='';if(cliFilter==='active'){list=list.filter(function(c){return c.vencimento>=hoje});filterLabel='Ativos'}if(cliFilter==='expired'){list=list.filter(function(c){return c.vencimento<hoje});filterLabel='Vencidos'}if(cliFilter==='today'){list=list.filter(function(c){return c.vencimento===hoje});filterLabel='Hoje'}if(cliFilter==='all'){filterLabel='Todos'}var filterHtml=filterLabel?'<div class="filter-badge">'+filterLabel+' ('+list.length+')<button onclick="window._clearFilter()"><i data-lucide="x" width="12" height="12"></i></button></div>':'';mc.innerHTML=filterHtml+'<div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="cliSearch" placeholder="Buscar por nome ou WhatsApp..." autocomplete="off"></div><div id="cliCards"></div>';var snapshot=list.slice();renderCards('cliCards',snapshot,hoje);var inp=document.getElementById('cliSearch');if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var filtered=q?snapshot.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q))}):snapshot;renderCards('cliCards',filtered,today())})}
 function renderCards(containerId,list,hoje){var cont=document.getElementById(containerId);if(!cont)return;if(list.length===0){cont.innerHTML='<div class="empty-state"><i data-lucide="user-round" width="48" height="48"></i><p>Nenhum cliente encontrado</p></div>';icons();return}var sorted=list.slice().sort(function(a,b){return a.vencimento.localeCompare(b.vencimento)});cont.innerHTML=sorted.map(function(c,i){var plano=db.planos.find(function(p){return p.id===c.planoId})||{};var serv=db.servidores.find(function(s){return s.id===c.servidorId})||{};var partes=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0});var ini=(partes.length>=2?partes[0][0]+partes[partes.length-1][0]:(partes[0]||'?').substring(0,2)).toUpperCase();var badge=c.vencimento<hoje?'<span class="badge badge-exp">Vencido</span>':c.vencimento===hoje?'<span class="badge badge-today">Hoje</span>':'<span class="badge badge-ok">Ativo</span>';var valor=((plano.valor||0)-(c.desconto||0));var cid=esc(c.id);var temNota=(c.anotacoes&&c.anotacoes.trim())?' nota-destaque':'';return'<div class="client-card" style="animation-delay:'+(i*0.035)+'s"><div class="client-card-header"><div class="avatar">'+ini+'</div><div style="flex:1;min-width:0"><div class="client-name">'+esc(c.nome)+'</div><div class="client-sub">'+esc(plano.nome||'Sem plano')+' · '+esc(serv.nome||'Sem servidor')+'</div></div>'+badge+'</div><div class="client-footer"><span>📅 '+fmtDate(c.vencimento)+'</span><span>R$ '+fmt(valor)+'</span></div><div class="client-actions">'+(c.whatsapp?'<button class="action-btn" onclick="window._wp(\''+cid+'\')"><i data-lucide="message-circle" width="13" height="13"></i>WhatsApp</button>':'')+'<button class="action-btn" onclick="window._renovar(\''+cid+'\')"><i data-lucide="rotate-cw" width="13" height="13"></i>Renovar</button><button class="action-btn'+temNota+'" onclick="window._nota(\''+cid+'\')"><i data-lucide="file-text" width="13" height="13"></i>Nota</button><button class="action-btn" onclick="window._editar(\''+cid+'\')"><i data-lucide="pencil" width="13" height="13"></i>Editar</button><button class="action-btn" onclick="window._excluir(\''+cid+'\')"><i data-lucide="trash-2" width="13" height="13"></i></button></div></div>'}).join('');icons()}
@@ -409,14 +398,16 @@ document.getElementById('btnMensagens').addEventListener('click',function(){clos
 document.getElementById('btnRestaurar').addEventListener('click',function(){document.getElementById('fileRestore').click()});
 document.getElementById('fileRestore').addEventListener('change',function(){restaurarBackup(this.files[0]);this.value=''});
 
+// BACKUP INTELIGENTE: download no navegador, modal compactado no APK
 function exportarBackup(){
-  var json=JSON.stringify(db,null,2);
-  // Sempre mostra o modal com JSON e botão Copiar
-  var body='<div class="field"><label class="field-label">Conteúdo do Backup</label><textarea class="backup-json-box" id="backupJsonText" readonly>'+esc(json)+'</textarea></div><p style="font-size:.72rem;color:var(--text3);margin-bottom:4px">Copie e salve em local seguro.</p>';
-  showModal('backup','💾 Backup',body,'<button class="btn btn-ghost" onclick="window._closeModal(\'backup\')">Fechar</button><button class="btn btn-primary" id="backupCopy">Copiar</button>');
+  var json=JSON.stringify(db);
+  // Compacta com LZString
+  var comprimido='OWP'+LZString.compressToBase64(json);
+  var body='<p style="font-size:.75rem;color:var(--text3);margin-bottom:12px;text-align:center">Código compactado do backup</p><input class="backup-code-box" id="backupCode" value="'+esc(comprimido)+'" readonly onclick="this.select()"><p style="font-size:.68rem;color:var(--text3);margin-top:6px;text-align:center">Toque no código para selecionar e copiar</p>';
+  showModal('backup','💾 Backup',body,'<button class="btn btn-ghost" onclick="window._closeModal(\'backup\')">Fechar</button><button class="btn btn-primary" id="backupCopyBtn">Copiar</button>');
   setTimeout(function(){
-    var btn=document.getElementById('backupCopy');
-    var txt=document.getElementById('backupJsonText');
+    var btn=document.getElementById('backupCopyBtn');
+    var txt=document.getElementById('backupCode');
     if(btn&&txt){
       btn.addEventListener('click',function(){
         txt.select();txt.setSelectionRange(0,99999);
@@ -424,9 +415,9 @@ function exportarBackup(){
       });
     }
   },200);
-  // Tenta também o download (só funciona no navegador)
+  // No navegador, também tenta baixar o .json (sem mostrar modal extra)
   try{
-    var blob=new Blob([json],{type:'application/json'});
+    var blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
     a.href=url;a.download='owerplay-backup-'+today()+'.json';
@@ -435,7 +426,28 @@ function exportarBackup(){
   }catch(e){}
   icons();
 }
-function restaurarBackup(file){if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);if(!data.clientes)throw new Error();db=data;if(!db.templates)db.templates=Object.assign({},DEFAULT_TEMPLATES);if(!db.lembretes)db.lembretes=[];saveDB();render(currentSec);toast('Backup restaurado!','success')}catch(ex){toast('Arquivo inválido','error')}};reader.readAsText(file)}
+function restaurarBackup(file){
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var raw=e.target.result;
+      var data;
+      // Tenta JSON normal primeiro
+      try{data=JSON.parse(raw)}catch(ex){
+        // Se falhar, tenta descompactar LZString (começa com OWP)
+        if(raw.startsWith('OWP')){data=JSON.parse(LZString.decompressFromBase64(raw.slice(3)))}
+        else{throw new Error('Formato inválido')}
+      }
+      if(!data.clientes)throw new Error();
+      db=data;
+      if(!db.templates)db.templates=Object.assign({},DEFAULT_TEMPLATES);
+      if(!db.lembretes)db.lembretes=[];
+      saveDB();render(currentSec);toast('Backup restaurado!','success');
+    }catch(ex){toast('Arquivo inválido','error')}
+  };
+  reader.readAsText(file);
+}
 function ativarNotifs(){if(!('Notification' in window)){toast('Notificações não suportadas','warning');return}Notification.requestPermission().then(function(p){if(p==='granted'){toast('Notificações ativadas!','success')}else toast('Permissão negada','warning')})}
 
 loadDB();autoSincTrans();saveDB();navigateTo('dashboard');verificarVencimentosHoje();
