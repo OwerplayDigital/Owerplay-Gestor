@@ -134,8 +134,6 @@
     .login-input{width:100%;padding:14px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);font-family:inherit;font-size:.9rem;outline:none;margin-bottom:10px;color:var(--text)}
     .login-input:focus{border-color:var(--accent)}
     .login-link{font-size:.75rem;color:var(--accent);font-weight:600;cursor:pointer;margin-top:12px;text-align:center}
-    .user-badge{display:flex;align-items:center;gap:8px;background:var(--surface2);padding:6px 12px;border-radius:20px;font-size:.7rem;font-weight:600;color:var(--text2);cursor:pointer;margin-right:8px}
-    .user-badge:active{background:var(--border)}
     
     .finance-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
     .fin-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 10px;text-align:center}
@@ -162,24 +160,6 @@
     .alert-amount{font-weight:700;font-size:.85rem;color:var(--warning);flex-shrink:0}
     .alert-footer{padding:16px 20px;display:flex;gap:10px}.alert-footer .btn{flex:1}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-    .report-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px}
-    .report-summary-item{background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center}
-    .report-summary-value{font-size:1.1rem;font-weight:800}.report-summary-value.green{color:var(--success)}.report-summary-value.red{color:var(--danger)}.report-summary-value.blue{color:var(--accent)}
-    .report-summary-label{font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:2px}
-    .report-section-title{font-size:.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:14px;display:flex;align-items:center;gap:6px}.report-section-title:first-of-type{margin-top:0}
-    .report-dot{width:8px;height:8px;border-radius:50%}.report-dot.green{background:var(--success)}.report-dot.blue{background:var(--accent)}
-    .report-client-mini{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:10px;margin-bottom:6px}
-    .report-client-left{display:flex;align-items:center;gap:10px}
-    .report-mini-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-light);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.65rem}
-    .report-mini-name{font-weight:600;font-size:.8rem;color:var(--text)}.report-mini-plan{font-size:.62rem;color:var(--text3);margin-top:1px}
-    .report-mini-value{font-weight:700;font-size:.8rem;color:var(--success)}.report-mini-value.new{color:var(--accent)}
-    .lembrete-item-ui{display:flex;align-items:flex-start;gap:10px;padding:10px 8px;background:var(--surface2);border-radius:10px;margin-bottom:6px;transition:all .15s}
-    .lembrete-check{width:20px;height:20px;border:2px solid #CBD5E1;border-radius:6px;flex-shrink:0;margin-top:1px;transition:all .15s;display:flex;align-items:center;justify-content:center;cursor:pointer}
-    [data-theme="dark"] .lembrete-check{border-color:#475569}.lembrete-check.feito{background:var(--success);border-color:var(--success);color:#fff;font-size:12px}
-    .lembrete-texto{flex:1;font-size:.83rem;color:var(--text);font-weight:500;word-break:break-word;cursor:pointer;padding:1px 0}.lembrete-texto.feito{text-decoration:line-through;color:var(--text3)}
-    .lembrete-del{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;flex-shrink:0;transition:all .15s;display:flex;align-items:center}
-    .lembrete-del:active{background:rgba(0,0,0,.05);color:var(--danger)}
-    .lembrete-input-wrap{width:100%;padding:10px 12px;border-radius:10px;border:2px dashed var(--border);background:none;font-family:inherit;font-size:.85rem;outline:none;transition:border-color .15s;margin-bottom:14px;color:var(--text)}.lembrete-input-wrap:focus{border-color:var(--accent)}
   </style>
 </head>
 <body>
@@ -216,7 +196,7 @@
         <div class="topbar-brand">Owerplay Gestor</div>
         <div class="topbar-slogan">Conectando você ao lucro</div>
       </div>
-      <div id="userBadgeContainer" style="width:34px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end"></div>
+      <div style="width:34px;flex-shrink:0"></div>
     </div>
     <div id="mainContent"></div>
     <nav class="bottom-nav" id="bottomNav">
@@ -276,9 +256,8 @@ function renderLogin(mode){
       supabase.auth.signUp({email:email,password:pass}).then(function(res){if(res.error){toast('Erro: '+res.error.message,'error')}else{toast('Conta criada! Faça login.','success');renderLogin('login')}});
     }else{supabase.auth.signInWithPassword({email:email,password:pass}).then(function(res){if(res.error){toast('Erro: '+res.error.message,'error')}else{toast('Login feito!','success')}});}
   });
-  document.getElementById('fab').className='hidden';updateUserBadge();
+  document.getElementById('fab').className='hidden';
 }
-function updateUserBadge(){var cont=document.getElementById('userBadgeContainer');if(!cont)return;if(currentUser){cont.innerHTML='<span class="user-badge" onclick="window._logout()" title="Sair">'+esc(currentUser.email.split('@')[0])+'</span>'}else{cont.innerHTML=''}}
 function logout(){supabase.auth.signOut();}
 function saveDB(){saveLocal();salvarNuvem()}
 function loadDB(){}
@@ -289,7 +268,7 @@ function toast(msg,type){var el=document.getElementById('toast');if(!el)return;v
 function icons(){if(window.lucide)lucide.createIcons()}
 function openSidebar(){document.getElementById('sidebar').classList.add('open')}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open')}
-function navigateTo(sec,filter){if(!authLoaded||!currentUser){renderLogin();return}currentSec=sec;cliFilter=filter||null;closeSidebar();document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.sec===sec)});var fab=document.getElementById('fab');if(fab)fab.className=(sec==='financas')?'hidden':'';render(sec);updateUserBadge()}
+function navigateTo(sec,filter){if(!authLoaded||!currentUser){renderLogin();return}currentSec=sec;cliFilter=filter||null;closeSidebar();document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.sec===sec)});var fab=document.getElementById('fab');if(fab)fab.className=(sec==='financas')?'hidden':'';render(sec)}
 function render(sec){var mc=document.getElementById('mainContent');if(!mc)return;mc.scrollTop=0;if(sec==='dashboard')renderDashboard(mc);else if(sec==='clientes')renderClientes(mc);else if(sec==='planos')renderPlanos(mc);else if(sec==='servidores')renderServidores(mc);else if(sec==='financas')renderFinancas(mc);icons()}
 function verificarVencimentosHoje(){var hoje=today();var clientesHoje=db.clientes.filter(function(c){return c.vencimento===hoje});if(clientesHoje.length>0){mostrarAlertaDiario(clientesHoje)}}
 function mostrarAlertaDiario(clientesHoje){var alertaAnterior=document.getElementById('dailyAlertOverlay');if(alertaAnterior)alertaAnterior.remove();var clientesHtml=clientesHoje.map(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId})||{};var serv=db.servidores.find(function(s){return s.id===c.servidorId})||{};var valor=(plano.valor||0)-(c.desconto||0);var partes=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0});var ini=(partes.length>=2?partes[0][0]+partes[partes.length-1][0]:(partes[0]||'?').substring(0,2)).toUpperCase();return'<div class="alert-client-item" onclick="window._fecharAlertaDiario(); window._wp(\''+esc(c.id)+'\')"><div class="alert-avatar">'+ini+'</div><div class="alert-client-info"><div class="alert-client-name">'+esc(c.nome)+'</div><div class="alert-client-plan">'+esc(plano.nome||'Sem plano')+' · '+esc(serv.nome||'Sem servidor')+'</div></div><div class="alert-amount">R$ '+fmt(valor)+'</div></div>'}).join('');var totalValor=clientesHoje.reduce(function(soma,c){var plano=db.planos.find(function(p){return p.id===c.planoId})||{};return soma+((plano.valor||0)-(c.desconto||0))},0);var overlay=document.createElement('div');overlay.id='dailyAlertOverlay';overlay.className='daily-alert-overlay';overlay.innerHTML='<div class="daily-alert"><div class="alert-header"><div class="alert-icon-alert"><i data-lucide="bell" width="22" height="22" style="color:#fff"></i></div><div><div class="alert-title">Vencimentos Hoje!</div><div class="alert-subtitle">'+clientesHoje.length+' cliente'+(clientesHoje.length>1?'s':'')+' · Total: R$ '+fmt(totalValor)+'</div></div></div><div class="alert-body">'+clientesHtml+'</div><div class="alert-footer"><button class="btn btn-ghost" onclick="window._fecharAlertaDiario()">Fechar</button>'+(clientesHoje.some(function(c){return c.whatsapp})?'<button class="btn btn-primary" onclick="window._cobrarTodosAlerta()"><i data-lucide="send" width="14" height="14"></i> Cobrar Todos</button>':'')+'</div></div>';document.body.appendChild(overlay);overlay.addEventListener('click',function(e){if(e.target===overlay){fecharAlertaDiario()}});icons()}
@@ -376,7 +355,7 @@ document.getElementById('btnDarkMode').addEventListener('click',function(){darkM
 document.getElementById('btnNotif').addEventListener('click',function(){closeSidebar();ativarNotifs()});
 document.getElementById('btnMensagens').addEventListener('click',function(){closeSidebar();modalMensagens()});
 document.getElementById('btnLogout').addEventListener('click',function(){closeSidebar();logout()});
-function ativarNotifs(){if(!('Notification' in window)){toast('Notificações não suportadas','warning');return}Notification.requestPermission().then(function(p){if(p==='granted'){toast('Notificações ativadas!','success')}else toast('Permissão negada','warning')})}
+function ativarNotifs(){if(!('Notification' in window)){toast('Notificações não suportadas','warning');return}Notification.requestPermission().then(function(p){if(p=='granted'){toast('Notificações ativadas!','success')}else toast('Permissão negada','warning')})}
 
 initApp();
 })();
