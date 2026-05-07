@@ -59,6 +59,21 @@
     .sidebar-panel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:2px}
     [data-theme="dark"] .sidebar-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
 
+    .sidebar-badge{
+      margin-left:auto;
+      background:var(--danger);
+      color:#fff;
+      font-size:.6rem;
+      font-weight:700;
+      min-width:20px;
+      height:20px;
+      border-radius:99px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 6px;
+    }
+
     .topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:62px;gap:12px}
     .topbar.hidden{display:none}
     .topbar-menu{background:none;border:none;color:var(--text2);cursor:pointer;padding:6px;border-radius:8px;display:flex;align-items:center;flex-shrink:0}
@@ -191,6 +206,22 @@
     .report-client-left{flex:1;min-width:0}
     .report-mini-name{font-weight:600;font-size:.8rem;color:var(--text)}.report-mini-plan{font-size:.62rem;color:var(--text3);margin-top:1px}
     .report-mini-value{font-weight:700;font-size:.8rem;color:var(--success);flex-shrink:0}.report-mini-value.new{color:var(--accent)}
+
+    /* Modal Anual */
+    .progresso-bar{height:8px;background:var(--border);border-radius:4px;margin-top:14px;overflow:hidden}
+    .progresso-fill{height:100%;background:linear-gradient(90deg,var(--accent),#38BDF8);border-radius:4px}
+    .progresso-info{font-size:.62rem;color:var(--text3);margin-top:4px;text-align:right;font-weight:600}
+    .section-title{font-size:.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:18px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .mini-barras{display:flex;align-items:flex-end;gap:8px;height:90px}
+    .barra-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+    .barra-valor{font-size:.52rem;font-weight:700;color:var(--text)}
+    .barra{width:100%;background:var(--accent);border-radius:3px 3px 0 0;min-height:10px}
+    .barra.destaque{background:var(--success)}
+    .barra-label{font-size:.5rem;font-weight:600;color:var(--text3)}
+    .media-mensal{background:var(--accent-light);border:1px solid #BAE6FD;border-radius:10px;padding:10px 12px;margin-top:14px;display:flex;justify-content:space-between;align-items:center}
+    [data-theme="dark"] .media-mensal{background:rgba(2,136,209,.15);border-color:rgba(2,136,209,.3)}
+    .media-label{font-size:.65rem;font-weight:600;color:var(--accent)}
+    .media-valor{font-size:.9rem;font-weight:800;color:var(--accent)}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
   </style>
 </head>
@@ -209,11 +240,15 @@
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section"><div class="sidebar-section-label">Ferramentas</div>
-      <button class="sidebar-item" id="btnInadimplencia"><i data-lucide="alert-triangle" width="17" height="17"></i> Inadimplência</button>
+      <button class="sidebar-item" id="btnInadimplencia"><i data-lucide="alert-triangle" width="17" height="17"></i> Inadimplência <span class="sidebar-badge" id="badgeInadimplencia" style="display:none">0</span></button>
       <button class="sidebar-item" id="btnRelatorio"><i data-lucide="bar-chart-3" width="17" height="17"></i> Relatório Diário</button>
       <button class="sidebar-item" id="btnLembretes"><i data-lucide="sticky-note" width="17" height="17"></i> Lembretes</button>
       <button class="sidebar-item" id="btnLog"><i data-lucide="list-checks" width="17" height="17"></i> Log de Atividades</button>
       <button class="sidebar-item" id="btnBackup"><i data-lucide="cloud-upload" width="17" height="17"></i> Backup Nuvem</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section"><div class="sidebar-section-label">Compartilhar</div>
+      <button class="sidebar-item" id="btnCompartilhar"><i data-lucide="share-2" width="17" height="17"></i> Compartilhar App</button>
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section" style="padding-bottom:16px;">
@@ -293,6 +328,11 @@ function monthStr(offset){
 function sumTrans(tipo,prefix){
   return db.transacoes.filter(function(t){
     return t.tipo===tipo&&t.data&&t.data.startsWith(prefix);
+  }).reduce(function(s,t){return s+t.valor;},0);
+}
+function sumTransAno(tipo,ano){
+  return db.transacoes.filter(function(t){
+    return t.tipo===tipo&&t.data&&t.data.startsWith(String(ano));
   }).reduce(function(s,t){return s+t.valor;},0);
 }
 function fmt(n){return(n||0).toFixed(2);}
@@ -391,6 +431,22 @@ async function backupNuvem(){
 function saveDB(){saveLocal();salvarNuvem();}
 
 // ──────────────────────────────────────
+// BADGE INADIMPLENCIA (NOVO)
+// ──────────────────────────────────────
+function atualizarBadgeInadimplencia(){
+  var badge=document.getElementById('badgeInadimplencia');
+  if(!badge)return;
+  var hoje=today();
+  var count=db.clientes.filter(function(c){return c.vencimento<hoje;}).length;
+  if(count>0){
+    badge.textContent=count;
+    badge.style.display='flex';
+  }else{
+    badge.style.display='none';
+  }
+}
+
+// ──────────────────────────────────────
 // LOGIN – TELA
 // ──────────────────────────────────────
 function loginAction(isCadastro){
@@ -439,7 +495,10 @@ function renderLogin(mode){
 // ──────────────────────────────────────
 // NAVEGAÇÃO
 // ──────────────────────────────────────
-function openSidebar(){document.getElementById('sidebar').classList.add('open');}
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  atualizarBadgeInadimplencia();
+}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');}
 function navigateTo(sec,filter){
   if(!authLoaded||!currentUser){renderLogin();return;}
@@ -453,6 +512,7 @@ function navigateTo(sec,filter){
   var fab=document.getElementById('fab');
   if(fab)fab.className=(sec==='financas')?'hidden':'';
   render(sec);
+  atualizarBadgeInadimplencia();
 }
 function render(sec){
   var mc=document.getElementById('mainContent');if(!mc)return;
@@ -463,6 +523,22 @@ function render(sec){
   else if(sec==='servidores')renderServidores(mc);
   else if(sec==='financas')renderFinancas(mc);
   icons();
+  atualizarBadgeInadimplencia();
+}
+
+// ──────────────────────────────────────
+// COMPARTILHAR APP (NOVO)
+// ──────────────────────────────────────
+function compartilharApp(){
+  var link='https://owerplay.github.io/gestor/';
+  var msg='📱 Owerplay Gestor - Controle seus clientes de TV!\nGerencie planos, servidores e finanças com facilidade.\n\n👉 Acesse: '+link;
+  if(navigator.share){
+    navigator.share({title:'Owerplay Gestor',text:msg,url:link}).catch(function(){});
+  }else{
+    navigator.clipboard.writeText(msg).then(function(){
+      toast('Link copiado! Compartilhe com seus amigos.','success');
+    });
+  }
 }
 
 // ──────────────────────────────────────
@@ -736,6 +812,43 @@ function renderServidores(mc){
 function finStat(label,val,color){
   return'<div class="fin-stat"><div class="fin-stat-label">'+label+'</div><div class="fin-stat-value" style="color:'+color+'">'+val+'</div></div>';
 }
+function modalResumoAnual(){
+  var ano=new Date().getFullYear();
+  var entAno=sumTransAno('entrada',ano);
+  var saiAno=sumTransAno('saida',ano);
+  var lucAno=entAno-saiAno;
+
+  var mesAtual=new Date().getMonth()+1;
+  var meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  var barrasHtml='';
+  for(var i=1;i<=mesAtual;i++){
+    var prefix=ano+'-'+String(i).padStart(2,'0');
+    var entM=sumTrans('entrada',prefix);
+    var saiM=sumTrans('saida',prefix);
+    var lucM=entM-saiM;
+    var altura=Math.max(10,Math.min(70,(lucM/500)*70));
+    var destaque=(i===mesAtual)?' destaque':'';
+    barrasHtml+='<div class="barra-item"><div class="barra-valor">'+Math.round(lucM)+'</div><div class="barra'+destaque+'" style="height:'+altura+'px;"></div><div class="barra-label'+(destaque?'" style="color:var(--success);font-weight:700;"':'')+'>'+meses[i-1]+'</div></div>';
+  }
+
+  var percentAno=Math.round((mesAtual/12)*100);
+  var mediaMensal=mesAtual>0?lucAno/mesAtual:0;
+
+  var body=
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'+
+      '<div style="background:var(--surface2);border-radius:12px;padding:12px 8px;text-align:center;"><div style="font-size:1.1rem;font-weight:800;color:var(--accent);">R$ '+fmt(entAno)+'</div><div style="font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Entradas</div></div>'+
+      '<div style="background:var(--surface2);border-radius:12px;padding:12px 8px;text-align:center;"><div style="font-size:1.1rem;font-weight:800;color:var(--danger);">R$ '+fmt(saiAno)+'</div><div style="font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Saídas</div></div>'+
+      '<div style="background:var(--surface2);border-radius:12px;padding:12px 8px;text-align:center;"><div style="font-size:1.1rem;font-weight:800;color:'+(lucAno>=0?'var(--success)':'var(--danger)')+';">R$ '+fmt(lucAno)+'</div><div style="font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Lucro</div></div>'+
+    '</div>'+
+    '<div class="progresso-bar"><div class="progresso-fill" style="width:'+percentAno+'%;"></div></div>'+
+    '<div class="progresso-info">'+percentAno+'% do ano concluído</div>'+
+    '<div class="media-mensal"><span class="media-label">📊 Média mensal de lucro</span><span class="media-valor">R$ '+fmt(mediaMensal)+'</span></div>'+
+    '<div class="section-title">📋 Lucro por Mês</div>'+
+    '<div class="mini-barras">'+barrasHtml+'</div>';
+
+  showModal('resumoAnual','📊 Resumo Anual '+ano,body,
+    '<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'resumoAnual\')">Fechar</button>');
+}
 function renderFinancas(mc){
   var m=monthStr(0),mant=monthStr(-1);
   var ent=sumTrans('entrada',m),sai=sumTrans('saida',m),luc=ent-sai;
@@ -756,6 +869,8 @@ function renderFinancas(mc){
     '</div>';
   }).join(''):'<p style="color:var(--text3);font-size:.85rem;padding:12px 0;">Nenhuma transação</p>';
 
+  var mesLabel=new Date().toLocaleDateString('pt-BR',{month:'short',year:'numeric'}).toUpperCase().replace('.','');
+
   mc.innerHTML=
     '<div class="finance-stat-row">'+
       finStat('Entradas','R$ '+fmt(ent),'var(--accent)')+
@@ -764,6 +879,10 @@ function renderFinancas(mc){
     '</div>'+
     '<div class="card" style="margin-bottom:12px;">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'+
+        '<div style="font-size:.8rem;font-weight:700;color:var(--text3);">📆 Resumo Mensal <span style="background:var(--accent-light);color:var(--accent);font-size:.6rem;font-weight:700;padding:3px 7px;border-radius:99px;">'+mesLabel+'</span></div>'+
+        '<button onclick="window._verResumoAnual()" style="background:var(--accent-light);color:var(--accent);border:none;font-family:inherit;font-size:.65rem;font-weight:700;padding:5px 10px;border-radius:99px;cursor:pointer;display:flex;align-items:center;gap:4px;">📊 Ver Ano</button>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'+
         '<div style="font-size:.8rem;font-weight:700;color:var(--text3);">vs mês anterior</div>'+
         '<div style="font-size:.85rem;font-weight:700;color:'+(cresc>=0?'var(--success)':'var(--danger)')+';">'+crescTxt+'</div>'+
       '</div>'+
@@ -771,7 +890,7 @@ function renderFinancas(mc){
     '</div>'+
     '<div class="card" style="margin-bottom:12px;">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'+
-        '<div style="font-weight:700;">Transações Recentes</div>'+
+        '<div style="font-weight:700;">💳 Transações Recentes</div>'+
         '<button onclick="window._addTrans()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;"><i data-lucide="plus" width="12" height="12"></i>Adicionar</button>'+
       '</div>'+transHtml+
     '</div>'+
@@ -1238,6 +1357,7 @@ window._clearFilter=function(){navigateTo('clientes');};
 window._toggleLucro=function(){lucroOculto=!lucroOculto;localStorage.setItem('ow_lucroOc',lucroOculto?'1':'0');render('dashboard');};
 window._cobrancaMassa=function(){modalCobrancaMassa();};
 window._addTrans=function(){modalTrans();};
+window._verResumoAnual=function(){modalResumoAnual();};
 window._resetFin=function(){confirmModal('Resetar Financeiro?','Todas as transações serão apagadas.',function(){db.transacoes=[];addLog('Financeiro resetado');saveDB();render('financas');toast('Financeiro resetado','success');});};
 window._closeModal=function(id){closeModal(id);};
 window._editar=function(id){modalCliente(id);};
@@ -1290,6 +1410,7 @@ document.getElementById('btnLog').addEventListener('click',function(){closeSideb
 document.getElementById('btnBackup').addEventListener('click',function(){closeSidebar();backupNuvem();});
 document.getElementById('btnDarkMode').addEventListener('click',function(){darkMode=!darkMode;applyDark();});
 document.getElementById('btnMensagens').addEventListener('click',function(){closeSidebar();modalMensagens();});
+document.getElementById('btnCompartilhar').addEventListener('click',function(){closeSidebar();compartilharApp();});
 document.getElementById('btnLogout').addEventListener('click',function(){closeSidebar();logout();});
 
 initApp();
