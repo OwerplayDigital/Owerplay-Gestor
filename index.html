@@ -153,6 +153,7 @@
     .login-input{width:100%;padding:14px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);font-family:inherit;font-size:.9rem;outline:none;margin-bottom:10px;color:var(--text)}
     .login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(2,136,209,0.12)}
     .login-link{font-size:.75rem;color:var(--accent);font-weight:600;cursor:pointer;margin-top:12px;text-align:center}
+    .login-link:hover{text-decoration:underline}
     
     .finance-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
     .fin-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 10px;text-align:center}
@@ -194,9 +195,7 @@
     .report-mini-value{font-weight:700;font-size:.8rem;color:var(--success);flex-shrink:0}.report-mini-value.new{color:var(--accent)}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
-    /* ══════════════════════════════════════ */
-    /* NOVOS ESTILOS (ADICIONADOS)          */
-    /* ══════════════════════════════════════ */
+    /* NOVOS ESTILOS */
     .sidebar-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:99px;background:var(--danger);color:#fff;font-size:.6rem;font-weight:700;padding:0 5px;margin-left:auto;flex-shrink:0}
     .sidebar-badge.hidden{display:none}
     .alerta-vencimento-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .3s ease}
@@ -229,10 +228,6 @@
     .resumo-anual-crescimento{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface2);border-radius:10px;padding:10px;margin-bottom:16px;font-size:.8rem;font-weight:700}
     .resumo-anual-media{text-align:center;margin-bottom:16px;font-size:.8rem;color:var(--text2)}
     .resumo-anual-media strong{color:var(--accent);font-size:1rem}
-
-    /* ══════════════════════════════════════ */
-    /* INADIMPLÊNCIA REDESENHADO            */
-    /* ══════════════════════════════════════ */
     .inadim-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
     .inadim-summary-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 10px;text-align:center;box-shadow:var(--shadow)}
     .inadim-summary-value{font-size:1.3rem;font-weight:800}
@@ -340,7 +335,35 @@ async function backupNuvem(){if(!currentUser){toast('Faça login primeiro','warn
 function saveDB(){saveLocal();salvarNuvem();}
 
 function loginAction(isCadastro){var email=document.getElementById('loginEmail').value.trim();var pass=document.getElementById('loginPass').value.trim();if(!email||!email.includes('@')){toast('Digite um e-mail válido','warning');return;}if(!pass||pass.length<6){toast('Senha deve ter 6+ caracteres','warning');return;}if(isCadastro){var pass2=document.getElementById('loginPass2').value.trim();if(pass!==pass2){toast('Senhas não conferem','error');return;}supabase.auth.signUp({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else{toast('Conta criada! Faça login.','success');renderLogin('login');}});}else{supabase.auth.signInWithPassword({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else toast('Login feito!','success');});}}
-function renderLogin(mode){setLoginMode(true);var mc=document.getElementById('mainContent');if(!mc)return;var isCadastro=(mode==='cadastro');mc.innerHTML='<div class="login-container"><img class="login-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display=\'none\';var fb=document.createElement(\'span\');fb.style.cssText=\'width:70px;height:70px;border-radius:18px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2rem\';fb.textContent=\'✦\';this.parentNode.replaceChild(fb,this)"><div class="login-title">Owerplay Gestor</div><div class="login-subtitle">'+(isCadastro?'Crie sua conta':'Faça login')+'</div><div class="login-card"><input class="login-input" id="loginEmail" type="email" placeholder="Seu e-mail" autocomplete="email"><input class="login-input" id="loginPass" type="password" placeholder="Senha" autocomplete="'+(isCadastro?'new-password':'current-password')+'">'+(isCadastro?'<input class="login-input" id="loginPass2" type="password" placeholder="Repita a senha">':'')+'<button class="btn btn-primary btn-full" id="loginBtn">'+(isCadastro?'Criar Conta':'Entrar')+'</button><div class="login-link" id="toggleLogin">'+(isCadastro?'Já tem conta? Entrar':'Criar conta')+'</div></div></div>';document.getElementById('toggleLogin').addEventListener('click',function(){renderLogin(isCadastro?'login':'cadastro');});document.getElementById('loginBtn').addEventListener('click',function(){loginAction(isCadastro);});var pf=document.getElementById('loginPass');if(pf)pf.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});var p2=document.getElementById('loginPass2');if(p2)p2.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});}
+
+function renderLogin(mode){
+  setLoginMode(true);var mc=document.getElementById('mainContent');if(!mc)return;var isCadastro=(mode==='cadastro');
+  mc.innerHTML='<div class="login-container"><img class="login-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display=\'none\';var fb=document.createElement(\'span\');fb.style.cssText=\'width:70px;height:70px;border-radius:18px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2rem\';fb.textContent=\'✦\';this.parentNode.replaceChild(fb,this)">'+
+    '<div class="login-title">Owerplay Gestor</div>'+
+    '<div class="login-subtitle">'+(isCadastro?'Crie sua conta':'Faça login')+'</div>'+
+    '<div class="login-card">'+
+      '<input class="login-input" id="loginEmail" type="email" placeholder="Seu e-mail" autocomplete="email">'+
+      '<input class="login-input" id="loginPass" type="password" placeholder="Senha" autocomplete="'+(isCadastro?'new-password':'current-password')+'">'+
+      (isCadastro?'<input class="login-input" id="loginPass2" type="password" placeholder="Repita a senha">':'')+
+      '<button class="btn btn-primary btn-full" id="loginBtn">'+(isCadastro?'Criar Conta':'Entrar')+'</button>'+
+      '<div class="login-link" id="toggleLogin">'+(isCadastro?'Já tem conta? Entrar':'Criar conta')+'</div>'+
+      (isCadastro?'':'<div class="login-link" id="forgotPassword">Esqueci minha senha</div>')+
+    '</div>'+
+  '</div>';
+  document.getElementById('toggleLogin').addEventListener('click',function(){renderLogin(isCadastro?'login':'cadastro');});
+  document.getElementById('loginBtn').addEventListener('click',function(){loginAction(isCadastro);});
+  var fp=document.getElementById('forgotPassword');
+  if(fp)fp.addEventListener('click',function(){
+    var email=document.getElementById('loginEmail').value.trim();
+    if(!email||!email.includes('@')){toast('Digite seu e-mail primeiro','warning');return;}
+    supabase.auth.resetPasswordForEmail(email,{redirectTo:'https://owerplaydigital.github.io/Owerplay-Gestor/'}).then(function(res){
+      if(res.error)toast('Erro: '+res.error.message,'error');
+      else toast('Email de redefinição enviado! Verifique sua caixa de entrada.','success');
+    });
+  });
+  var pf=document.getElementById('loginPass');if(pf)pf.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});
+  var p2=document.getElementById('loginPass2');if(p2)p2.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});
+}
 
 function atualizarBadgeInadimplencia(){var badge=document.getElementById('badgeInadimplencia');if(!badge)return;var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje;}).length;if(vencidos>0){badge.textContent=vencidos>99?'99+':vencidos;badge.classList.remove('hidden');}else{badge.classList.add('hidden');}}
 
@@ -384,9 +407,6 @@ function modalPlano(id){var p=id?db.planos.find(function(x){return x.id===id;}):
 function modalServ(id){var s=id?db.servidores.find(function(x){return x.id===id;}):null;var body='<div class="field"><label class="field-label">Nome do servidor *</label><input class="input" id="servNome" value="'+esc(s?s.nome:'')+'" placeholder="Ex: Servidor Alpha"></div><div class="field"><label class="field-label">Custo mensal (R$)</label><input type="number" class="input" id="servValor" value="'+(s?s.valor||'':'')+'" placeholder="0.00" step="0.01"></div>';var el=showModal('serv',id?'Editar Servidor':'Novo Servidor',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'serv\')">Cancelar</button><button class="btn btn-primary btn-full" id="servSave">Salvar</button>');document.getElementById('servSave').addEventListener('click',function(){var nome=document.getElementById('servNome').value.trim();if(!nome){toast('Informe o nome','error');return;}var sval=parseFloat(document.getElementById('servValor').value)||0;if(id){db.servidores=db.servidores.map(function(x){return x.id===id?{id:id,nome:nome,valor:sval}:x;});}else{db.servidores.push({id:'s'+Date.now(),nome:nome,valor:sval});}addLog('Servidor '+(id?'atualizado':'criado')+': '+nome);saveDB();autoSincTrans();saveDB();closeModal('serv');render(currentSec);toast(id?'Servidor atualizado!':'Servidor criado!','success');});}
 function modalTrans(){var body='<div class="field"><label class="field-label">Tipo</label><select class="input" id="transType"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="transVal" placeholder="0.00" step="0.01"></div><div class="field"><label class="field-label">Descrição</label><input class="input" id="transDesc" placeholder="Ex: Mensalidade extra"></div><div class="field"><label class="field-label">Data</label><input type="date" class="input" id="transData" value="'+today()+'"></div>';showModal('trans','Adicionar Transação',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'trans\')">Cancelar</button><button class="btn btn-primary btn-full" id="transSave">Salvar</button>');document.getElementById('transSave').addEventListener('click',function(){var tipo=document.getElementById('transType').value,val=parseFloat(document.getElementById('transVal').value)||0,desc=document.getElementById('transDesc').value.trim(),data=document.getElementById('transData').value;if(!val||!data){toast('Informe valor e data','error');return;}db.transacoes.push({id:'t'+Date.now(),tipo:tipo,valor:val,data:data,desc:desc});addLog('Transação manual: '+tipo+' R$'+fmt(val));saveDB();closeModal('trans');render('financas');toast('Transação salva!','success');});}
 
-/* ══════════════════════════════════════ */
-/* INADIMPLÊNCIA (2 COLUNAS)            */
-/* ══════════════════════════════════════ */
 function modalInadimplencia(){
   var hoje=today();
   var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje;}).sort(function(a,b){return a.vencimento.localeCompare(b.vencimento);});
@@ -402,37 +422,20 @@ function modalInadimplencia(){
     var info={id:c.id,nome:c.nome,dias:dias,valor:valor,vencimento:c.vencimento,whatsapp:c.whatsapp};
     if(dias>7)criticos.push(info);else if(dias>=3)atencao.push(info);else recentes.push(info);
   });
-
   function criarCard(cli){
     var cid=esc(cli.id);
-    return'<div class="inadim-client-card">'+
-      '<div class="inadim-client-info">'+
-        '<div class="inadim-client-name">'+esc(cli.nome)+'</div>'+
-        '<div class="inadim-client-detail">'+cli.dias+' dia'+(cli.dias>1?'s':'')+' em atraso · Venceu '+fmtDate(cli.vencimento)+'</div>'+
-        '<div class="inadim-actions">'+
-          (cli.whatsapp?'<button class="inadim-btn cobrar" onclick="event.stopPropagation();window._closeModal(\'inadim\');window._wp(\''+cid+'\')"><i data-lucide="message-circle" width="12" height="12"></i>Cobrar</button>':'')+
-          '<button class="inadim-btn nota" onclick="event.stopPropagation();window._closeModal(\'inadim\');window._nota(\''+cid+'\')"><i data-lucide="file-text" width="12" height="12"></i>Nota</button>'+
-        '</div>'+
-      '</div>'+
-      '<div class="inadim-client-value">R$ '+fmt(cli.valor)+'</div>'+
-    '</div>';
+    return'<div class="inadim-client-card"><div class="inadim-client-info"><div class="inadim-client-name">'+esc(cli.nome)+'</div><div class="inadim-client-detail">'+cli.dias+' dia'+(cli.dias>1?'s':'')+' em atraso · Venceu '+fmtDate(cli.vencimento)+'</div><div class="inadim-actions">'+
+      (cli.whatsapp?'<button class="inadim-btn cobrar" onclick="event.stopPropagation();window._closeModal(\'inadim\');window._wp(\''+cid+'\')"><i data-lucide="message-circle" width="12" height="12"></i>Cobrar</button>':'')+
+      '<button class="inadim-btn nota" onclick="event.stopPropagation();window._closeModal(\'inadim\');window._nota(\''+cid+'\')"><i data-lucide="file-text" width="12" height="12"></i>Nota</button></div></div><div class="inadim-client-value">R$ '+fmt(cli.valor)+'</div></div>';
   }
-
   var sectionsHtml='';
   if(criticos.length>0){sectionsHtml+='<div class="inadim-group-title"><span class="inadim-dot critico"></span>🔴 CRÍTICO (+7 dias)</div>'+criticos.map(criarCard).join('');}
   if(atencao.length>0){sectionsHtml+='<div class="inadim-group-title"><span class="inadim-dot atencao"></span>🟠 ATENÇÃO (3-7 dias)</div>'+atencao.map(criarCard).join('');}
   if(recentes.length>0){sectionsHtml+='<div class="inadim-group-title"><span class="inadim-dot recente"></span>🟡 RECENTE (1-2 dias)</div>'+recentes.map(criarCard).join('');}
-
   var temWhatsApp=vencidos.some(function(c){return c.whatsapp;});
-  var body=
-    '<div class="inadim-summary">'+
-      '<div class="inadim-summary-item"><div class="inadim-summary-value" style="color:var(--danger)">'+vencidos.length+'</div><div class="inadim-summary-label">Em Atraso</div></div>'+
-      '<div class="inadim-summary-item"><div class="inadim-summary-value" style="color:var(--accent)">R$ '+fmt(totalEmAberto)+'</div><div class="inadim-summary-label">Total Aberto</div></div>'+
-    '</div>'+sectionsHtml;
-
+  var body='<div class="inadim-summary"><div class="inadim-summary-item"><div class="inadim-summary-value" style="color:var(--danger)">'+vencidos.length+'</div><div class="inadim-summary-label">Em Atraso</div></div><div class="inadim-summary-item"><div class="inadim-summary-value" style="color:var(--accent)">R$ '+fmt(totalEmAberto)+'</div><div class="inadim-summary-label">Total Aberto</div></div></div>'+sectionsHtml;
   var actions='<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'inadim\')">Fechar</button>';
   if(temWhatsApp)actions+='<button class="btn btn-primary btn-full" onclick="window._cobrancaInadimplencia()"><i data-lucide="send" width="15" height="15"></i> Cobrar Todos</button>';
-
   showModal('inadim','⚠️ Central de Cobrança',body,actions);
 }
 function cobrancaInadimplencia(){closeModal('inadim');var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje&&c.whatsapp;});if(!vencidos.length){toast('Nenhum cliente com WhatsApp','warning');return;}var delay=0;vencidos.forEach(function(c){setTimeout(function(){sendWA(c,'cobranca');},delay);delay+=2500;});toast('Abrindo WhatsApp para '+vencidos.length+' cliente(s)...','success');}
