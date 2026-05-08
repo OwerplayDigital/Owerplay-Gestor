@@ -28,7 +28,7 @@
     }
     [data-theme="dark"] { --bg:#0F172A; --surface:#1E293B; --surface2:#253047; --border:#334155; --text:#F1F5F9; --text2:#94A3B8; --text3:#64748B; --accent-light:#1E3A5F; --shadow:0 2px 12px rgba(0,0,0,.3); }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{background:#FFFFFF;color-scheme:light}
+    html{background:#000;color-scheme:light}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
     #app{display:flex;height:100dvh;overflow:hidden}
     
@@ -105,7 +105,7 @@
     .search-bar input{flex:1;border:none;background:none;padding:11px 0;color:var(--text);font-family:inherit;font-size:.9rem;outline:none}.search-bar i{color:var(--text3);flex-shrink:0}
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 20px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:700;transition:transform .12s,opacity .12s}
     .btn:active{transform:scale(.96)}.btn-primary{background:var(--accent);color:#fff}.btn-success{background:var(--success);color:#fff}.btn-danger{background:var(--danger);color:#fff}.btn-ghost{background:var(--surface2);color:var(--text);border:1.5px solid var(--border)}.btn-full{width:100%}
-    .modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:16px;animation:fadeIn .2s ease}
+    .modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;padding:16px;animation:fadeIn .2s ease}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     .modal{background:var(--surface);border-radius:20px 20px 16px 16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:24px 20px 28px;animation:slideUp .25s cubic-bezier(.4,0,.2,1)}
     @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -258,11 +258,7 @@
     .inadim-btn.cobrar:active{background:var(--accent-light)!important}
     .inadim-btn.nota{border-color:var(--text3)!important;color:var(--text3)!important}
     .inadim-btn.nota:active{background:var(--surface2)!important}
-    .servidor-checkbox-wrap{background:var(--surface2);border-radius:10px;padding:4px 8px;margin-bottom:8px}
-    .servidor-checkbox-item{display:flex;align-items:center;gap:10px;padding:10px 8px;cursor:pointer;border-radius:8px;border-bottom:1px solid var(--border)}
-    .servidor-checkbox-item:last-child{border-bottom:none}
-    .servidor-checkbox-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);flex-shrink:0}
-    .servidor-custo-total{display:flex;justify-content:space-between;align-items:center;background:var(--accent-light);border-radius:8px;padding:8px 12px;font-size:.78rem;font-weight:600;color:var(--accent)}
+    .servidores-badge-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
   </style>
 </head>
 <body>
@@ -363,7 +359,7 @@ function statCard(label,val,color,onclick){return'<div class="stat-card" onclick
 function renderDashboard(mc){var hoje=today(),mesAtual=hoje.slice(0,7);var ent=sumTrans('entrada',mesAtual),sai=sumTrans('saida',mesAtual),lucro=ent-sai;var ativos=db.clientes.filter(function(c){return c.vencimento>=hoje;}).length;var venc=db.clientes.filter(function(c){return c.vencimento<hoje;}).length;var hj=db.clientes.filter(function(c){return c.vencimento===hoje;}).length;var lv=lucroOculto?'••••••':'R$ '+fmt(lucro);var eyeIcon=lucroOculto?'eye-off':'eye';var list=db.clientes.slice();if(cliFilterDash==='active')list=list.filter(function(c){return c.vencimento>=hoje;});if(cliFilterDash==='expired')list=list.filter(function(c){return c.vencimento<hoje;});if(cliFilterDash==='today')list=list.filter(function(c){return c.vencimento===hoje;});mc.innerHTML='<div class="lucro-card"><button class="lucro-eye" onclick="window._toggleLucro()"><i data-lucide="'+eyeIcon+'" width="16" height="16"></i></button><div class="lucro-label">💰 Lucro do Mês</div><div class="lucro-value" id="lucroVal">'+lv+'</div></div><div class="stat-grid">'+statCard('✅ Ativos',ativos,'',"window._filter('active')")+statCard('⚠️ Vencidos',venc,'red',"window._filter('expired')")+statCard('📅 Hoje',hj,'orange',"window._filter('today')")+statCard('👥 Total',db.clientes.length,'',"window._filter('all')")+'</div><div style="margin-bottom:10px;"><div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="dashSearch" placeholder="Buscar cliente..." autocomplete="off"></div><div id="dashCards"></div></div>';var baseList=cliFilterDash?list:db.clientes;renderCards('dashCards',baseList,hoje);var inp=document.getElementById('dashSearch');if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var filtrados=baseList.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q));});renderCards('dashCards',filtrados,today());});}
 
 function verificarAlertaDiario(){var hoje=today();var clientesHoje=db.clientes.filter(function(c){return c.vencimento===hoje;});if(clientesHoje.length>0)mostrarAlertaDiario(clientesHoje);}
-function mostrarAlertaDiario(clientesHoje){var existente=document.getElementById('alertaVencimentoOverlay');if(existente)existente.remove();var totalValor=clientesHoje.reduce(function(soma,c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};return soma+((plano.valor||0)-(c.desconto||0));},0);var clientesHtml=clientesHoje.map(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};var serv=db.servidores.find(function(s){return s.id===c.servidorId;})||{};var valor=(plano.valor||0)-(c.desconto||0);return'<div class="alerta-vencimento-cliente" onclick="window._fecharAlertaDiario();window._wp(\''+esc(c.id)+'\')"><div class="alerta-vencimento-cliente-info"><div class="alerta-vencimento-cliente-nome">'+esc(c.nome)+'</div><div class="alerta-vencimento-cliente-plano">'+esc(plano.nome||'Sem plano')+' · '+esc(serv.nome||'Sem servidor')+'</div></div><div class="alerta-vencimento-cliente-valor">R$ '+fmt(valor)+'</div></div>';}).join('');var temWhatsApp=clientesHoje.some(function(c){return c.whatsapp;});var overlay=document.createElement('div');overlay.id='alertaVencimentoOverlay';overlay.className='alerta-vencimento-overlay';overlay.innerHTML='<div class="alerta-vencimento-modal"><div class="alerta-vencimento-header"><div class="alerta-vencimento-icon"><i data-lucide="bell-ring" width="28" height="28" style="color:#fff"></i></div><div class="alerta-vencimento-titulo">Vencimentos Hoje</div><div class="alerta-vencimento-subtitulo">'+clientesHoje.length+' cliente'+(clientesHoje.length>1?'s':'')+' para renovar</div><div class="alerta-vencimento-total">💵 Total: R$ '+fmt(totalValor)+'</div></div><div class="alerta-vencimento-body">'+clientesHtml+'</div><div class="alerta-vencimento-footer"><button class="btn btn-ghost" onclick="window._fecharAlertaDiario()">Fechar</button>'+(temWhatsApp?'<button class="btn btn-primary" onclick="window._cobrarTodosAlerta()"><i data-lucide="send" width="15" height="15"></i> Cobrar Todos</button>':'')+'</div></div>';document.body.appendChild(overlay);overlay.addEventListener('click',function(e){if(e.target===overlay)fecharAlertaDiario();});icons();}
+function mostrarAlertaDiario(clientesHoje){var existente=document.getElementById('alertaVencimentoOverlay');if(existente)existente.remove();var totalValor=clientesHoje.reduce(function(soma,c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};return soma+((plano.valor||0)-(c.desconto||0));},0);var clientesHtml=clientesHoje.map(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};var servs=c.servidoresIds||(c.servidorId?[c.servidorId]:[]);var servsNomes=servs.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(', ');var valor=(plano.valor||0)-(c.desconto||0);return'<div class="alerta-vencimento-cliente" onclick="window._fecharAlertaDiario();window._wp(\''+esc(c.id)+'\')"><div class="alerta-vencimento-cliente-info"><div class="alerta-vencimento-cliente-nome">'+esc(c.nome)+'</div><div class="alerta-vencimento-cliente-plano">'+esc(plano.nome||'Sem plano')+(servsNomes?' · '+esc(servsNomes):'')+'</div></div><div class="alerta-vencimento-cliente-valor">R$ '+fmt(valor)+'</div></div>';}).join('');var temWhatsApp=clientesHoje.some(function(c){return c.whatsapp;});var overlay=document.createElement('div');overlay.id='alertaVencimentoOverlay';overlay.className='alerta-vencimento-overlay';overlay.innerHTML='<div class="alerta-vencimento-modal"><div class="alerta-vencimento-header"><div class="alerta-vencimento-icon"><i data-lucide="bell-ring" width="28" height="28" style="color:#fff"></i></div><div class="alerta-vencimento-titulo">Vencimentos Hoje</div><div class="alerta-vencimento-subtitulo">'+clientesHoje.length+' cliente'+(clientesHoje.length>1?'s':'')+' para renovar</div><div class="alerta-vencimento-total">💵 Total: R$ '+fmt(totalValor)+'</div></div><div class="alerta-vencimento-body">'+clientesHtml+'</div><div class="alerta-vencimento-footer"><button class="btn btn-ghost" onclick="window._fecharAlertaDiario()">Fechar</button>'+(temWhatsApp?'<button class="btn btn-primary" onclick="window._cobrarTodosAlerta()"><i data-lucide="send" width="15" height="15"></i> Cobrar Todos</button>':'')+'</div></div>';document.body.appendChild(overlay);overlay.addEventListener('click',function(e){if(e.target===overlay)fecharAlertaDiario();});icons();}
 function fecharAlertaDiario(){var overlay=document.getElementById('alertaVencimentoOverlay');if(overlay){overlay.style.opacity='0';overlay.style.transition='opacity .2s';setTimeout(function(){overlay.remove();},200);}}
 function cobrarTodosAlerta(){var hoje=today();var clientesHoje=db.clientes.filter(function(c){return c.vencimento===hoje&&c.whatsapp;});fecharAlertaDiario();if(!clientesHoje.length){toast('Nenhum cliente com WhatsApp','warning');return;}var delay=0;clientesHoje.forEach(function(c){setTimeout(function(){sendWA(c,'cobranca');},delay);delay+=2500;});toast('Abrindo WhatsApp para '+clientesHoje.length+' cliente(s)...','success');}
 
@@ -398,7 +394,7 @@ function closeModal(id){var el=document.getElementById('mo_'+id);if(el)el.remove
 function confirmModal(title,msg,onConfirm){var el=showModal('confirm',title,'<p style="color:var(--text2);font-size:.9rem;margin-bottom:0;">'+msg+'</p>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'confirm\')">Cancelar</button><button class="btn btn-danger btn-full" id="confirmOk">Confirmar</button>');document.getElementById('confirmOk').addEventListener('click',function(){closeModal('confirm');onConfirm();});}
 
 /* ══════════════════════════════════════ */
-/* MODAL CLIENTE - MÚLTIPLOS SERVIDORES */
+/* MODAL CLIENTE - SERVIDORES EM MODAL  */
 /* ══════════════════════════════════════ */
 function modalCliente(id){
   if(db.planos.length===0&&!id){toast('Cadastre um plano primeiro!','warning');return;}
@@ -406,26 +402,34 @@ function modalCliente(id){
   var c=id?db.clientes.find(function(x){return x.id===id;}):null;
   var planOpts=db.planos.map(function(p){return'<option value="'+p.id+'"'+((c&&c.planoId===p.id)?' selected':'')+'>'+esc(p.nome)+' · R$'+fmt(p.valor)+'</option>';}).join('');
   var servidoresSelecionados=c?c.servidoresIds||(c.servidorId?[c.servidorId]:[]):[];
-  var servidoresHtml='';
-  db.servidores.forEach(function(s){
-    var checked=servidoresSelecionados.includes(s.id)?' checked':'';
-    servidoresHtml+='<label class="servidor-checkbox-item"><input type="checkbox" class="cliServCheck" value="'+s.id+'"'+checked+'><div style="flex:1;"><div style="font-weight:700;font-size:.85rem;">'+esc(s.nome)+'</div><div style="font-size:.7rem;color:var(--text3);">Custo: R$ '+fmt(s.valor||0)+'</div></div></label>';
-  });
+  function getServsNomes(){return servidoresSelecionados.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?esc(s.nome):'';}).filter(Boolean).join(', ')||'Nenhum';}
+  function getServsCusto(){return servidoresSelecionados.reduce(function(soma,sid){var s=db.servidores.find(function(x){return x.id===sid;});return soma+(s?s.valor||0:0);},0);}
   var body=
     '<div class="field"><label class="field-label">Nome *</label><input class="input" id="cliNome" value="'+esc(c?c.nome:'')+'" placeholder="Nome do cliente"></div>'+
     '<div class="field"><label class="field-label">WhatsApp</label><input class="input" id="cliWa" value="'+esc(c?c.whatsapp||'':'')+'" placeholder="55119..." inputmode="numeric"></div>'+
     '<div class="field"><label class="field-label">Vencimento *</label><input type="date" class="input" id="cliVenc" value="'+(c?c.vencimento:'')+'"></div>'+
     '<div class="field"><label class="field-label">Plano</label><select class="input" id="cliPlano"><option value="">Selecione</option>'+planOpts+'</select></div>'+
-    '<div class="field"><label class="field-label">Servidores</label><div class="servidor-checkbox-wrap">'+servidoresHtml+'</div><div class="servidor-custo-total"><span>Custo total:</span><span id="servCustoTotal">R$ 0,00</span></div></div>'+
+    '<div class="field"><label class="field-label">Servidores</label><button class="btn btn-ghost btn-full" id="btnSelServidores" style="justify-content:space-between;"><span id="servSelLabel">'+getServsNomes()+'</span><span id="servCustoTotal" style="color:var(--accent);font-size:.78rem;">R$ '+fmt(getServsCusto())+'</span></button></div>'+
     '<div class="field"><label class="field-label">Desconto (R$)</label><input type="number" class="input" id="cliDesc" value="'+(c?c.desconto||'':'')+'" placeholder="0"></div>';
   var el=showModal('cli',id?'Editar Cliente':'Novo Cliente',body,
     '<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'cli\')">Cancelar</button><button class="btn btn-primary btn-full" id="cliSave">Salvar</button>');
-  function atualizarCusto(){
-    var total=0;document.querySelectorAll('.cliServCheck:checked').forEach(function(chk){var s=db.servidores.find(function(x){return x.id===chk.value;});if(s)total+=s.valor||0;});
-    document.getElementById('servCustoTotal').textContent='R$ '+fmt(total);
+  function atualizarBotao(){
+    document.getElementById('servSelLabel').textContent=getServsNomes();
+    document.getElementById('servCustoTotal').textContent='R$ '+fmt(getServsCusto());
   }
-  atualizarCusto();
-  document.querySelectorAll('.cliServCheck').forEach(function(chk){chk.addEventListener('change',atualizarCusto);});
+  document.getElementById('btnSelServidores').addEventListener('click',function(){
+    var checks='';
+    db.servidores.forEach(function(s){
+      var checked=servidoresSelecionados.includes(s.id)?' checked':'';
+      checks+='<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);"><input type="checkbox" class="modalServCheck" value="'+s.id+'"'+checked+' style="width:18px;height:18px;accent-color:var(--accent);"><div style="flex:1;"><div style="font-weight:700;font-size:.85rem;">'+esc(s.nome)+'</div><div style="font-size:.7rem;color:var(--text3);">Custo: R$ '+fmt(s.valor||0)+'</div></div></label>';
+    });
+    var modalEl=showModal('servidoresModal','🖥️ Selecionar Servidores','<div style="max-height:50vh;overflow-y:auto;">'+checks+'</div>',
+      '<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'servidoresModal\')">Cancelar</button><button class="btn btn-primary btn-full" id="servModalOk">OK</button>');
+    document.getElementById('servModalOk').addEventListener('click',function(){
+      servidoresSelecionados=[];document.querySelectorAll('.modalServCheck:checked').forEach(function(chk){servidoresSelecionados.push(chk.value);});
+      closeModal('servidoresModal');atualizarBotao();
+    });
+  });
   document.getElementById('cliSave').addEventListener('click',function(){
     var nome=document.getElementById('cliNome').value.trim();
     var wa=document.getElementById('cliWa').value.replace(/\D/g,'');
@@ -434,17 +438,9 @@ function modalCliente(id){
     var desc=parseFloat(document.getElementById('cliDesc').value)||0;
     if(!nome||!venc){toast('Preencha nome e vencimento','error');return;}
     if(wa&&(wa.length<10||wa.length>15)){toast('WhatsApp inválido (inclua DDD)','warning');return;}
-    var servs=[];document.querySelectorAll('.cliServCheck:checked').forEach(function(chk){servs.push(chk.value);});
-    var novo={
-      id:id||'c'+Date.now(),nome:nome,whatsapp:wa,vencimento:venc,
-      planoId:plano,servidoresIds:servs,desconto:desc,
-      anotacoes:c?c.anotacoes||'':'',cadastradoEm:c?c.cadastradoEm||today():today(),
-      renovacoes:c?c.renovacoes||[]:[]
-    };
-    if(id){db.clientes=db.clientes.map(function(x){return x.id===id?novo:x;});}
-    else{db.clientes.push(novo);}
-    addLog(nome+(id?' atualizado':' cadastrado'));saveDB();autoSincTrans();saveDB();
-    closeModal('cli');render(currentSec);toast(id?'Atualizado!':'Cadastrado!','success');
+    var novo={id:id||'c'+Date.now(),nome:nome,whatsapp:wa,vencimento:venc,planoId:plano,servidoresIds:servidoresSelecionados,desconto:desc,anotacoes:c?c.anotacoes||'':'',cadastradoEm:c?c.cadastradoEm||today():today(),renovacoes:c?c.renovacoes||[]:[]};
+    if(id){db.clientes=db.clientes.map(function(x){return x.id===id?novo:x;});}else{db.clientes.push(novo);}
+    addLog(nome+(id?' atualizado':' cadastrado'));saveDB();autoSincTrans();saveDB();closeModal('cli');render(currentSec);toast(id?'Atualizado!':'Cadastrado!','success');
   });
 }
 
@@ -514,7 +510,7 @@ function modalNota(id){
     financeiroHtml='<div style="font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:16px;margin-bottom:10px;">💳 Financeiro</div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;"><div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:var(--accent);">R$ '+fmt(totalEnt)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Entradas</div></div><div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:var(--danger);">R$ '+fmt(totalSai)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Saídas</div></div><div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:'+(lucroCliente>=0?'var(--success)':'var(--danger)')+';">R$ '+fmt(lucroCliente)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Lucro</div></div></div>'+transHtml;
   }
-  var body=cadastroHtml+(servsBadges?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">'+servsBadges+'</div>':'')+'<div class="field"><label class="field-label">Anotações</label><textarea class="input" id="notaText" rows="3" placeholder="Escreva suas anotações aqui..." style="resize:vertical;">'+esc(c.anotacoes||'')+'</textarea></div>'+financeiroHtml;
+  var body=cadastroHtml+(servsBadges?'<div class="servidores-badge-wrap">'+servsBadges+'</div>':'')+'<div class="field"><label class="field-label">Anotações</label><textarea class="input" id="notaText" rows="3" placeholder="Escreva suas anotações aqui..." style="resize:vertical;">'+esc(c.anotacoes||'')+'</textarea></div>'+financeiroHtml;
   var el=showModal('nota','📝 '+esc(c.nome),body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'nota\')">Fechar</button><button class="btn btn-primary btn-full" id="notaSave">Salvar</button>');
   document.getElementById('notaSave').addEventListener('click',function(){c.anotacoes=document.getElementById('notaText').value;saveDB();closeModal('nota');toast('Anotação salva!','success');});
 }
@@ -562,14 +558,9 @@ function modalCobrancaMassa(){var hoje=today();var hojeClientes=db.clientes.filt
 function modalRelatorioSemanal(){
   var hoje=new Date();hoje.setHours(hoje.getHours()-3);
   var diaSemana=hoje.getDay();
-  var segunda=new Date(hoje);
-  segunda.setDate(hoje.getDate()-(diaSemana===0?6:diaSemana-1));
-  segunda.setHours(0,0,0,0);
-  var domingo=new Date(segunda);
-  domingo.setDate(segunda.getDate()+6);
-  domingo.setHours(23,59,59,999);
-  var segStr=segunda.toISOString().split('T')[0];
-  var domStr=domingo.toISOString().split('T')[0];
+  var segunda=new Date(hoje);segunda.setDate(hoje.getDate()-(diaSemana===0?6:diaSemana-1));segunda.setHours(0,0,0,0);
+  var domingo=new Date(segunda);domingo.setDate(segunda.getDate()+6);domingo.setHours(23,59,59,999);
+  var segStr=segunda.toISOString().split('T')[0];var domStr=domingo.toISOString().split('T')[0];
   var periodo=segunda.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' a '+domingo.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
   var transSemana=db.transacoes.filter(function(t){return t.data>=segStr&&t.data<=domStr;});
   var entSemana=transSemana.filter(function(t){return t.tipo==='entrada';}).reduce(function(s,t){return s+t.valor;},0);
@@ -580,10 +571,7 @@ function modalRelatorioSemanal(){
   var hojeStr=hoje.toISOString().split('T')[0];
   var emAtraso=db.clientes.filter(function(c){return c.vencimento<hojeStr;}).length;
   var renovadosHtml='';
-  if(renovadosSemana.length>0){
-    renovadosHtml='<div style="font-size:.7rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">📋 Renovados esta semana</div>';
-    renovadosSemana.forEach(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};var valor=(plano.valor||0)-(c.desconto||0);renovadosHtml+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:10px;margin-bottom:6px;"><div><div style="font-weight:700;font-size:.82rem;color:var(--text);">'+esc(c.nome)+'</div><div style="font-size:.68rem;color:var(--text3);">'+esc(plano.nome||'—')+'</div></div><div style="font-weight:700;font-size:.82rem;color:var(--accent);">R$ '+fmt(valor)+'</div></div>';});
-  }else{renovadosHtml='<div style="text-align:center;padding:16px;color:var(--text3);font-size:.8rem;">Nenhuma renovação esta semana</div>';}
+  if(renovadosSemana.length>0){renovadosHtml='<div style="font-size:.7rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">📋 Renovados esta semana</div>';renovadosSemana.forEach(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};var valor=(plano.valor||0)-(c.desconto||0);renovadosHtml+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:10px;margin-bottom:6px;"><div><div style="font-weight:700;font-size:.82rem;color:var(--text);">'+esc(c.nome)+'</div><div style="font-size:.68rem;color:var(--text3);">'+esc(plano.nome||'—')+'</div></div><div style="font-weight:700;font-size:.82rem;color:var(--accent);">R$ '+fmt(valor)+'</div></div>';});}else{renovadosHtml='<div style="text-align:center;padding:16px;color:var(--text3);font-size:.8rem;">Nenhuma renovação esta semana</div>';}
   var body='<div style="font-size:.75rem;color:var(--text3);margin-bottom:18px;">📅 '+periodo+'</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;"><div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:var(--accent);">R$ '+fmt(entSemana)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Entradas</div></div><div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:var(--danger);">R$ '+fmt(saiSemana)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Saídas</div></div><div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:'+(lucroSemana>=0?'var(--success)':'var(--danger)')+';">R$ '+fmt(lucroSemana)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Lucro</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;"><div style="background:var(--success-bg);border-radius:8px;padding:10px 8px;text-align:center;"><div style="font-size:.85rem;font-weight:800;color:var(--success);">'+renovadosSemana.length+'</div><div style="font-size:.58rem;font-weight:700;color:var(--success);text-transform:uppercase;">Renovados</div></div><div style="background:var(--accent-light);border-radius:8px;padding:10px 8px;text-align:center;"><div style="font-size:.85rem;font-weight:800;color:var(--accent);">'+novosSemana.length+'</div><div style="font-size:.58rem;font-weight:700;color:var(--accent);text-transform:uppercase;">Novos</div></div><div style="background:var(--danger-bg);border-radius:8px;padding:10px 8px;text-align:center;"><div style="font-size:.85rem;font-weight:800;color:var(--danger);">'+emAtraso+'</div><div style="font-size:.58rem;font-weight:700;color:var(--danger);text-transform:uppercase;">Em Atraso</div></div></div>'+renovadosHtml;
   showModal('relSemanal','📊 Relatório Semanal',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relSemanal\')">Fechar</button>');
 }
@@ -601,17 +589,11 @@ function renderResumoChart(dados,labels){setTimeout(function(){var ctx=document.
 
 function autoSincTrans(){
   var m=monthStr(0);
-  db.transacoes=db.transacoes.filter(function(t){
-    if(!t.data||!t.data.startsWith(m))return true;
-    if(!t.clienteId)return true;
-    return db.clientes.some(function(c){return c.id===t.clienteId;});
-  });
+  db.transacoes=db.transacoes.filter(function(t){if(!t.data||!t.data.startsWith(m))return true;if(!t.clienteId)return true;return db.clientes.some(function(c){return c.id===t.clienteId;});});
   db.clientes.forEach(function(c){
     var p=db.planos.find(function(x){return x.id===c.planoId;});
     var valEntrada=p?(p.valor-(c.desconto||0)):0;
-    if(valEntrada>0&&!db.transacoes.some(function(t){return t.clienteId===c.id&&t.tipo==='entrada'&&t.data.startsWith(m);})){
-      db.transacoes.push({id:'t'+Date.now()+Math.random().toString(36).slice(2),clienteId:c.id,tipo:'entrada',valor:valEntrada,data:today(),desc:c.nome});
-    }
+    if(valEntrada>0&&!db.transacoes.some(function(t){return t.clienteId===c.id&&t.tipo==='entrada'&&t.data.startsWith(m);})){db.transacoes.push({id:'t'+Date.now()+Math.random().toString(36).slice(2),clienteId:c.id,tipo:'entrada',valor:valEntrada,data:today(),desc:c.nome});}
     var servs=c.servidoresIds||(c.servidorId?[c.servidorId]:[]);
     servs.forEach(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});if(s&&s.valor&&!db.transacoes.some(function(t){return t.clienteId===c.id&&t.servId===s.id&&t.tipo==='saida'&&t.data.startsWith(m);})){db.transacoes.push({id:'t'+Date.now()+Math.random().toString(36).slice(2),clienteId:c.id,servId:s.id,tipo:'saida',valor:s.valor,data:today(),desc:s.nome});}});
   });
