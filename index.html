@@ -195,7 +195,6 @@
     .report-mini-value{font-weight:700;font-size:.8rem;color:var(--success);flex-shrink:0}.report-mini-value.new{color:var(--accent)}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
-    /* NOVOS ESTILOS */
     .sidebar-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:99px;background:var(--danger);color:#fff;font-size:.6rem;font-weight:700;padding:0 5px;margin-left:auto;flex-shrink:0}
     .sidebar-badge.hidden{display:none}
     .alerta-vencimento-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .3s ease}
@@ -314,7 +313,7 @@ var currentSec='dashboard';var cliFilter=null;var cliFilterDash=null;var cliPage
 var darkMode=false;var lucroOculto=false;var chartInst=null;var chartInstResumo=null;var currentUser=null;var authLoaded=false;
 var ITENS_POR_PAGINA=25;
 
-function today(){return new Date().toISOString().split('T')[0];}
+function today(){var d=new Date();d.setHours(d.getHours()-3);return d.toISOString().split('T')[0];}
 function monthStr(offset){var d=new Date();d.setDate(1);d.setMonth(d.getMonth()+(offset||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
 function sumTrans(tipo,prefix){return db.transacoes.filter(function(t){return t.tipo===tipo&&t.data&&t.data.startsWith(prefix);}).reduce(function(s,t){return s+t.valor;},0);}
 function fmt(n){return(n||0).toFixed(2);}
@@ -335,35 +334,7 @@ async function backupNuvem(){if(!currentUser){toast('Faça login primeiro','warn
 function saveDB(){saveLocal();salvarNuvem();}
 
 function loginAction(isCadastro){var email=document.getElementById('loginEmail').value.trim();var pass=document.getElementById('loginPass').value.trim();if(!email||!email.includes('@')){toast('Digite um e-mail válido','warning');return;}if(!pass||pass.length<6){toast('Senha deve ter 6+ caracteres','warning');return;}if(isCadastro){var pass2=document.getElementById('loginPass2').value.trim();if(pass!==pass2){toast('Senhas não conferem','error');return;}supabase.auth.signUp({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else{toast('Conta criada! Faça login.','success');renderLogin('login');}});}else{supabase.auth.signInWithPassword({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else toast('Login feito!','success');});}}
-
-function renderLogin(mode){
-  setLoginMode(true);var mc=document.getElementById('mainContent');if(!mc)return;var isCadastro=(mode==='cadastro');
-  mc.innerHTML='<div class="login-container"><img class="login-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display=\'none\';var fb=document.createElement(\'span\');fb.style.cssText=\'width:70px;height:70px;border-radius:18px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2rem\';fb.textContent=\'✦\';this.parentNode.replaceChild(fb,this)">'+
-    '<div class="login-title">Owerplay Gestor</div>'+
-    '<div class="login-subtitle">'+(isCadastro?'Crie sua conta':'Faça login')+'</div>'+
-    '<div class="login-card">'+
-      '<input class="login-input" id="loginEmail" type="email" placeholder="Seu e-mail" autocomplete="email">'+
-      '<input class="login-input" id="loginPass" type="password" placeholder="Senha" autocomplete="'+(isCadastro?'new-password':'current-password')+'">'+
-      (isCadastro?'<input class="login-input" id="loginPass2" type="password" placeholder="Repita a senha">':'')+
-      '<button class="btn btn-primary btn-full" id="loginBtn">'+(isCadastro?'Criar Conta':'Entrar')+'</button>'+
-      '<div class="login-link" id="toggleLogin">'+(isCadastro?'Já tem conta? Entrar':'Criar conta')+'</div>'+
-      (isCadastro?'':'<div class="login-link" id="forgotPassword">Esqueci minha senha</div>')+
-    '</div>'+
-  '</div>';
-  document.getElementById('toggleLogin').addEventListener('click',function(){renderLogin(isCadastro?'login':'cadastro');});
-  document.getElementById('loginBtn').addEventListener('click',function(){loginAction(isCadastro);});
-  var fp=document.getElementById('forgotPassword');
-  if(fp)fp.addEventListener('click',function(){
-    var email=document.getElementById('loginEmail').value.trim();
-    if(!email||!email.includes('@')){toast('Digite seu e-mail primeiro','warning');return;}
-    supabase.auth.resetPasswordForEmail(email,{redirectTo:'https://owerplaydigital.github.io/Owerplay-Gestor/'}).then(function(res){
-      if(res.error)toast('Erro: '+res.error.message,'error');
-      else toast('Email de redefinição enviado! Verifique sua caixa de entrada.','success');
-    });
-  });
-  var pf=document.getElementById('loginPass');if(pf)pf.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});
-  var p2=document.getElementById('loginPass2');if(p2)p2.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});
-}
+function renderLogin(mode){setLoginMode(true);var mc=document.getElementById('mainContent');if(!mc)return;var isCadastro=(mode==='cadastro');mc.innerHTML='<div class="login-container"><img class="login-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display=\'none\';var fb=document.createElement(\'span\');fb.style.cssText=\'width:70px;height:70px;border-radius:18px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2rem\';fb.textContent=\'✦\';this.parentNode.replaceChild(fb,this)"><div class="login-title">Owerplay Gestor</div><div class="login-subtitle">'+(isCadastro?'Crie sua conta':'Faça login')+'</div><div class="login-card"><input class="login-input" id="loginEmail" type="email" placeholder="Seu e-mail" autocomplete="email"><input class="login-input" id="loginPass" type="password" placeholder="Senha" autocomplete="'+(isCadastro?'new-password':'current-password')+'">'+(isCadastro?'<input class="login-input" id="loginPass2" type="password" placeholder="Repita a senha">':'')+'<button class="btn btn-primary btn-full" id="loginBtn">'+(isCadastro?'Criar Conta':'Entrar')+'</button><div class="login-link" id="toggleLogin">'+(isCadastro?'Já tem conta? Entrar':'Criar conta')+'</div></div></div>';document.getElementById('toggleLogin').addEventListener('click',function(){renderLogin(isCadastro?'login':'cadastro');});document.getElementById('loginBtn').addEventListener('click',function(){loginAction(isCadastro);});var pf=document.getElementById('loginPass');if(pf)pf.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});var p2=document.getElementById('loginPass2');if(p2)p2.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});}
 
 function atualizarBadgeInadimplencia(){var badge=document.getElementById('badgeInadimplencia');if(!badge)return;var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje;}).length;if(vencidos>0){badge.textContent=vencidos>99?'99+':vencidos;badge.classList.remove('hidden');}else{badge.classList.add('hidden');}}
 
