@@ -280,11 +280,13 @@
     <div class="sidebar-section"><div class="sidebar-section-label">Ferramentas</div>
       <button class="sidebar-item" id="btnInadimplencia"><i data-lucide="alert-triangle" width="17" height="17"></i> Inadimplência<span class="sidebar-badge hidden" id="badgeInadimplencia">0</span></button>
       <button class="sidebar-item" id="btnRelatorio"><i data-lucide="bar-chart-3" width="17" height="17"></i> Relatório Diário</button>
+<button class="sidebar-item" id="btnRelatorioSemanal"><i data-lucide="calendar-check" width="17" height="17"></i> Relatório Semanal</button>
       <button class="sidebar-item" id="btnResumoAnual"><i data-lucide="trending-up" width="17" height="17"></i> Resumo Anual</button>
       <button class="sidebar-item" id="btnLembretes"><i data-lucide="sticky-note" width="17" height="17"></i> Lembretes</button>
       <button class="sidebar-item" id="btnLog"><i data-lucide="list-checks" width="17" height="17"></i> Log de Atividades</button>
       <button class="sidebar-item" id="btnBackup"><i data-lucide="cloud-upload" width="17" height="17"></i> Backup Nuvem</button>
 <button class="sidebar-item" id="btnCompartilhar"><i data-lucide="share-2" width="17" height="17"></i> Compartilhar App</button>
+
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section" style="padding-bottom:16px;">
@@ -500,6 +502,71 @@ function modalInadimplencia(){
 }
 function cobrancaInadimplencia(){closeModal('inadim');var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje&&c.whatsapp;});if(!vencidos.length){toast('Nenhum cliente com WhatsApp','warning');return;}var delay=0;vencidos.forEach(function(c){setTimeout(function(){sendWA(c,'cobranca');},delay);delay+=2500;});toast('Abrindo WhatsApp para '+vencidos.length+' cliente(s)...','success');}
 function modalCobrancaMassa(){var hoje=today();var hojeClientes=db.clientes.filter(function(c){return c.vencimento===hoje&&c.whatsapp;});if(!hojeClientes.length){toast('Nenhum cliente com WhatsApp vence hoje','warning');return;}var checks=hojeClientes.map(function(c){return'<label style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;"><input type="checkbox" class="massa-check" data-id="'+esc(c.id)+'" checked style="width:18px;height:18px;accent-color:var(--accent);"><span style="font-size:.88rem;font-weight:600;">'+esc(c.nome)+'</span></label>';}).join('');showModal('massa','📲 Cobrança em Massa','<div style="margin-bottom:12px;font-size:.85rem;color:var(--text2);">'+hojeClientes.length+' cliente(s) vencem hoje com WhatsApp:</div>'+checks,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'massa\')">Cancelar</button><button class="btn btn-primary btn-full" id="massaSend">Enviar para todos</button>');document.getElementById('massaSend').addEventListener('click',function(){var ids=[];document.querySelectorAll('.massa-check:checked').forEach(function(ch){ids.push(ch.dataset.id);});closeModal('massa');var delay=0;ids.forEach(function(cid){var c=db.clientes.find(function(x){return x.id===cid;});if(c)setTimeout(function(){sendWA(c,'cobranca');},delay);delay+=2500;});toast('Abrindo WhatsApp para '+ids.length+' cliente(s)...','success');});}
+function modalRelatorioSemanal(){
+  var hoje=new Date();hoje.setHours(hoje.getHours()-3);
+  var diaSemana=hoje.getDay();
+  // Segunda da semana atual
+  var segunda=new Date(hoje);
+  segunda.setDate(hoje.getDate()-(diaSemana===0?6:diaSemana-1));
+  segunda.setHours(0,0,0,0);
+  // Domingo da semana atual
+  var domingo=new Date(segunda);
+  domingo.setDate(segunda.getDate()+6);
+  domingo.setHours(23,59,59,999);
+  
+  var segStr=segunda.toISOString().split('T')[0];
+  var domStr=domingo.toISOString().split('T')[0];
+  var periodo=segunda.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' a '+domingo.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  
+  // Transações da semana
+  var transSemana=db.transacoes.filter(function(t){return t.data>=segStr&&t.data<=domStr;});
+  var entSemana=transSemana.filter(function(t){return t.tipo==='entrada';}).reduce(function(s,t){return s+t.valor;},0);
+  var saiSemana=transSemana.filter(function(t){return t.tipo==='saida';}).reduce(function(s,t){return s+t.valor;},0);
+  var lucroSemana=entSemana-saiSemana;
+  
+  // Renovados esta semana
+  var renovadosSemana=db.clientes.filter(function(c){
+    return c.renovacoes&&c.renovacoes.some(function(r){return r.data>=segStr&&r.data<=domStr;});
+  });
+  
+  // Novos clientes esta semana
+  var novosSemana=db.clientes.filter(function(c){return c.cadastradoEm>=segStr&&c.cadastradoEm<=domStr;});
+  
+  // Em atraso (vencidos até hoje)
+  var hojeStr=hoje.toISOString().split('T')[0];
+  var emAtraso=db.clientes.filter(function(c){return c.vencimento<hojeStr;}).length;
+  
+  var renovadosHtml='';
+  if(renovadosSemana.length>0){
+    renovadosHtml='<div style="font-size:.7rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">📋 Renovados esta semana</div>';
+    renovadosSemana.forEach(function(c){
+      var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};
+      var valor=(plano.valor||0)-(c.desconto||0);
+      renovadosHtml+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:10px;margin-bottom:6px;">'+
+        '<div><div style="font-weight:700;font-size:.82rem;color:var(--text);">'+esc(c.nome)+'</div><div style="font-size:.68rem;color:var(--text3);">'+esc(plano.nome||'—')+'</div></div>'+
+        '<div style="font-weight:700;font-size:.82rem;color:var(--accent);">R$ '+fmt(valor)+'</div></div>';
+    });
+  }else{
+    renovadosHtml='<div style="text-align:center;padding:16px;color:var(--text3);font-size:.8rem;">Nenhuma renovação esta semana</div>';
+  }
+  
+  var body=
+    '<div style="font-size:.75rem;color:var(--text3);margin-bottom:18px;">📅 '+periodo+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">'+
+      '<div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:var(--accent);">R$ '+fmt(entSemana)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Entradas</div></div>'+
+      '<div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:var(--danger);">R$ '+fmt(saiSemana)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Saídas</div></div>'+
+      '<div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:'+(lucroSemana>=0?'var(--success)':'var(--danger)')+';">R$ '+fmt(lucroSemana)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Lucro</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">'+
+      '<div style="background:var(--success-bg);border-radius:8px;padding:10px 8px;text-align:center;"><div style="font-size:.85rem;font-weight:800;color:var(--success);">'+renovadosSemana.length+'</div><div style="font-size:.58rem;font-weight:700;color:var(--success);text-transform:uppercase;">Renovados</div></div>'+
+      '<div style="background:var(--accent-light);border-radius:8px;padding:10px 8px;text-align:center;"><div style="font-size:.85rem;font-weight:800;color:var(--accent);">'+novosSemana.length+'</div><div style="font-size:.58rem;font-weight:700;color:var(--accent);text-transform:uppercase;">Novos</div></div>'+
+      '<div style="background:var(--danger-bg);border-radius:8px;padding:10px 8px;text-align:center;"><div style="font-size:.85rem;font-weight:800;color:var(--danger);">'+emAtraso+'</div><div style="font-size:.58rem;font-weight:700;color:var(--danger);text-transform:uppercase;">Em Atraso</div></div>'+
+    '</div>'+
+    renovadosHtml;
+    
+  showModal('relSemanal','📊 Relatório Semanal',body,
+    '<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relSemanal\')">Fechar</button>');
+}
 function modalRelatorioDiario(){var hoje=today();var entradas=db.transacoes.filter(function(t){return t.tipo==='entrada'&&t.data===hoje;});var saidas=db.transacoes.filter(function(t){return t.tipo==='saida'&&t.data===hoje;});var totalEnt=entradas.reduce(function(s,t){return s+t.valor;},0),totalSai=saidas.reduce(function(s,t){return s+t.valor;},0),lucroDia=totalEnt-totalSai;var renovadosHoje=db.clientes.filter(function(c){return c.renovacoes&&c.renovacoes.some(function(r){return r.data===hoje;});});var novosHoje=db.clientes.filter(function(c){return c.cadastradoEm===hoje;});if(!renovadosHoje.length&&!novosHoje.length&&!entradas.length&&!saidas.length){showModal('relatorio','📊 Relatório Diário — '+fmtDate(hoje),'<div class="empty-state" style="padding:20px"><p style="font-size:.85rem">✨ Nenhuma movimentação hoje.</p></div>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relatorio\')">Fechar</button>');return;}var body='<div class="report-summary"><div class="report-summary-item"><div class="report-summary-value green">R$ '+fmt(totalEnt)+'</div><div class="report-summary-label">Entradas</div></div><div class="report-summary-item"><div class="report-summary-value red">R$ '+fmt(totalSai)+'</div><div class="report-summary-label">Saídas</div></div><div class="report-summary-item"><div class="report-summary-value blue">R$ '+fmt(lucroDia)+'</div><div class="report-summary-label">Lucro</div></div></div>';if(renovadosHoje.length>0){body+='<div class="report-section-title"><span class="report-dot green"></span> Renovados Hoje</div>';body+=renovadosHoje.map(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{},serv=db.servidores.find(function(s){return s.id===c.servidorId;})||{},valor=(plano.valor||0)-(c.desconto||0);return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+esc(serv.nome||'—')+'</div></div><div class="report-mini-value">R$ '+fmt(valor)+'</div></div>';}).join('');}if(novosHoje.length>0){body+='<div class="report-section-title"><span class="report-dot blue"></span> Novos Clientes Hoje</div>';body+=novosHoje.map(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{},serv=db.servidores.find(function(s){return s.id===c.servidorId;})||{},valor=(plano.valor||0)-(c.desconto||0);return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+esc(serv.nome||'—')+'</div></div><div class="report-mini-value new">R$ '+fmt(valor)+'</div></div>';}).join('');}showModal('relatorio','📊 Relatório Diário — '+fmtDate(hoje),body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relatorio\')">Fechar</button>');}
 function modalLembretes(){var body='<div><input class="lembrete-input-wrap" id="lembreteInput" placeholder="Escreva um lembrete..."></div><div id="lembretesLista"></div>';var el=showModal('lembretes','📝 Lembretes',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'lembretes\')">Fechar</button><button class="btn btn-primary btn-full" id="lembreteAdd">Adicionar</button>');renderLembretesLista();document.getElementById('lembreteAdd').addEventListener('click',function(){var texto=document.getElementById('lembreteInput').value.trim();if(!texto){toast('Escreva algo','warning');return;}db.lembretes.push({id:'l'+Date.now(),texto:texto,feito:false,data:today()});saveDB();document.getElementById('lembreteInput').value='';renderLembretesLista();toast('Lembrete salvo!','success');});}
 function renderLembretesLista(){var container=document.getElementById('lembretesLista');if(!container)return;if(!db.lembretes.length){container.innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--text3);font-size:.85rem;">✨<br>Nenhum lembrete ainda.<br>Comece a anotar suas tarefas!</div>';return;}var html='';for(var i=db.lembretes.length-1;i>=0;i--){var l=db.lembretes[i],feitoClass=l.feito?' feito':'';html+='<div class="lembrete-item-ui"><div class="lembrete-check'+feitoClass+'" onclick="window._toggleLembrete(\''+l.id+'\')">'+(l.feito?'✓':'')+'</div><span class="lembrete-texto'+feitoClass+'" onclick="window._editarLembrete(\''+l.id+'\')">'+esc(l.texto)+'</span><button class="lembrete-del" onclick="window._delLembrete(\''+l.id+'\')"><i data-lucide="trash-2" width="14" height="14"></i></button></div>';}container.innerHTML=html;icons();}
@@ -557,6 +624,7 @@ document.getElementById('btnResumoAnual').addEventListener('click',function(){cl
 document.getElementById('btnLembretes').addEventListener('click',function(){closeSidebar();modalLembretes();});
 document.getElementById('btnLog').addEventListener('click',function(){closeSidebar();modalLog();});
 document.getElementById('btnBackup').addEventListener('click',function(){closeSidebar();backupNuvem();});
+document.getElementById('btnRelatorioSemanal').addEventListener('click',function(){closeSidebar();modalRelatorioSemanal();});
 document.getElementById('btnCompartilhar').addEventListener('click',function(){
   closeSidebar();
   var msg='📱 *Owerplay Gestor* — Seu negócio mais organizado!\nChega de esquecer vencimentos. Controle tudo de um lugar só.\n\n📲 Baixar app: https://bit.ly/4wfaSxp\n🌐 Acessar: https://bit.ly/4cVMuJB';
