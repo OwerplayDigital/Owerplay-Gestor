@@ -284,6 +284,7 @@
       <button class="sidebar-item" id="btnLembretes"><i data-lucide="sticky-note" width="17" height="17"></i> Lembretes</button>
       <button class="sidebar-item" id="btnLog"><i data-lucide="list-checks" width="17" height="17"></i> Log de Atividades</button>
       <button class="sidebar-item" id="btnBackup"><i data-lucide="cloud-upload" width="17" height="17"></i> Backup Nuvem</button>
+<button class="sidebar-item" id="btnCompartilhar"><i data-lucide="share-2" width="17" height="17"></i> Compartilhar App</button>
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section" style="padding-bottom:16px;">
@@ -556,6 +557,15 @@ document.getElementById('btnResumoAnual').addEventListener('click',function(){cl
 document.getElementById('btnLembretes').addEventListener('click',function(){closeSidebar();modalLembretes();});
 document.getElementById('btnLog').addEventListener('click',function(){closeSidebar();modalLog();});
 document.getElementById('btnBackup').addEventListener('click',function(){closeSidebar();backupNuvem();});
+document.getElementById('btnCompartilhar').addEventListener('click',function(){
+  closeSidebar();
+  var msg='📱 *Owerplay Gestor* — Seu negócio mais organizado!\nChega de esquecer vencimentos. Controle tudo de um lugar só.\n\n📲 Baixar app: https://bit.ly/4wfaSxp\n🌐 Acessar: https://bit.ly/4cVMuJB';
+  if(navigator.share){
+    navigator.share({title:'Owerplay Gestor',text:msg}).catch(function(){});
+  }else{
+    navigator.clipboard.writeText(msg).then(function(){toast('Link copiado!','success');});
+  }
+});
 document.getElementById('btnDarkMode').addEventListener('click',function(){darkMode=!darkMode;applyDark();});
 document.getElementById('btnMensagens').addEventListener('click',function(){closeSidebar();modalMensagens();});
 document.getElementById('btnLogout').addEventListener('click',function(){closeSidebar();logout();});
