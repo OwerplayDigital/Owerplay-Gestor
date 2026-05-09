@@ -663,6 +663,7 @@ function renderFinancas(mc){
     
     var badges='';
     if(g.entrada>0) badges+='<span class="badge-entrada">+R$ '+fmt(g.entrada)+'</span>';
+else if(g.entrada===0 && g.clienteId) badges+='<span class="badge-entrada">R$ 0,00</span>';
     if(g.saida>0) badges+='<span class="badge-saida">-R$ '+fmt(g.saida)+'</span>';
     
     transHtml+='<div class="trans-row"><div><div class="trans-desc">'+esc(nome)+'</div><div class="trans-date">'+sub+'</div></div><div class="trans-values">'+badges+'</div></div>';
