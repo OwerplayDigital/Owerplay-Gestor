@@ -642,10 +642,12 @@ function renderFinancas(mc){
   });
   
   var chaves=Object.keys(agrupado).sort(function(a,b){
-    if(agrupado[a].data>agrupado[b].data)return -1;
-    if(agrupado[a].data<agrupado[b].data)return 1;
-    return 0;
-  }).slice(0,20);
+  if(agrupado[a].data>agrupado[b].data)return -1;
+  if(agrupado[a].data<agrupado[b].data)return 1;
+  if(a>b)return -1;
+  if(a<b)return 1;
+  return 0;
+}).slice(0,20);
   
   var transHtml='';
   chaves.forEach(function(k){
