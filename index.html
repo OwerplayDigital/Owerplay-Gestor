@@ -358,6 +358,70 @@
       margin-top: 8px;
       text-align: center;
     }
+/* ===== RELATÓRIO DIÁRIO ===== */
+.report-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.report-summary-item {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.report-summary-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.report-summary-value.green { color: var(--success); }
+.report-summary-value.red { color: var(--danger); }
+.report-summary-value.blue { color: var(--accent); }
+.report-summary-label {
+  font-size: .6rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.report-section-title {
+  font-size: .65rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 8px;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.report-section-title:first-of-type { margin-top: 0; }
+.report-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.report-dot.green { background: var(--success); }
+.report-dot.blue { background: var(--accent); }
+
+/* ===== LINHAS DOS CLIENTES ===== */
+.trans-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.trans-row:last-child { border-bottom: none; }
+.trans-info { flex: 1; min-width: 0; }
+.trans-nome { font-weight: 700; font-size: 0.85rem; color: var(--text); }
+.trans-meta { font-size: 0.65rem; color: var(--text3); margin-top: 3px; white-space: nowrap; overflow-x: hidden; text-overflow: ellipsis; }
+.badges { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.badge-entrada { background: var(--success-bg); color: var(--success); padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
+.badge-saida { background: var(--danger-bg); color: var(--danger); padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
+.badge-lucro { background: var(--accent-light); color: var(--accent-dark); padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -851,9 +915,12 @@ function modalRelatorioDiario(){
     body+=renovadosHoje.map(function(c){
       var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};
       var servs=c.servidoresIds||(c.servidorId?[c.servidorId]:[]);
-      var servsNomes=servs.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(', ');
-      var valor=(plano.valor||0)-(c.desconto||0);
-      return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+(servsNomes||'—')+'</div></div><div class="report-mini-value">R$ '+fmt(valor)+'</div></div>';
+      var servsNomes=servs.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(' + ');
+      var valorEntrada=(plano.valor||0)-(c.desconto||0);
+      var custoServidores=servs.reduce(function(soma,sid){var s=db.servidores.find(function(x){return x.id===sid;});return soma+(s?s.valor||0:0);},0);
+      var lucroCliente=valorEntrada-custoServidores;
+      
+      return'<div class="trans-row"><div class="trans-info"><div class="trans-nome">'+esc(c.nome)+'</div><div class="trans-meta">'+esc(plano.nome||'—')+' · '+(servsNomes||'—')+'</div></div><div class="badges"><span class="badge-entrada">+R$ '+fmt(valorEntrada)+'</span><span class="badge-saida">-R$ '+fmt(custoServidores)+'</span><span class="badge-lucro">💰 R$ '+fmt(lucroCliente)+'</span></div></div>';
     }).join('');
   }
   
@@ -862,9 +929,12 @@ function modalRelatorioDiario(){
     body+=novosHoje.map(function(c){
       var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};
       var servs=c.servidoresIds||(c.servidorId?[c.servidorId]:[]);
-      var servsNomes=servs.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(', ');
-      var valor=(plano.valor||0)-(c.desconto||0);
-      return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+(servsNomes||'—')+'</div></div><div class="report-mini-value new">R$ '+fmt(valor)+'</div></div>';
+      var servsNomes=servs.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(' + ');
+      var valorEntrada=(plano.valor||0)-(c.desconto||0);
+      var custoServidores=servs.reduce(function(soma,sid){var s=db.servidores.find(function(x){return x.id===sid;});return soma+(s?s.valor||0:0);},0);
+      var lucroCliente=valorEntrada-custoServidores;
+      
+      return'<div class="trans-row"><div class="trans-info"><div class="trans-nome">'+esc(c.nome)+'</div><div class="trans-meta">'+esc(plano.nome||'—')+' · '+(servsNomes||'—')+'</div></div><div class="badges"><span class="badge-entrada">+R$ '+fmt(valorEntrada)+'</span><span class="badge-saida">-R$ '+fmt(custoServidores)+'</span><span class="badge-lucro">💰 R$ '+fmt(lucroCliente)+'</span></div></div>';
     }).join('');
   }
   
