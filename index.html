@@ -884,16 +884,29 @@ document.getElementById('btnLog').addEventListener('click',function(){closeSideb
 document.getElementById('btnRelatorioSemanal').addEventListener('click',function(){closeSidebar();modalRelatorioSemanal();});
 document.getElementById('btnCompartilhar').addEventListener('click',function(){closeSidebar();
   var msg='📱 *Owerplay Gestor* — Seu negócio mais organizado!\nChega de esquecer vencimentos. Controle tudo de um lugar só.\n\n📲 Baixar app: https://bit.ly/4wfaSxp\n🌐 Acessar: https://bit.ly/4cVMuJB';
-  if(navigator.share){navigator.share({title:'Owerplay Gestor',text:msg}).catch(function(){});}
-  else{
-  var textarea = document.createElement('textarea');
-  textarea.value = msg;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textarea);
-  toast('Link copiado!', 'success');
-}
+  function legacyCopy(){
+    var ta=document.createElement('textarea');
+    ta.value=msg;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    document.execCommand('copy');document.body.removeChild(ta);
+    toast('Link copiado!','success');
+  }
+  function copyFallback(){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(msg).then(function(){toast('Link copiado!','success');}).catch(legacyCopy);
+    }else{legacyCopy();}
+  }
+  if(navigator.share){
+    navigator.share({title:'Owerplay Gestor',text:msg}).catch(copyFallback);
+    return;
+  }
+  if(/Android/i.test(navigator.userAgent)){
+    try{
+      window.location.href='intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT='+encodeURIComponent(msg)+';end';
+      return;
+    }catch(e){}
+  }
+  copyFallback();
 });
 document.getElementById('btnDarkMode').addEventListener('click',function(){darkMode=!darkMode;applyDark();});
 document.getElementById('btnMensagens').addEventListener('click',function(){closeSidebar();modalMensagens();});
