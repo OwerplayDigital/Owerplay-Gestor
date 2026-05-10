@@ -828,7 +828,48 @@ function modalRelatorioSemanal(){
   var body='<div style="font-size:.75rem;color:var(--text3);margin-bottom:18px;">📅 '+periodo+'</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;"><div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:var(--accent);">R$ '+fmt(entSemana)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Entradas</div></div><div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:var(--danger);">R$ '+fmt(saiSemana)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Saídas</div></div><div style="background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;"><div style="font-size:1rem;font-weight:800;color:'+(lucroSemana>=0?'var(--success)':'var(--danger)')+';">R$ '+fmt(lucroSemana)+'</div><div style="font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:3px;">Lucro</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;"><div style="background:var(--success-bg);border-radius:8px;padding:10px 8px;text-align:center;"><div style="font-size:.85rem;font-weight:800;color:var(--success);">'+renovadosSemana.length+'</div><div style="font-size:.58rem;font-weight:700;color:var(--success);text-transform:uppercase;">Renovados</div></div><div style="background:var(--accent-light);border-radius:8px;padding:10px 8px;text-align:center;"><div style="font-size:.85rem;font-weight:800;color:var(--accent);">'+novosSemana.length+'</div><div style="font-size:.58rem;font-weight:700;color:var(--accent);text-transform:uppercase;">Novos</div></div><div style="background:var(--danger-bg);border-radius:8px;padding:10px 8px;text-align:center;"><div style="font-size:.85rem;font-weight:800;color:var(--danger);">'+emAtraso+'</div><div style="font-size:.58rem;font-weight:700;color:var(--danger);text-transform:uppercase;">Em Atraso</div></div></div>'+renovadosHtml;
   showModal('relSemanal','📊 Relatório Semanal',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relSemanal\')">Fechar</button>');
 }
-function modalRelatorioDiario(){var hoje=today();var entradas=db.transacoes.filter(function(t){return t.tipo==='entrada'&&t.data===hoje;});var saidas=db.transacoes.filter(function(t){return t.tipo==='saida'&&t.data===hoje;});var totalEnt=entradas.reduce(function(s,t){return s+t.valor;},0),totalSai=saidas.reduce(function(s,t){return s+t.valor;},0),lucroDia=totalEnt-totalSai;var renovadosHoje=db.clientes.filter(function(c){return c.renovacoes&&c.renovacoes.some(function(r){return r.data===hoje;});});var novosHoje=db.clientes.filter(function(c){return c.cadastradoEm===hoje;});if(!renovadosHoje.length&&!novosHoje.length&&!entradas.length&&!saidas.length){showModal('relatorio','📊 Relatório Diário — '+fmtDate(hoje),'<div class="empty-state" style="padding:20px"><p style="font-size:.85rem">✨ Nenhuma movimentação hoje.</p></div>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relatorio\')">Fechar</button>');return;}var body='<div class="report-summary"><div class="report-summary-item"><div class="report-summary-value green">R$ '+fmt(totalEnt)+'</div><div class="report-summary-label">Entradas</div></div><div class="report-summary-item"><div class="report-summary-value red">R$ '+fmt(totalSai)+'</div><div class="report-summary-label">Saídas</div></div><div class="report-summary-item"><div class="report-summary-value blue">R$ '+fmt(lucroDia)+'</div><div class="report-summary-label">Lucro</div></div></div>';if(renovadosHoje.length>0){body+='<div class="report-section-title"><span class="report-dot green"></span> Renovados Hoje</div>';body+=renovadosHoje.map(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{},serv=db.servidores.find(function(s){return s.id===c.servidorId;})||{},valor=(plano.valor||0)-(c.desconto||0);return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+esc(serv.nome||'—')+'</div></div><div class="report-mini-value">R$ '+fmt(valor)+'</div></div>';}).join('');}if(novosHoje.length>0){body+='<div class="report-section-title"><span class="report-dot blue"></span> Novos Clientes Hoje</div>';body+=novosHoje.map(function(c){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{},serv=db.servidores.find(function(s){return s.id===c.servidorId;})||{},valor=(plano.valor||0)-(c.desconto||0);return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+esc(serv.nome||'—')+'</div></div><div class="report-mini-value new">R$ '+fmt(valor)+'</div></div>';}).join('');}showModal('relatorio','📊 Relatório Diário — '+fmtDate(hoje),body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relatorio\')">Fechar</button>');}
+function modalRelatorioDiario(){
+  var hoje=today();
+  var entradas=db.transacoes.filter(function(t){return t.tipo==='entrada'&&t.data===hoje;});
+  var saidas=db.transacoes.filter(function(t){return t.tipo==='saida'&&t.data===hoje;});
+  var totalEnt=entradas.reduce(function(s,t){return s+t.valor;},0);
+  var totalSai=saidas.reduce(function(s,t){return s+t.valor;},0);
+  var lucroDia=totalEnt-totalSai;
+  
+  var renovadosHoje=db.clientes.filter(function(c){return c.renovacoes&&c.renovacoes.some(function(r){return r.data===hoje;});});
+  var novosHoje=db.clientes.filter(function(c){return c.cadastradoEm===hoje;});
+  
+  if(!renovadosHoje.length&&!novosHoje.length&&!entradas.length&&!saidas.length){
+    showModal('relatorio','📊 Relatório Diário — '+fmtDate(hoje),'<div class="empty-state" style="padding:20px"><p style="font-size:.85rem">✨ Nenhuma movimentação hoje.</p></div>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relatorio\')">Fechar</button>');
+    return;
+  }
+  
+  var body='<div class="report-summary"><div class="report-summary-item"><div class="report-summary-value green">R$ '+fmt(totalEnt)+'</div><div class="report-summary-label">Entradas</div></div><div class="report-summary-item"><div class="report-summary-value red">R$ '+fmt(totalSai)+'</div><div class="report-summary-label">Saídas</div></div><div class="report-summary-item"><div class="report-summary-value blue">R$ '+fmt(lucroDia)+'</div><div class="report-summary-label">Lucro</div></div></div>';
+  
+  if(renovadosHoje.length>0){
+    body+='<div class="report-section-title"><span class="report-dot green"></span> Renovados Hoje</div>';
+    body+=renovadosHoje.map(function(c){
+      var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};
+      var servs=c.servidoresIds||(c.servidorId?[c.servidorId]:[]);
+      var servsNomes=servs.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(', ');
+      var valor=(plano.valor||0)-(c.desconto||0);
+      return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+(servsNomes||'—')+'</div></div><div class="report-mini-value">R$ '+fmt(valor)+'</div></div>';
+    }).join('');
+  }
+  
+  if(novosHoje.length>0){
+    body+='<div class="report-section-title"><span class="report-dot blue"></span> Novos Clientes Hoje</div>';
+    body+=novosHoje.map(function(c){
+      var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};
+      var servs=c.servidoresIds||(c.servidorId?[c.servidorId]:[]);
+      var servsNomes=servs.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(', ');
+      var valor=(plano.valor||0)-(c.desconto||0);
+      return'<div class="report-client-mini"><div class="report-client-left"><div class="report-mini-name">'+esc(c.nome)+'</div><div class="report-mini-plan">'+esc(plano.nome||'—')+' · '+(servsNomes||'—')+'</div></div><div class="report-mini-value new">R$ '+fmt(valor)+'</div></div>';
+    }).join('');
+  }
+  
+  showModal('relatorio','📊 Relatório Diário — '+fmtDate(hoje),body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'relatorio\')">Fechar</button>');
+}
 function modalLog(){var rows=db.log.slice(0,50).map(function(l){return'<div class="log-row"><div class="log-dot"></div><div class="log-msg">'+esc(l.msg)+'</div><div class="log-date">'+(l.ts||'')+'</div></div>';}).join('')||'<p style="color:var(--text3);font-size:.85rem;">Nenhuma atividade</p>';showModal('log','📋 Log de Atividades',rows,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'log\')">Fechar</button>');}
 function modalMensagens(){
   function renderTemplateLista(){
