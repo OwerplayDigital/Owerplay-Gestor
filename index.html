@@ -882,31 +882,18 @@ document.getElementById('btnResumoAnual').addEventListener('click',function(){cl
 document.getElementById('btnLembretes').addEventListener('click',function(){closeSidebar();modalLembretesAvancado();});
 document.getElementById('btnLog').addEventListener('click',function(){closeSidebar();modalLog();});
 document.getElementById('btnRelatorioSemanal').addEventListener('click',function(){closeSidebar();modalRelatorioSemanal();});
-document.getElementById('btnCompartilhar').addEventListener('click',function(){
+document.getElementById('btnCompartilhar').addEventListener('click',function(){closeSidebar();
   var msg='📱 *Owerplay Gestor* — Seu negócio mais organizado!\nChega de esquecer vencimentos. Controle tudo de um lugar só.\n\n📲 Baixar app: https://bit.ly/4wfaSxp\n🌐 Acessar: https://bit.ly/4cVMuJB';
-  function legacyCopy(){
-    var ta=document.createElement('textarea');
-    ta.value=msg;ta.style.position='fixed';ta.style.left='-9999px';
-    document.body.appendChild(ta);ta.focus();ta.select();
-    try{document.execCommand('copy');toast('Link copiado!','success');}catch(e){}
-    document.body.removeChild(ta);
-  }
-  function copyFallback(){
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(msg).then(function(){toast('Link copiado!','success');}).catch(legacyCopy);
-    }else{legacyCopy();}
-  }
-  if(navigator.share){
-    navigator.share({title:'Owerplay Gestor',text:msg})
-      .then(function(){closeSidebar();})
-      .catch(function(err){
-        closeSidebar();
-        if(err&&err.name!=='AbortError'){copyFallback();}
-      });
-  }else{
-    closeSidebar();
-    copyFallback();
-  }
+  if(navigator.share){navigator.share({title:'Owerplay Gestor',text:msg,url:'https://bit.ly/4cVMuJB'}).catch(function(){});}
+  else{
+  var textarea = document.createElement('textarea');
+  textarea.value = msg;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+  toast('Link copiado!', 'success');
+}
 });
 document.getElementById('btnDarkMode').addEventListener('click',function(){darkMode=!darkMode;applyDark();});
 document.getElementById('btnMensagens').addEventListener('click',function(){closeSidebar();modalMensagens();});
