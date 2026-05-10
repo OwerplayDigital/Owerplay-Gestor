@@ -882,14 +882,14 @@ document.getElementById('btnResumoAnual').addEventListener('click',function(){cl
 document.getElementById('btnLembretes').addEventListener('click',function(){closeSidebar();modalLembretesAvancado();});
 document.getElementById('btnLog').addEventListener('click',function(){closeSidebar();modalLog();});
 document.getElementById('btnRelatorioSemanal').addEventListener('click',function(){closeSidebar();modalRelatorioSemanal();});
-document.getElementById('btnCompartilhar').addEventListener('click',function(){closeSidebar();
+document.getElementById('btnCompartilhar').addEventListener('click',function(){
   var msg='📱 *Owerplay Gestor* — Seu negócio mais organizado!\nChega de esquecer vencimentos. Controle tudo de um lugar só.\n\n📲 Baixar app: https://bit.ly/4wfaSxp\n🌐 Acessar: https://bit.ly/4cVMuJB';
   function legacyCopy(){
     var ta=document.createElement('textarea');
-    ta.value=msg;ta.style.position='fixed';ta.style.opacity='0';
+    ta.value=msg;ta.style.position='fixed';ta.style.left='-9999px';
     document.body.appendChild(ta);ta.focus();ta.select();
-    document.execCommand('copy');document.body.removeChild(ta);
-    toast('Link copiado!','success');
+    try{document.execCommand('copy');toast('Link copiado!','success');}catch(e){}
+    document.body.removeChild(ta);
   }
   function copyFallback(){
     if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -897,16 +897,16 @@ document.getElementById('btnCompartilhar').addEventListener('click',function(){c
     }else{legacyCopy();}
   }
   if(navigator.share){
-    navigator.share({title:'Owerplay Gestor',text:msg}).catch(copyFallback);
-    return;
+    navigator.share({title:'Owerplay Gestor',text:msg})
+      .then(function(){closeSidebar();})
+      .catch(function(err){
+        closeSidebar();
+        if(err&&err.name!=='AbortError'){copyFallback();}
+      });
+  }else{
+    closeSidebar();
+    copyFallback();
   }
-  if(/Android/i.test(navigator.userAgent)){
-    try{
-      window.location.href='intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT='+encodeURIComponent(msg)+';end';
-      return;
-    }catch(e){}
-  }
-  copyFallback();
 });
 document.getElementById('btnDarkMode').addEventListener('click',function(){darkMode=!darkMode;applyDark();});
 document.getElementById('btnMensagens').addEventListener('click',function(){closeSidebar();modalMensagens();});
