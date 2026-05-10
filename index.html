@@ -885,7 +885,15 @@ document.getElementById('btnRelatorioSemanal').addEventListener('click',function
 document.getElementById('btnCompartilhar').addEventListener('click',function(){closeSidebar();
   var msg='📱 *Owerplay Gestor* — Seu negócio mais organizado!\nChega de esquecer vencimentos. Controle tudo de um lugar só.\n\n📲 Baixar app: https://bit.ly/4wfaSxp\n🌐 Acessar: https://bit.ly/4cVMuJB';
   if(navigator.share){navigator.share({title:'Owerplay Gestor',text:msg}).catch(function(){});}
-  else{navigator.clipboard.writeText(msg).then(function(){toast('Link copiado!','success');});}
+  else{
+  var textarea = document.createElement('textarea');
+  textarea.value = msg;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+  toast('Link copiado!', 'success');
+}
 });
 document.getElementById('btnDarkMode').addEventListener('click',function(){darkMode=!darkMode;applyDark();});
 document.getElementById('btnMensagens').addEventListener('click',function(){closeSidebar();modalMensagens();});
