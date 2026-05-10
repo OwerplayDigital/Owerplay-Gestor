@@ -782,9 +782,7 @@ function modalWhatsApp(id){
   var botoes = '';
   for(var key in db.templates){
     var nomeBotao = key.charAt(0).toUpperCase() + key.slice(1);
-    var icone = (key === 'cobranca' ? '💰' : (key === 'renovacao' ? '✅' : '📝'));
     botoes += '<button class="btn btn-ghost btn-full" id="btnTemplate_'+key+'" style="justify-content:flex-start;gap:12px;margin-bottom:8px;padding:14px;">'
-      +'<span style="font-size:1.2rem;">'+icone+'</span>'
       +'<div style="text-align:left"><div style="font-weight:700;">'+nomeBotao+'</div>'
       +'<div style="font-size:.75rem;color:var(--text3);">'+key+'</div></div></button>';
   }
@@ -839,21 +837,23 @@ function modalMensagens(){
       var template = db.templates[key];
       var preview = template.substring(0, 80) + (template.length > 80 ? '...' : '');
       listaHtml += '<div class="list-item" style="margin-bottom:10px;">';
-      listaHtml += '<div style="flex:1;"><div class="list-item-main" style="text-transform:capitalize;">📝 ' + key + '</div>';
+      listaHtml += '<div style="flex:1;"><div class="list-item-main" style="text-transform:capitalize;">' + key + '</div>';
       listaHtml += '<div class="list-item-sub" style="font-size:0.7rem;">' + esc(preview) + '</div></div>';
-      listaHtml += '<div class="list-item-actions"><button class="icon-btn" onclick="window._editarTemplate(\'' + key + '\')"><i data-lucide="pencil" width="15" height="15"></i></button></div>';
-      listaHtml += '</div>';
+      listaHtml += '<div class="list-item-actions">';
+      listaHtml += '<button class="icon-btn" onclick="window._editarTemplate(\'' + key + '\')"><i data-lucide="pencil" width="15" height="15"></i></button>';
+      listaHtml += '<button class="icon-btn" onclick="window._excluirTemplate(\'' + key + '\')" style="color:var(--danger);"><i data-lucide="trash-2" width="15" height="15"></i></button>';
+      listaHtml += '</div></div>';
     }
     listaHtml += '</div>';
-    listaHtml += '<div class="field"><label class="field-label">➕ Novo template</label>';
+    listaHtml += '<div class="field"><label class="field-label">Novo template</label>';
     listaHtml += '<input class="input" id="newTemplateName" placeholder="Nome (ex: boas_vindas, lembrete)" style="margin-bottom:8px;">';
     listaHtml += '<textarea class="input" id="newTemplateMsg" rows="3" placeholder="Mensagem... Use {nome}, {primeiro_nome}, {vencimento}, {valor}"></textarea>';
     listaHtml += '<button class="btn btn-primary btn-full" id="btnAddTemplate" style="margin-top:8px;">Adicionar</button></div>';
     return listaHtml;
   }
-  var body = '<div style="margin-bottom:12px;font-size:0.75rem;color:var(--text2);">✏️ Clique no lápis para editar um template.<br>📌 Variáveis disponíveis: <code>{nome}</code> <code>{primeiro_nome}</code> <code>{vencimento}</code> <code>{valor}</code></div>';
+  var body = '<div style="margin-bottom:12px;font-size:0.75rem;color:var(--text2);">✏️ Clique no lápis para editar | 🗑️ Clique na lixeira para excluir<br>📌 Variáveis: <code>{nome}</code> <code>{primeiro_nome}</code> <code>{vencimento}</code> <code>{valor}</code></div>';
   body += '<div id="templateListContainer">' + renderTemplateLista() + '</div>';
-  showModal('msg', '💬 Mensagens WhatsApp', body, '<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'msg\')">Fechar</button>');
+  showModal('msg', 'Mensagens WhatsApp', body, '<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'msg\')">Fechar</button>');
   document.getElementById('btnAddTemplate').addEventListener('click', function(){
     var nome = document.getElementById('newTemplateName').value.trim();
     var msg = document.getElementById('newTemplateMsg').value.trim();
@@ -866,6 +866,35 @@ function modalMensagens(){
     toast('Template adicionado!', 'success');
   });
 }
+window._editarTemplate = function(nome){
+  var template = db.templates[nome];
+  if(!template) return;
+  var body = '<div class="field"><label class="field-label">Nome do template</label><input class="input" id="editTemplateName" value="'+esc(nome)+'"></div>';
+  body += '<div class="field"><label class="field-label">Mensagem</label><textarea class="input" id="editTemplateMsg" rows="6">'+esc(template)+'</textarea></div>';
+  body += '<div style="font-size:.72rem;color:var(--text3);">Use: {nome} · {primeiro_nome} · {vencimento} · {valor}</div>';
+  showModal('editTemplate', 'Editar Template', body, '<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'editTemplate\')">Cancelar</button><button class="btn btn-primary btn-full" id="editTemplateSave">Salvar</button>');
+  document.getElementById('editTemplateSave').addEventListener('click', function(){
+    var novoNome = document.getElementById('editTemplateName').value.trim();
+    var novaMsg = document.getElementById('editTemplateMsg').value.trim();
+    if(!novoNome || !novaMsg){ toast('Preencha nome e mensagem', 'warning'); return; }
+    if(novoNome !== nome && db.templates[novoNome]){ toast('Já existe um template com este nome', 'error'); return; }
+    delete db.templates[nome];
+    db.templates[novoNome] = novaMsg;
+    saveDB();
+    closeModal('editTemplate');
+    setTimeout(function(){ modalMensagens(); }, 100);
+    toast('Template atualizado!', 'success');
+  });
+};
+window._excluirTemplate = function(nome){
+  confirmModal('Excluir template?', 'Isso não pode ser desfeito.', function(){
+    delete db.templates[nome];
+    saveDB();
+    closeModal('editTemplate');
+    setTimeout(function(){ modalMensagens(); }, 100);
+    toast('Template excluído!', 'success');
+  });
+};
 window._editarTemplate = function(nome){
   var template = db.templates[nome];
   if(!template) return;
