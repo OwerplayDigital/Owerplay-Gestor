@@ -17,7 +17,33 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root {
+    .lucro-eye {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  opacity: 0.7;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+  padding: 0;
+}
+.client-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  animation: fadeUp .2s ease both;
+}
+:root {
       --accent:       #0288D1; --accent-light: #E1F5FE; --accent-dark:  #01579B;
       --success:      #2E7D32; --success-bg:   #E8F5E9; --warning:      #E65100;
       --warning-bg:   #FFF3E0; --danger:       #C62828; --danger-bg:    #FFEBEE;
@@ -77,13 +103,68 @@
     
     .card{background:var(--surface);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border)}.card+.card{margin-top:10px}
     .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-    .stat-card{background:var(--surface);border-radius:var(--radius);padding:14px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .12s;position:relative;overflow:hidden}
+    .stat-card {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform .12s;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
     .stat-card:active{transform:scale(.97)}.stat-label{font-size:.7rem;font-weight:600;color:var(--text3);margin-bottom:4px}
     .stat-value{font-size:1.5rem;font-weight:800;color:var(--text)}.stat-value.green{color:var(--success)}.stat-value.red{color:var(--danger)}.stat-value.orange{color:var(--warning)}
-    .lucro-card{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-dark) 100%);border-radius:var(--radius);padding:20px;color:#fff;margin-bottom:14px;cursor:default;box-shadow:0 6px 24px rgba(2,136,209,.35);transition:transform .12s;position:relative}
-    .lucro-label{font-size:.75rem;font-weight:600;opacity:.8;margin-bottom:4px}.lucro-value{font-size:2rem;font-weight:800}
-    .lucro-eye{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:10px;cursor:pointer;display:flex}
-    .client-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:12px;margin-bottom:10px;box-shadow:var(--shadow);animation:fadeUp .2s ease both}
+    .lucro-card {
+  background: linear-gradient(135deg,var(--accent) 0%,var(--accent-dark) 100%);
+  border-radius: 24px;
+  padding: 22px;
+  color: #fff;
+  margin-bottom: 14px;
+  cursor: default;
+  box-shadow: 0 10px 35px rgba(2,136,209,.28);
+  transition: transform .12s;
+  position: relative;
+  overflow: hidden;
+}
+
+.lucro-card::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+}
+   .lucro-label {
+  font-size: .85rem;
+  font-weight: 700;
+  opacity: .9;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}.lucro-value{font-size:2rem;font-weight:800}
+    position: absolute;
+top: 12px;
+right: 12px;
+background: transparent;
+border: none;
+color: #fff;
+opacity: 0.7;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 40px;
+height: 40px;
+font-size: 1.3rem;
+padding: 0;
+border-radius: 50%;
+transition: all 0.2s ease;
+z-index: 10;
     @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .client-card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
     .avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem;flex-shrink:0}
