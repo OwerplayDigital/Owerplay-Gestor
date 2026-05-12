@@ -19,20 +19,25 @@
   <style>
     .lucro-eye {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 8px;
   background: transparent;
   border: none;
   color: #fff;
-  opacity: 0.7;
+  opacity: 0.9;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  font-size: 1.2rem;
+
+  width: 48px;
+  height: 48px;
+
   padding: 0;
+  border-radius: 50%;
+
+  z-index: 50;
+  touch-action: manipulation;
 }
 .client-card {
   background: var(--surface);
@@ -150,24 +155,7 @@
 .lucro-value.oculto {
   font-size: 1rem;
 }
-    position: absolute;
-top: 12px;
-right: 12px;
-background: transparent;
-border: none;
-color: #fff;
-opacity: 0.7;
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-width: 40px;
-height: 40px;
-font-size: 1.3rem;
-padding: 0;
-border-radius: 50%;
-transition: all 0.2s ease;
-z-index: 10;
+ 
     @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .client-card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
     .avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem;flex-shrink:0}
