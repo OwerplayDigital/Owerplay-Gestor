@@ -948,8 +948,86 @@ function mostrarAlertaDiario(clientesHoje){var existente=document.getElementById
 function fecharAlertaDiario(){var overlay=document.getElementById('alertaVencimentoOverlay');if(overlay){overlay.style.opacity='0';overlay.style.transition='opacity .2s';setTimeout(function(){overlay.remove();},200);}}
 function cobrarTodosAlerta(){var hoje=today();var clientesHoje=db.clientes.filter(function(c){return c.vencimento===hoje&&c.whatsapp;});fecharAlertaDiario();if(!clientesHoje.length){toast('Nenhum cliente com WhatsApp','warning');return;}var delay=0;clientesHoje.forEach(function(c){setTimeout(function(){sendWA(c,'cobranca');},delay);delay+=2500;});toast('Abrindo WhatsApp para '+clientesHoje.length+' cliente(s)...','success');}
 
-function obterListaFiltrada(){var hoje=today();var list=db.clientes.slice();if(cliFilter==='active')list=list.filter(function(c){return c.vencimento>=hoje;});if(cliFilter==='expired')list=list.filter(function(c){return c.vencimento<hoje;});if(cliFilter==='today')list=list.filter(function(c){return c.vencimento===hoje;});if(cliFilterPlano)list=list.filter(function(c){return c.planoId===cliFilterPlano;});if(cliFilterServidor)list=list.filter(function(c){return c.servidorId===cliFilterServidor;});return list;}
-function renderClientes(mc){var hoje=today();var list=obterListaFiltrada();var totalRegistros=list.length;var totalPages=Math.ceil(totalRegistros/ITENS_POR_PAGINA);if(cliPage>totalPages)cliPage=1;var inicio=(cliPage-1)*ITENS_POR_PAGINA;var paginado=list.slice(inicio,inicio+ITENS_POR_PAGINA);var ate=Math.min(inicio+ITENS_POR_PAGINA,totalRegistros);var filterLabel='';if(cliFilter==='active')filterLabel='Ativos';if(cliFilter==='expired')filterLabel='Vencidos';if(cliFilter==='today')filterLabel='Hoje';if(cliFilter==='all')filterLabel='Todos';var filterHtml=filterLabel?'<div class="filter-badge">'+filterLabel+' ('+list.length+')<button onclick="window._clearFilter()"><i data-lucide="x" width="12" height="12"></i></button></div>':'';var planOpts='<option value="">Todos os planos</option>';db.planos.forEach(function(p){planOpts+='<option value="'+p.id+'"'+(cliFilterPlano===p.id?' selected':'')+'>'+esc(p.nome)+'</option>';});var servOpts='<option value="">Todos os servidores</option>';db.servidores.forEach(function(s){servOpts+='<option value="'+s.id+'"'+(cliFilterServidor===s.id?' selected':'')+'>'+esc(s.nome)+'</option>';});mc.innerHTML=filterHtml+'<div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="cliSearch" placeholder="Buscar por nome ou WhatsApp..." autocomplete="off"></div><div class="filter-row"><select class="filter-select'+(cliFilterPlano?' active':'')+'" id="cliFiltroPlano">'+planOpts+'</select><select class="filter-select'+(cliFilterServidor?' active':'')+'" id="cliFiltroServidor">'+servOpts+'</select></div><div id="cliCards"></div>'+(totalRegistros>0?'<div class="pagination" id="cliPaginacao">'+gerarPaginacao(cliPage,totalPages)+'</div><div class="page-info">'+(inicio+1)+'–'+ate+' de '+totalRegistros+'</div>':'<div class="empty-state"><i data-lucide="user-round" width="48" height="48"></i><p>Nenhum cliente encontrado</p></div>');renderCards('cliCards',paginado,hoje);var selPlano=document.getElementById('cliFiltroPlano');var selServ=document.getElementById('cliFiltroServidor');if(selPlano)selPlano.addEventListener('change',function(){cliFilterPlano=this.value||null;cliPage=1;render('clientes');});if(selServ)selServ.addEventListener('change',function(){cliFilterServidor=this.value||null;cliPage=1;render('clientes');});var inp=document.getElementById('cliSearch');var snapshot=paginado.slice();var baseCompleta=list.slice();if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var filtrados=q?baseCompleta.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q));}):baseCompleta;var tp=Math.ceil(filtrados.length/ITENS_POR_PAGINA);var pg=1;var ini=(pg-1)*ITENS_POR_PAGINA;var pag=filtrados.slice(ini,ini+ITENS_POR_PAGINA);var at=Math.min(ini+ITENS_POR_PAGINA,filtrados.length);renderCards('cliCards',pag,hoje);var pagDiv=document.getElementById('cliPaginacao');if(pagDiv)pagDiv.innerHTML=gerarPaginacao(pg,tp);var infoDiv=document.querySelector('.page-info');if(infoDiv)infoDiv.textContent=(filtrados.length>0?(ini+1)+'–'+at+' de '+filtrados.length:'0 resultados');});var pagDiv=document.getElementById('cliPaginacao');if(pagDiv){pagDiv.querySelectorAll('.page-btn').forEach(function(btn){btn.addEventListener('click',function(){var p=parseInt(this.dataset.page);if(!isNaN(p)){cliPage=p;render('clientes');}});});}}
+function obterListaFiltrada(){
+  var hoje=today();
+  var list=db.clientes.slice();
+  if(cliFilter==='active') list=list.filter(function(c){ return c.vencimento>=hoje; });
+  if(cliFilter==='expired') list=list.filter(function(c){ return c.vencimento<hoje; });
+  if(cliFilter==='today') list=list.filter(function(c){ return c.vencimento===hoje; });
+  if(cliFilterPlano) list=list.filter(function(c){ return c.planoId===cliFilterPlano; });
+  
+  // CORREÇÃO: filtro por servidor - verifica se o servidor está em servidoresIds OU no antigo servidorId
+  if(cliFilterServidor){
+    list=list.filter(function(c){
+      // Se tiver servidoresIds (array moderno)
+      if(c.servidoresIds && Array.isArray(c.servidoresIds)){
+        return c.servidoresIds.includes(cliFilterServidor);
+      }
+      // Fallback para campo antigo servidorId
+      return c.servidorId === cliFilterServidor;
+    });
+  }
+  return list;
+}
+
+function renderClientes(mc){
+  var hoje=today();
+  var list=obterListaFiltrada();
+  // ORDENAÇÃO GLOBAL por vencimento (do mais antigo para o mais novo)
+  list.sort(function(a,b){ return a.vencimento.localeCompare(b.vencimento); });
+  var totalRegistros=list.length;
+  var totalPages=Math.ceil(totalRegistros/ITENS_POR_PAGINA);
+  if(cliPage>totalPages)cliPage=1;
+  var inicio=(cliPage-1)*ITENS_POR_PAGINA;
+  var paginado=list.slice(inicio,inicio+ITENS_POR_PAGINA);
+  var ate=Math.min(inicio+ITENS_POR_PAGINA,totalRegistros);
+  var filterLabel='';
+  if(cliFilter==='active')filterLabel='Ativos';
+  if(cliFilter==='expired')filterLabel='Vencidos';
+  if(cliFilter==='today')filterLabel='Hoje';
+  if(cliFilter==='all')filterLabel='Todos';
+  var filterHtml=filterLabel?'<div class="filter-badge">'+filterLabel+' ('+list.length+')<button onclick="window._clearFilter()"><i data-lucide="x" width="12" height="12"></i></button></div>':'';
+  var planOpts='<option value="">Todos os planos</option>';
+  db.planos.forEach(function(p){planOpts+='<option value="'+p.id+'"'+(cliFilterPlano===p.id?' selected':'')+'>'+esc(p.nome)+'</option>';});
+  var servOpts='<option value="">Todos os servidores</option>';
+  db.servidores.forEach(function(s){servOpts+='<option value="'+s.id+'"'+(cliFilterServidor===s.id?' selected':'')+'>'+esc(s.nome)+'</option>';});
+  mc.innerHTML=filterHtml+'<div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="cliSearch" placeholder="Buscar por nome ou WhatsApp..." autocomplete="off"></div><div class="filter-row"><select class="filter-select'+(cliFilterPlano?' active':'')+'" id="cliFiltroPlano">'+planOpts+'</select><select class="filter-select'+(cliFilterServidor?' active':'')+'" id="cliFiltroServidor">'+servOpts+'</select></div><div id="cliCards"></div>'+(totalRegistros>0?'<div class="pagination" id="cliPaginacao">'+gerarPaginacao(cliPage,totalPages)+'</div><div class="page-info">'+(inicio+1)+'–'+ate+' de '+totalRegistros+'</div>':'<div class="empty-state"><i data-lucide="user-round" width="48" height="48"></i><p>Nenhum cliente encontrado</p></div>');
+  renderCards('cliCards',paginado,hoje);
+  var selPlano=document.getElementById('cliFiltroPlano');
+  var selServ=document.getElementById('cliFiltroServidor');
+  if(selPlano)selPlano.addEventListener('change',function(){cliFilterPlano=this.value||null;cliPage=1;render('clientes');});
+  if(selServ)selServ.addEventListener('change',function(){cliFilterServidor=this.value||null;cliPage=1;render('clientes');});
+  var inp=document.getElementById('cliSearch');
+  var snapshot=paginado.slice();
+  var baseCompleta=list.slice();
+  if(inp)inp.addEventListener('input',function(){
+    var q=this.value.trim().toLowerCase();
+    var filtrados=q?baseCompleta.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q));}):baseCompleta;
+    var tp=Math.ceil(filtrados.length/ITENS_POR_PAGINA);
+    var pg=1;
+    var ini=(pg-1)*ITENS_POR_PAGINA;
+    var pag=filtrados.slice(ini,ini+ITENS_POR_PAGINA);
+    var at=Math.min(ini+ITENS_POR_PAGINA,filtrados.length);
+    renderCards('cliCards',pag,hoje);
+    var pagDiv=document.getElementById('cliPaginacao');
+    if(pagDiv)pagDiv.innerHTML=gerarPaginacao(pg,tp);
+    var infoDiv=document.querySelector('.page-info');
+    if(infoDiv)infoDiv.textContent=(filtrados.length>0?(ini+1)+'–'+at+' de '+filtrados.length:'0 resultados');
+  });
+  var pagDiv=document.getElementById('cliPaginacao');
+  if(pagDiv){
+    pagDiv.querySelectorAll('.page-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var p=parseInt(this.dataset.page);
+        if(!isNaN(p)){
+          cliPage=p;
+          render('clientes');
+        }
+      });
+    });
+  }
+}
+
 function gerarPaginacao(pagAtual,totalPages){if(totalPages<=1)return'';var html='';html+='<button class="page-btn" data-page="'+(pagAtual-1)+'"'+(pagAtual===1?' disabled':'')+'>‹</button>';var paginas=[];if(totalPages<=7){for(var i=1;i<=totalPages;i++)paginas.push(i);}else{paginas.push(1);if(pagAtual>3)paginas.push('...');var inicio=Math.max(2,pagAtual-1);var fim=Math.min(totalPages-1,pagAtual+1);for(var i=inicio;i<=fim;i++)paginas.push(i);if(pagAtual<totalPages-2)paginas.push('...');paginas.push(totalPages);}paginas.forEach(function(p){if(p==='...')html+='<span class="page-btn" style="border:none;background:none;pointer-events:none">…</span>';else html+='<button class="page-btn'+(p===pagAtual?' active':'')+'" data-page="'+p+'">'+p+'</button>';});html+='<button class="page-btn" data-page="'+(pagAtual+1)+'"'+(pagAtual===totalPages?' disabled':'')+'>›</button>';return html;}
 function renderCards(containerId,list,hoje){var cont=document.getElementById(containerId);if(!cont)return;if(list.length===0){cont.innerHTML='<div class="empty-state"><i data-lucide="user-round" width="48" height="48"></i><p>Nenhum cliente encontrado</p></div>';icons();return;}var sorted=list.slice().sort(function(a,b){return a.vencimento.localeCompare(b.vencimento);});cont.innerHTML=sorted.map(function(c,i){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};var servidoresIds=c.servidoresIds||(c.servidorId?[c.servidorId]:[]);var servsNomes=servidoresIds.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(', ');var ini=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0;});var iniTxt=(ini.length>=2?ini[0][0]+ini[ini.length-1][0]:(ini[0]||'?').substring(0,2)).toUpperCase();var badge=c.vencimento<hoje?'<span class="badge badge-exp">Vencido</span>':c.vencimento===hoje?'<span class="badge badge-today">Hoje</span>':'<span class="badge badge-ok">Ativo</span>';var valor=((plano.valor||0)-(c.desconto||0));var cid=esc(c.id);var temNota=(c.anotacoes&&c.anotacoes.trim())?' nota-destaque':'';return'<div class="client-card"><div class="client-card-header"><div class="avatar">'+iniTxt+'</div><div style="flex:1;min-width:0"><div class="client-name">'+esc(c.nome)+'</div><div class="client-sub">'+esc(plano.nome||'Sem plano')+' · '+(servsNomes||'Sem servidor')+'</div></div>'+badge+'</div><div class="client-footer"><span>📅 '+fmtDate(c.vencimento)+'</span><span>R$ '+fmt(valor)+'</span></div><div class="client-actions">'+(c.whatsapp?'<button class="action-btn" onclick="window._wp(\''+cid+'\')"><i data-lucide="message-circle" width="13" height="13"></i>WhatsApp</button>':'')+'<button class="action-btn" onclick="window._renovar(\''+cid+'\')"><i data-lucide="rotate-cw" width="13" height="13"></i>Renovar</button><button class="action-btn'+temNota+'" onclick="window._nota(\''+cid+'\')"><i data-lucide="file-text" width="13" height="13"></i>Nota</button><button class="action-btn" onclick="window._editar(\''+cid+'\')"><i data-lucide="pencil" width="13" height="13"></i>Editar</button><button class="action-btn" onclick="window._excluir(\''+cid+'\')"><i data-lucide="trash-2" width="13" height="13"></i></button></div></div>';}).join('');icons();}
 
