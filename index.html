@@ -1,43 +1,51 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+
+<html data-theme="light" lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#FFFFFF">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>Owerplay Gestor</title>
-  
-  <link rel="icon" type="image/png" href="IMG_20260501_113710.png">
-  <link rel="apple-touch-icon" href="IMG_20260501_113710.png">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="#FFFFFF" name="theme-color"/>
+<meta content="max-age=3600, stale-while-revalidate=86400" http-equiv="Cache-Control"/>
+<title>Owerplay Gestor</title>
+<link href="manifest.json" rel="manifest"/>
+<link href="IMG_20260501_113710.png" rel="icon" type="image/png"/>
+<link href="IMG_20260501_113710.png" rel="apple-touch-icon"/>
+<meta content="default" name="apple-mobile-web-app-status-bar-style"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.gstatic.com" rel="preconnect" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script defer src="https://unpkg.com/lucide@latest"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
     .lucro-eye {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 12px;
+  right: 12px;
   background: transparent;
   border: none;
   color: #fff;
-  opacity: 0.9;
+  opacity: 0.7;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  width: 48px;
-  height: 48px;
-
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
   padding: 0;
-  border-radius: 50%;
-
-  z-index: 50;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 10;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 .client-card {
   background: var(--surface);
@@ -46,7 +54,6 @@
   padding: 12px;
   margin-bottom: 10px;
   box-shadow: var(--shadow);
-  animation: fadeUp .2s ease both;
 }
 :root {
       --accent:       #0288D1; --accent-light: #E1F5FE; --accent-dark:  #01579B;
@@ -57,7 +64,21 @@
       --text3:        #718096; --radius:       14px;    --radius-sm:    8px;
       --shadow:       0 2px 12px rgba(0,0,0,.08); --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
     }
-    [data-theme="dark"] { --bg:#0F172A; --surface:#1E293B; --surface2:#253047; --border:#334155; --text:#F1F5F9; --text2:#94A3B8; --text3:#64748B; --accent-light:#1E3A5F; --shadow:0 2px 12px rgba(0,0,0,.3); }
+    [data-theme="dark"] { 
+      --bg:#0F172A; 
+      --surface:#1E293B; 
+      --surface2:#253047; 
+      --border:#334155; 
+      --text:#F1F5F9; 
+      --text2:#94A3B8; 
+      --text3:#64748B; 
+      --accent-light:#1E3A5F; 
+      --shadow:0 2px 12px rgba(0,0,0,.3);
+      
+      /* CORREÇÕES PARA O MODO ESCURO - TOPBAR E BOTTOM NAV */
+      --topbar-bg: rgba(15, 23, 42, 0.85);
+      --bottom-nav-bg: rgba(15, 23, 42, 0.88);
+    }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{background:#000;color-scheme:light}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
@@ -66,8 +87,8 @@
     .sidebar{position:fixed;inset:0;z-index:200;display:flex;pointer-events:none}
     .sidebar-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .4s cubic-bezier(.25,.1,.25,1)}
     .sidebar.open .sidebar-backdrop{background:rgba(0,0,0,.45);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
-    .sidebar-panel{width:285px;height:100%;overflow-y:auto;background:rgba(255,255,255,.82);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border-right:1px solid rgba(255,255,255,.5);box-shadow:4px 0 40px rgba(0,0,0,.12);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,16px);transform:translateX(-100%);transition:transform .45s cubic-bezier(.32,.72,0,1);will-change:transform;position:relative;z-index:1}
-    [data-theme="dark"] .sidebar-panel{background:rgba(15,23,42,.88);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border-right:1px solid rgba(255,255,255,.08);box-shadow:4px 0 40px rgba(0,0,0,.35)}
+    .sidebar-panel{width:285px;height:100%;overflow-y:auto;background:rgba(255,255,255,.72);backdrop-filter:blur(26px) saturate(200%);-webkit-backdrop-filter:blur(22px) saturate(170%);border-right:1px solid rgba(255,255,255,.5);box-shadow:4px 0 40px rgba(0,0,0,.12);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,16px);transform:translateX(-100%);transition:transform .45s cubic-bezier(.32,.72,0,1);will-change:transform;position:relative;z-index:1}
+    [data-theme="dark"] .sidebar-panel{background:rgba(15,23,42,.88);backdrop-filter:blur(22px) saturate(170%);-webkit-backdrop-filter:blur(22px) saturate(170%);border-right:1px solid rgba(255,255,255,.08);box-shadow:4px 0 40px rgba(0,0,0,.35)}
     .sidebar.open{pointer-events:all}
     .sidebar.open .sidebar-panel{transform:translateX(0);transition:transform .5s cubic-bezier(.16,1,.3,1)}
     .sidebar-header{display:flex;align-items:center;gap:12px;padding:20px 20px 18px;border-bottom:1px solid rgba(0,0,0,.06);margin-bottom:4px}
@@ -90,7 +111,25 @@
     .sidebar-panel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:2px}
     [data-theme="dark"] .sidebar-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
 
-    .topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:62px;gap:12px}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:100;
+      background: rgba(255,255,255,.78);
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      padding:0 16px;
+      height:62px;
+      gap:12px;
+      backdrop-filter:blur(16px) saturate(170%);
+      -webkit-backdrop-filter:blur(16px) saturate(170%);
+      transition: background 0.2s ease;
+    }
+    [data-theme="dark"] .topbar {
+      background: var(--topbar-bg);
+      border-bottom-color: rgba(255,255,255,0.08);
+    }
     .topbar.hidden{display:none}
     .topbar-menu{background:none;border:none;color:var(--text2);cursor:pointer;padding:6px;border-radius:8px;display:flex;align-items:center;flex-shrink:0}
     .topbar-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
@@ -99,7 +138,24 @@
     .topbar-slogan{font-size:0.55rem;font-weight:500;color:var(--text3);letter-spacing:2.5px;text-transform:uppercase;margin-top:5px}
     .main-wrap{flex:1;display:flex;flex-direction:column;width:100%;overflow:hidden}
     #mainContent{flex:1;overflow-y:auto;padding:16px 16px 100px;-webkit-overflow-scrolling:touch}
-    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--surface);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0)}
+    .bottom-nav{
+      position:fixed;
+      bottom:0;
+      left:0;
+      right:0;
+      z-index:100;
+      background: rgba(255,255,255,.82);
+      border-top:1px solid var(--border);
+      display:flex;
+      padding-bottom:env(safe-area-inset-bottom,0);
+      backdrop-filter:blur(18px) saturate(170%);
+      -webkit-backdrop-filter:blur(18px) saturate(170%);
+      transition: background 0.2s ease;
+    }
+    [data-theme="dark"] .bottom-nav {
+      background: var(--bottom-nav-bg);
+      border-top-color: rgba(255,255,255,0.08);
+    }
     .bottom-nav.hidden{display:none}
     .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px;background:none;border:none;cursor:pointer;color:var(--text3);font-family:inherit;font-size:.6rem;font-weight:600;transition:color .15s}
     .nav-btn.active{color:var(--accent)}.nav-btn i{transition:transform .15s}.nav-btn.active i{transform:scale(1.15)}
@@ -115,12 +171,14 @@
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   cursor: pointer;
-  transition: transform .12s;
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow .25s ease;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
+  -webkit-tap-highlight-color: transparent;
 }
-    .stat-card:active{transform:scale(.97)}.stat-label{font-size:.7rem;font-weight:600;color:var(--text3);margin-bottom:4px}
+    .stat-card:active { transform: scale(0.97); }
+    .stat-card .stat-label{font-size:.7rem;font-weight:600;color:var(--text3);margin-bottom:4px}
     .stat-value{font-size:1.5rem;font-weight:800;color:var(--text)}.stat-value.green{color:var(--success)}.stat-value.red{color:var(--danger)}.stat-value.orange{color:var(--warning)}
     .lucro-card {
   background: linear-gradient(135deg,var(--accent) 0%,var(--accent-dark) 100%);
@@ -128,12 +186,14 @@
   padding: 22px;
   color: #fff;
   margin-bottom: 14px;
-  cursor: default;
+  cursor: pointer;
   box-shadow: 0 10px 35px rgba(2,136,209,.28);
-  transition: transform .12s;
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow .3s ease, background .4s ease;
   position: relative;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
+.lucro-card:active { transform: scale(0.97); }
 
 .lucro-card::before {
   content: '';
@@ -153,9 +213,10 @@
   letter-spacing: 0.5px;
 }.lucro-value{font-size:2rem;font-weight:800}
 .lucro-value.oculto {
-  font-size: 1rem;
+  font-size: 2rem;
+  letter-spacing: 0.15em;
 }
- 
+
     @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .client-card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
     .avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem;flex-shrink:0}
@@ -213,37 +274,11 @@
     .login-link:hover{text-decoration:underline}
     
     .finance-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-    .fin-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 10px;text-align:center}
-    .fin-stat-label{font-size:.65rem;font-weight:700;color:var(--text3);margin-bottom:3px}.fin-stat-value{font-size:1rem;font-weight:800}
+    .fin-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+    .fin-stat-label{font-size:.62rem;font-weight:700;color:var(--text3);white-space:nowrap;text-align:center;}.fin-stat-value{font-size:.88rem;font-weight:800;white-space:nowrap;text-align:center;}
     
-    .trans-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .trans-row:last-child { border-bottom: none; }
     .trans-desc { font-weight: 600; color: var(--text); }
     .trans-date { font-size: 0.7rem; color: var(--text3); margin-top: 1px; }
-    .badge-entrada {
-      background: var(--accent-light);
-      color: var(--accent-dark);
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 0.65rem;
-      font-weight: 600;
-      display: inline-block;
-    }
-    .badge-saida {
-      background: var(--danger-bg);
-      color: var(--danger);
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 0.65rem;
-      font-weight: 600;
-      display: inline-block;
-    }
     .trans-values {
       display: flex;
       gap: 10px;
@@ -285,7 +320,6 @@
       color: var(--text3);
       cursor: pointer;
       border-radius: 20px;
-      transition: all 0.15s;
     }
     .lembrete-tab.active { background: var(--accent-light); color: var(--accent-dark); }
     .lembrete-panel { display: none; }
@@ -304,12 +338,6 @@
       font-size: 0.8rem;
     }
     
-    .report-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px}
-    .report-summary-item{background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center}
-    .report-summary-value{font-size:1.1rem;font-weight:800}.report-summary-value.green{color:var(--success)}.report-summary-value.red{color:var(--danger)}.report-summary-value.blue{color:var(--accent)}
-    .report-summary-label{font-size:.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-top:2px}
-    .report-section-title{font-size:.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:14px;display:flex;align-items:center;gap:6px}.report-section-title:first-of-type{margin-top:0}
-    .report-dot{width:8px;height:8px;border-radius:50%}.report-dot.green{background:var(--success)}.report-dot.blue{background:var(--accent)}
     .report-client-mini{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:10px;margin-bottom:6px}
     .report-client-left{flex:1;min-width:0}
     .report-mini-name{font-weight:600;font-size:.8rem;color:var(--text)}.report-mini-plan{font-size:.62rem;color:var(--text3);margin-top:1px}
@@ -501,54 +529,137 @@
 .badge-entrada { background: var(--success-bg); color: var(--success); padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
 .badge-saida { background: var(--danger-bg); color: var(--danger); padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
 .badge-lucro { background: var(--accent-light); color: var(--accent-dark); padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
-  </style>
+  
+
+
+
+.stat-card,
+.client-card,
+.btn,
+.icon-btn,
+.action-btn,
+.nav-btn {
+  transition:
+    transform .18s ease,
+    box-shadow .25s ease,
+    background .25s ease,
+    opacity .2s ease;
+}
+
+.lucro-card {
+  transition:
+    transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow .3s ease,
+    background .4s ease;
+}
+
+.lucro-card:active .lucro-eye {
+  transform: none;
+}
+
+
+/* ===== REFINOS PREMIUM: LUCRO, FINANCEIRO E SPLASH ===== */
+.lucro-content{position:relative;z-index:2;}
+.lucro-change{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-top:6px;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  color:rgba(255,255,255,.94);
+  font-size:.62rem;
+  font-weight:800;
+  letter-spacing:.1px;
+  line-height:1;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.lucro-change.negative{background:rgba(255,255,255,.12);}
+.finance-chart-card{padding:14px 14px 12px!important;}
+.finance-chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.finance-chart-title{font-size:.86rem;font-weight:800;color:var(--text);letter-spacing:-.2px;}
+.finance-chart-sub{font-size:.62rem;font-weight:700;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;}
+.finance-growth{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;padding:6px 9px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);}
+.finance-growth span{font-size:.58rem;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.45px;line-height:1;}
+.finance-growth strong{font-size:.86rem;font-weight:900;line-height:1.05;}
+.finance-growth.positive strong{color:var(--success);}
+.finance-growth.negative strong{color:var(--danger);}
+.finance-chart-wrap{position:relative;height:170px;margin-top:2px;}
+.splash-screen{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  background:linear-gradient(180deg,var(--surface) 0%,var(--bg) 100%);
+  transition:opacity .45s ease,visibility .45s ease,transform .45s ease;
+}
+.splash-screen.hide{opacity:0;visibility:hidden;transform:scale(1.015);pointer-events:none;}
+.splash-logo{width:76px;height:76px;border-radius:22px;object-fit:cover;box-shadow:0 14px 38px rgba(2,136,209,.22);animation:splashFade .85s ease both;}
+.splash-title{font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:splashFade .85s ease .08s both;}
+.splash-loader{width:42px;height:3px;border-radius:99px;background:var(--border);overflow:hidden;animation:splashFade .85s ease .16s both;}
+.splash-loader::after{content:'';display:block;width:45%;height:100%;border-radius:99px;background:var(--accent);animation:splashLoad .9s ease-in-out infinite;}
+@keyframes splashFade{from{opacity:0;transform:translateY(8px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes splashLoad{0%{transform:translateX(-120%);}100%{transform:translateX(240%);}}
+.lucro-eye:active {
+  transform: none !important;
+}
+</style>
 </head>
 <body>
-<div id="app">
-  <div class="sidebar" id="sidebar"><div class="sidebar-panel">
-    <div class="sidebar-header">
-      <img class="sidebar-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex';">
-      <span id="logoFallback" style="display:none;width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;">✦</span>
-      <span class="sidebar-brand">Owerplay Gestor</span>
-      <button class="sidebar-close" id="sidebarClose"><i data-lucide="x" width="18" height="18"></i></button>
-    </div>
-    <div class="sidebar-section" style="margin-top:8px;"><div class="sidebar-section-label">Preferências</div>
-      <button class="sidebar-item" id="btnMensagens"><i data-lucide="message-square" width="17" height="17"></i> Mensagens WhatsApp</button>
-      <button class="sidebar-item" id="btnDarkMode"><i data-lucide="moon" width="17" height="17"></i> <span id="darkModeLabel">Modo Escuro</span></button>
-    </div>
-    <div class="sidebar-divider"></div>
-    <div class="sidebar-section"><div class="sidebar-section-label">Ferramentas</div>
-      <button class="sidebar-item" id="btnMetaMensal"><i data-lucide="target" width="17" height="17"></i> Meta Mensal</button>
-      <button class="sidebar-item" id="btnEnvioMassa"><i data-lucide="send" width="17" height="17"></i> Envio em Massa</button>
-      <button class="sidebar-item" id="btnInadimplencia"><i data-lucide="alert-triangle" width="17" height="17"></i> Inadimplência<span class="sidebar-badge hidden" id="badgeInadimplencia">0</span></button>
-      <button class="sidebar-item" id="btnRelatorio"><i data-lucide="bar-chart-3" width="17" height="17"></i> Relatório Diário</button>
-      <button class="sidebar-item" id="btnRelatorioSemanal"><i data-lucide="calendar-check" width="17" height="17"></i> Relatório Semanal</button>
-      <button class="sidebar-item" id="btnResumoAnual"><i data-lucide="trending-up" width="17" height="17"></i> Resumo Anual</button>
-      <button class="sidebar-item" id="btnLembretes"><i data-lucide="sticky-note" width="17" height="17"></i> Lembretes</button>
-      <button class="sidebar-item" id="btnLog"><i data-lucide="list-checks" width="17" height="17"></i> Log de Atividades</button>
-      <button class="sidebar-item" id="btnCompartilhar"><i data-lucide="share-2" width="17" height="17"></i> Compartilhar App</button>
-    </div>
-    <div class="sidebar-divider"></div>
-    <div class="sidebar-section" style="padding-bottom:16px;">
-      <button class="sidebar-item danger" id="btnLogout"><i data-lucide="log-out" width="17" height="17"></i> Sair</button>
-    </div>
-  </div><div class="sidebar-backdrop" id="sidebarBackdrop"></div></div>
-
-  <div class="main-wrap">
-    <div class="topbar" id="topbarWrap"><button class="topbar-menu" id="menuBtn"><i data-lucide="menu" width="22" height="22"></i></button><div class="topbar-center"><div class="topbar-brand">Owerplay Gestor</div><div class="topbar-slogan">Conectando você ao lucro</div></div><div style="width:34px;flex-shrink:0"></div></div>
-    <div id="mainContent"></div>
-    <nav class="bottom-nav" id="bottomNav">
-      <button class="nav-btn active" data-sec="dashboard"><i data-lucide="home" width="20" height="20"></i>Início</button>
-      <button class="nav-btn" data-sec="clientes"><i data-lucide="users" width="20" height="20"></i>Clientes</button>
-      <button class="nav-btn" data-sec="planos"><i data-lucide="layers" width="20" height="20"></i>Planos</button>
-      <button class="nav-btn" data-sec="servidores"><i data-lucide="server" width="20" height="20"></i>Servidores</button>
-      <button class="nav-btn" data-sec="financas"><i data-lucide="wallet" width="20" height="20"></i>Finanças</button>
-    </nav>
-  </div>
-  <button id="fab"><i data-lucide="plus" width="24" height="24"></i></button>
-  <div id="toast"></div>
+<div class="splash-screen" id="splashScreen">
+<img alt="Owerplay" class="splash-logo" onerror="this.style.display='none';" src="IMG_20260501_113710.png"/>
+<div class="splash-title">Owerplay Gestor</div>
+<div aria-hidden="true" class="splash-loader"></div>
 </div>
-
+<div id="app">
+<div class="sidebar" id="sidebar"><div class="sidebar-panel">
+<div class="sidebar-header">
+<img alt="Owerplay" class="sidebar-logo" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex';" src="IMG_20260501_113710.png"/>
+<span id="logoFallback" style="display:none;width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;">✦</span>
+<span class="sidebar-brand">Owerplay Gestor</span>
+<button class="sidebar-close" id="sidebarClose"><i data-lucide="x" height="18" width="18"></i></button>
+</div>
+<div class="sidebar-section" style="margin-top:8px;"><div class="sidebar-section-label">Preferências</div>
+<button class="sidebar-item" id="btnMensagens"><i data-lucide="message-square" height="17" width="17"></i> Mensagens WhatsApp</button>
+<button class="sidebar-item" id="btnDarkMode"><i data-lucide="moon" height="17" width="17"></i> <span id="darkModeLabel">Modo Escuro</span></button>
+</div>
+<div class="sidebar-divider"></div>
+<div class="sidebar-section"><div class="sidebar-section-label">Ferramentas</div>
+<button class="sidebar-item" id="btnMetaMensal"><i data-lucide="target" height="17" width="17"></i> Meta Mensal</button>
+<button class="sidebar-item" id="btnEnvioMassa"><i data-lucide="send" height="17" width="17"></i> Envio em Massa</button>
+<button class="sidebar-item" id="btnInadimplencia"><i data-lucide="alert-triangle" height="17" width="17"></i> Inadimplência<span class="sidebar-badge hidden" id="badgeInadimplencia">0</span></button>
+<button class="sidebar-item" id="btnRelatorio"><i data-lucide="bar-chart-3" height="17" width="17"></i> Relatório Diário</button>
+<button class="sidebar-item" id="btnRelatorioSemanal"><i data-lucide="calendar-check" height="17" width="17"></i> Relatório Semanal</button>
+<button class="sidebar-item" id="btnResumoAnual"><i data-lucide="trending-up" height="17" width="17"></i> Resumo Anual</button>
+<button class="sidebar-item" id="btnLembretes"><i data-lucide="sticky-note" height="17" width="17"></i> Lembretes</button>
+<button class="sidebar-item" id="btnLog"><i data-lucide="list-checks" height="17" width="17"></i> Log de Atividades</button>
+<button class="sidebar-item" id="btnCompartilhar"><i data-lucide="share-2" height="17" width="17"></i> Compartilhar App</button>
+</div>
+<div class="sidebar-divider"></div>
+<div class="sidebar-section" style="padding-bottom:16px;">
+<button class="sidebar-item danger" id="btnLogout"><i data-lucide="log-out" height="17" width="17"></i> Sair</button>
+</div>
+</div><div class="sidebar-backdrop" id="sidebarBackdrop"></div></div>
+<div class="main-wrap">
+<div class="topbar" id="topbarWrap"><button class="topbar-menu" id="menuBtn"><i data-lucide="menu" height="22" width="22"></i></button><div class="topbar-center"><div class="topbar-brand">Owerplay Gestor</div><div class="topbar-slogan">Conectando você ao lucro</div><div id="syncStatus" style="display:none;font-size:.6rem;color:var(--text3);margin-top:2px;">🟢 Sincronizado</div></div><div style="width:34px;flex-shrink:0"></div></div>
+<div id="mainContent"></div>
+<nav class="bottom-nav" id="bottomNav">
+<button class="nav-btn active" data-sec="dashboard"><i data-lucide="home" height="20" width="20"></i>Início</button>
+<button class="nav-btn" data-sec="clientes"><i data-lucide="users" height="20" width="20"></i>Clientes</button>
+<button class="nav-btn" data-sec="planos"><i data-lucide="layers" height="20" width="20"></i>Planos</button>
+<button class="nav-btn" data-sec="servidores"><i data-lucide="server" height="20" width="20"></i>Servidores</button>
+<button class="nav-btn" data-sec="financas"><i data-lucide="wallet" height="20" width="20"></i>Finanças</button>
+</nav>
+</div>
+<button id="fab"><i data-lucide="plus" height="24" width="24"></i></button>
+<div id="toast"></div>
+</div>
 <script>
 (function(){'use strict';
 var SUPABASE_URL='https://auepntbwueklrnqazkhs.supabase.co';
@@ -558,17 +669,21 @@ var STORAGE_KEY='owerplay_v3';
 var DEFAULT_TEMPLATES={cobranca:"Olá {primeiro_nome}, Bom dia!\nSeu plano de tv vence hoje *{vencimento}*\n\n⚠️ *Na data do vencimento, o sistema poderá bloquear automaticamente a qualquer momento, renove assim que possível!\n\nDADOS PARA PAGAMENTO:\nValor: *R${valor}*\nPix:\nBanco:\n\n✅ *Favor enviar comprovante*",renovacao:"📌 Obrigado pela confiança!\n✅ Sua assinatura foi renovada com sucesso!\n🗓️ PRÓXIMO VENCIMENTO: *{vencimento}*"};
 var db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};
 var currentSec='dashboard';var cliFilter=null;var cliFilterDash=null;var cliPage=1;var cliFilterPlano=null;var cliFilterServidor=null;
-var darkMode=false;var lucroOculto=true;var chartInst=null;var chartInstResumo=null;var currentUser=null;var authLoaded=false;
+var darkMode=false;var lucroOculto=true;var chartInst=null;var chartDataKey=null;var chartInstResumo=null;var currentUser=null;var authLoaded=false;
 var ITENS_POR_PAGINA=25;
 var metaMensal = { valor: 5000 };
 
 function today(){var d=new Date();d.setHours(d.getHours()-3);return d.toISOString().split('T')[0];}
 function monthStr(offset){var d=new Date();d.setDate(1);d.setMonth(d.getMonth()+(offset||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
 function sumTrans(tipo,prefix){return db.transacoes.filter(function(t){return t.tipo===tipo&&t.data&&t.data.startsWith(prefix);}).reduce(function(s,t){return s+t.valor;},0);}
-function fmt(n){return(n||0).toFixed(2);}
+function fmt(n){return(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtDate(d){if(!d)return'—';return new Date(d+'T00:00:00').toLocaleDateString('pt-BR');}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function toast(msg,type){
+  if(navigator.vibrate){
+    if(type==='error') navigator.vibrate([30,50,30]);
+    else navigator.vibrate(10);
+  }
   var el=document.getElementById('toast');
   if(!el)return;
   var iconSpan='';
@@ -596,35 +711,93 @@ function toast(msg,type){
     el.style.borderLeftColor='';
   },2800);
 }
-function icons(){if(window.lucide)lucide.createIcons();}
+function icons(el){
+  if(!window.lucide)return;
+  if(el){var nodes=el.querySelectorAll('[data-lucide]');if(nodes.length)lucide.createIcons({nodes:nodes});}
+  else{lucide.createIcons();}
+}
+
+function hideSplash(){var sp=document.getElementById('splashScreen');if(!sp)return;sp.classList.add('hide');setTimeout(function(){if(sp&&sp.parentNode)sp.parentNode.removeChild(sp);},520);}
 
 function setLoginMode(m){var tb=document.getElementById('topbarWrap');var bn=document.getElementById('bottomNav');var fab=document.getElementById('fab');if(tb)tb.className='topbar'+(m?' hidden':'');if(bn)bn.className='bottom-nav'+(m?' hidden':'');if(fab)fab.className=(m?'hidden':'');}
+
+function iniciarNotificacoes(){
+  if(!('Notification' in window)) return;
+  Notification.requestPermission();
+}
+
+function verificarNotificacoes(){
+  if(Notification.permission!=='granted') return;
+
+  var hoje=today();
+
+  var vencendoHoje=db.clientes.filter(function(c){
+    return c.vencimento===hoje;
+  });
+
+  if(vencendoHoje.length){
+    new Notification('Owerplay Gestor',{
+      body:vencendoHoje.length+' cliente(s) vencem hoje.',
+      icon:'IMG_20260501_113710.png'
+    });
+  }
+}
+
 function initApp(){
   var savedMeta = localStorage.getItem('owerplay_meta_mensal');
   if(savedMeta) metaMensal = JSON.parse(savedMeta);
   supabase.auth.getSession().then(function(res){if(res.data.session){currentUser=res.data.session.user;afterLogin();}else{authLoaded=true;renderLogin();}});
   supabase.auth.onAuthStateChange(function(event,session){if(event==='SIGNED_IN'&&session){currentUser=session.user;afterLogin();}else if(event==='SIGNED_OUT'){currentUser=null;db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};renderLogin();}});
 }
-function afterLogin(){carregarDados().then(function(){authLoaded=true;setLoginMode(false);navigateTo('dashboard');});}
+function afterLogin(){iniciarNotificacoes();carregarDados().then(function(){authLoaded=true;setLoginMode(false);navigateTo('dashboard');setTimeout(hideSplash,650);setTimeout(verificarNotificacoes,1500);});}
 function logout(){supabase.auth.signOut();}
 
 async function carregarDados(){var uid=currentUser.id;var resp=await supabase.from('backups').select('dados').eq('token',uid).maybeSingle();if(resp.data&&resp.data.dados){db=Object.assign(db,resp.data.dados);if(!db.templates)db.templates=Object.assign({},DEFAULT_TEMPLATES);if(!db.lembretes)db.lembretes=[];saveLocal();return;}var local=localStorage.getItem(STORAGE_KEY+'_'+uid);if(local){try{var parsed=JSON.parse(local);db=Object.assign(db,parsed);if(!db.templates)db.templates=Object.assign({},DEFAULT_TEMPLATES);if(!db.lembretes)db.lembretes=[];}catch(e){}}}
 function saveLocal(){if(!currentUser)return;try{localStorage.setItem(STORAGE_KEY+'_'+currentUser.id,JSON.stringify(db));}catch(e){}}
-function salvarNuvem(){if(!currentUser)return;saveLocal();supabase.from('backups').upsert({token:currentUser.id,dados:db},{onConflict:'token'}).then(function(){});}
+function salvarNuvem(){
+
+if(!currentUser)return;
+
+var sync=document.getElementById('syncStatus');
+
+if(sync){
+sync.innerHTML='🟡 Salvando...';
+}
+
+saveLocal();
+
+supabase.from('backups').upsert(
+{token:currentUser.id,dados:db},
+{onConflict:'token'}
+).then(function(res){
+
+if(sync){
+sync.innerHTML=res.error
+?'🔴 Erro ao sincronizar'
+:'🟢 Sincronizado';
+}
+
+});
+
+}
+
 function saveDB(){saveLocal();salvarNuvem();}
 
 function loginAction(isCadastro){var email=document.getElementById('loginEmail').value.trim();var pass=document.getElementById('loginPass').value.trim();if(!email||!email.includes('@')){toast('Digite um e-mail válido','warning');return;}if(!pass||pass.length<6){toast('Senha deve ter 6+ caracteres','warning');return;}if(isCadastro){var pass2=document.getElementById('loginPass2').value.trim();if(pass!==pass2){toast('Senhas não conferem','error');return;}supabase.auth.signUp({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else{toast('Conta criada! Faça login.','success');renderLogin('login');}});}else{supabase.auth.signInWithPassword({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else toast('Login feito!','success');});}}
-function renderLogin(mode){setLoginMode(true);var mc=document.getElementById('mainContent');if(!mc)return;var isCadastro=(mode==='cadastro');mc.innerHTML='<div class="login-container"><img class="login-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display=\'none\';var fb=document.createElement(\'span\');fb.style.cssText=\'width:70px;height:70px;border-radius:18px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2rem\';fb.textContent=\'✦\';this.parentNode.replaceChild(fb,this)"><div class="login-title">Owerplay Gestor</div><div class="login-subtitle">'+(isCadastro?'Crie sua conta':'Faça login')+'</div><div class="login-card"><input class="login-input" id="loginEmail" type="email" placeholder="Seu e-mail" autocomplete="email"><input class="login-input" id="loginPass" type="password" placeholder="Senha" autocomplete="'+(isCadastro?'new-password':'current-password')+'">'+(isCadastro?'<input class="login-input" id="loginPass2" type="password" placeholder="Repita a senha">':'')+'<button class="btn btn-primary btn-full" id="loginBtn">'+(isCadastro?'Criar Conta':'Entrar')+'</button><div class="login-link" id="toggleLogin">'+(isCadastro?'Já tem conta? Entrar':'Criar conta')+'</div></div></div>';document.getElementById('toggleLogin').addEventListener('click',function(){renderLogin(isCadastro?'login':'cadastro');});document.getElementById('loginBtn').addEventListener('click',function(){loginAction(isCadastro);});var pf=document.getElementById('loginPass');if(pf)pf.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});var p2=document.getElementById('loginPass2');if(p2)p2.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});}
+function renderLogin(mode){setLoginMode(true);var mc=document.getElementById('mainContent');if(!mc)return;var isCadastro=(mode==='cadastro');mc.innerHTML='<div class="login-container"><img class="login-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display=\'none\';var fb=document.createElement(\'span\');fb.style.cssText=\'width:70px;height:70px;border-radius:18px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2rem\';fb.textContent=\'✦\';this.parentNode.replaceChild(fb,this)"><div class="login-title">Owerplay Gestor</div><div class="login-subtitle">'+(isCadastro?'Crie sua conta':'Faça login')+'</div><div class="login-card"><input class="login-input" id="loginEmail" type="email" placeholder="Seu e-mail" autocomplete="email"><input class="login-input" id="loginPass" type="password" placeholder="Senha" autocomplete="'+(isCadastro?'new-password':'current-password')+'">'+(isCadastro?'<input class="login-input" id="loginPass2" type="password" placeholder="Repita a senha">':'')+'<button class="btn btn-primary btn-full" id="loginBtn">'+(isCadastro?'Criar Conta':'Entrar')+'</button><div class="login-link" id="toggleLogin">'+(isCadastro?'Já tem conta? Entrar':'Criar conta')+'</div></div></div>';document.getElementById('toggleLogin').addEventListener('click',function(){renderLogin(isCadastro?'login':'cadastro');});document.getElementById('loginBtn').addEventListener('click',function(){loginAction(isCadastro);});var pf=document.getElementById('loginPass');if(pf)pf.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});var p2=document.getElementById('loginPass2');if(p2)p2.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});setTimeout(hideSplash,650);}
 
 function atualizarBadgeInadimplencia(){var badge=document.getElementById('badgeInadimplencia');if(!badge)return;var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje;}).length;if(vencidos>0){badge.textContent=vencidos>99?'99+':vencidos;badge.classList.remove('hidden');}else{badge.classList.add('hidden');}}
 function openSidebar(){atualizarBadgeInadimplencia();document.getElementById('sidebar').classList.add('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');}
 function navigateTo(sec,filter){if(!authLoaded||!currentUser){renderLogin();return;}currentSec=sec;cliFilter=filter||null;cliPage=1;cliFilterPlano=null;cliFilterServidor=null;closeSidebar();document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.sec===sec);});var fab=document.getElementById('fab');if(fab)fab.className=(sec==='financas')?'hidden':'';render(sec);if(sec==='dashboard'){setTimeout(function(){verificarAlertaDiario();},600);}}
-function render(sec){var mc=document.getElementById('mainContent');if(!mc)return;mc.scrollTop=0;if(sec==='dashboard')renderDashboard(mc);else if(sec==='clientes')renderClientes(mc);else if(sec==='planos')renderPlanos(mc);else if(sec==='servidores')renderServidores(mc);else if(sec==='financas')renderFinancas(mc);icons();}
+function render(sec){var mc=document.getElementById('mainContent');if(!mc)return;mc.scrollTop=0;if(sec==='dashboard')renderDashboard(mc);else if(sec==='clientes')renderClientes(mc);else if(sec==='planos')renderPlanos(mc);else if(sec==='servidores')renderServidores(mc);else if(sec==='financas')renderFinancas(mc);icons(mc);}
 
 function statCard(label,val,color,onclick){return'<div class="stat-card" onclick="'+onclick+'"><div class="stat-label">'+label+'</div><div class="stat-value'+(color?' '+color:'')+'">'+val+'</div></div>';}
 function renderDashboard(mc){var hoje=today(),mesAtual=hoje.slice(0,7);var ent=sumTrans('entrada',mesAtual),sai=sumTrans('saida',mesAtual),lucro=ent-sai;var ativos=db.clientes.filter(function(c){return c.vencimento>=hoje;}).length;var venc=db.clientes.filter(function(c){return c.vencimento<hoje;}).length;var hj=db.clientes.filter(function(c){return c.vencimento===hoje;}).length;var lv=lucroOculto?'••••••':'R$ '+fmt(lucro);
-var lucroEl=document.getElementById('lucroVal');if(lucroEl)lucroEl.className=lucroOculto?'lucro-value oculto':'lucro-value';var eyeIcon=lucroOculto?'eye-off':'eye';var list=db.clientes.slice();if(cliFilterDash==='active')list=list.filter(function(c){return c.vencimento>=hoje;});if(cliFilterDash==='expired')list=list.filter(function(c){return c.vencimento<hoje;});if(cliFilterDash==='today')list=list.filter(function(c){return c.vencimento===hoje;});mc.innerHTML='<div class="lucro-card"><button class="lucro-eye" onclick="window._toggleLucro()"><i data-lucide="'+eyeIcon+'" width="16" height="16"></i></button><div class="lucro-label">💰 Lucro do Mês</div><div class="lucro-value" id="lucroVal">'+lv+'</div></div><div class="stat-grid">'+statCard('✅ Ativos',ativos,'',"window._filter('active')")+statCard('⚠️ Vencidos',venc,'red',"window._filter('expired')")+statCard('📅 Hoje',hj,'orange',"window._filter('today')")+statCard('👥 Total',db.clientes.length,'',"window._filter('all')")+'</div><div style="margin-bottom:10px;"><div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="dashSearch" placeholder="Buscar cliente..." autocomplete="off"></div><div id="dashCards"></div></div>';var baseList=cliFilterDash?list:db.clientes;renderCards('dashCards',baseList,hoje);var inp=document.getElementById('dashSearch');if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var filtrados=baseList.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q));});renderCards('dashCards',filtrados,today());});}
+var eyeIcon=lucroOculto?'eye-off':'eye';var list=db.clientes.slice();if(cliFilterDash==='active')list=list.filter(function(c){return c.vencimento>=hoje;});if(cliFilterDash==='expired')list=list.filter(function(c){return c.vencimento<hoje;});if(cliFilterDash==='today')list=list.filter(function(c){return c.vencimento===hoje;});
+mc.innerHTML='<div class="lucro-card"><button class="lucro-eye" onclick="window._toggleLucro()" ontouchend="event.preventDefault();window._toggleLucro();"><i data-lucide="'+eyeIcon+'" width="16" height="16"></i></button><div class="lucro-label">💰 Lucro do Mês</div><div class="lucro-value" id="lucroVal">'+lv+'</div></div><div class="stat-grid">'+statCard('✅ Ativos',ativos,'',"window._filter('active')")+statCard('⚠️ Vencidos',venc,'',"window._filter('expired')")+statCard('📅 Hoje',hj,'',"window._filter('today')")+statCard('👥 Total',db.clientes.length,'',"window._filter('all')")+'</div><div style="margin-bottom:10px;"><div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="dashSearch" placeholder="Buscar cliente..." autocomplete="off"></div><div id="dashCards"></div></div>';var baseList=cliFilterDash?list:db.clientes;renderCards('dashCards',baseList,hoje);
+var inp=document.getElementById('dashSearch');if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var filtrados=baseList.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q));});renderCards('dashCards',filtrados,today());});
+}
 
 function modalMetaMensal(){
   var hoje=today();
@@ -777,7 +950,7 @@ function cobrarTodosAlerta(){var hoje=today();var clientesHoje=db.clientes.filte
 function obterListaFiltrada(){var hoje=today();var list=db.clientes.slice();if(cliFilter==='active')list=list.filter(function(c){return c.vencimento>=hoje;});if(cliFilter==='expired')list=list.filter(function(c){return c.vencimento<hoje;});if(cliFilter==='today')list=list.filter(function(c){return c.vencimento===hoje;});if(cliFilterPlano)list=list.filter(function(c){return c.planoId===cliFilterPlano;});if(cliFilterServidor)list=list.filter(function(c){return c.servidorId===cliFilterServidor;});return list;}
 function renderClientes(mc){var hoje=today();var list=obterListaFiltrada();var totalRegistros=list.length;var totalPages=Math.ceil(totalRegistros/ITENS_POR_PAGINA);if(cliPage>totalPages)cliPage=1;var inicio=(cliPage-1)*ITENS_POR_PAGINA;var paginado=list.slice(inicio,inicio+ITENS_POR_PAGINA);var ate=Math.min(inicio+ITENS_POR_PAGINA,totalRegistros);var filterLabel='';if(cliFilter==='active')filterLabel='Ativos';if(cliFilter==='expired')filterLabel='Vencidos';if(cliFilter==='today')filterLabel='Hoje';if(cliFilter==='all')filterLabel='Todos';var filterHtml=filterLabel?'<div class="filter-badge">'+filterLabel+' ('+list.length+')<button onclick="window._clearFilter()"><i data-lucide="x" width="12" height="12"></i></button></div>':'';var planOpts='<option value="">Todos os planos</option>';db.planos.forEach(function(p){planOpts+='<option value="'+p.id+'"'+(cliFilterPlano===p.id?' selected':'')+'>'+esc(p.nome)+'</option>';});var servOpts='<option value="">Todos os servidores</option>';db.servidores.forEach(function(s){servOpts+='<option value="'+s.id+'"'+(cliFilterServidor===s.id?' selected':'')+'>'+esc(s.nome)+'</option>';});mc.innerHTML=filterHtml+'<div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="cliSearch" placeholder="Buscar por nome ou WhatsApp..." autocomplete="off"></div><div class="filter-row"><select class="filter-select'+(cliFilterPlano?' active':'')+'" id="cliFiltroPlano">'+planOpts+'</select><select class="filter-select'+(cliFilterServidor?' active':'')+'" id="cliFiltroServidor">'+servOpts+'</select></div><div id="cliCards"></div>'+(totalRegistros>0?'<div class="pagination" id="cliPaginacao">'+gerarPaginacao(cliPage,totalPages)+'</div><div class="page-info">'+(inicio+1)+'–'+ate+' de '+totalRegistros+'</div>':'<div class="empty-state"><i data-lucide="user-round" width="48" height="48"></i><p>Nenhum cliente encontrado</p></div>');renderCards('cliCards',paginado,hoje);var selPlano=document.getElementById('cliFiltroPlano');var selServ=document.getElementById('cliFiltroServidor');if(selPlano)selPlano.addEventListener('change',function(){cliFilterPlano=this.value||null;cliPage=1;render('clientes');});if(selServ)selServ.addEventListener('change',function(){cliFilterServidor=this.value||null;cliPage=1;render('clientes');});var inp=document.getElementById('cliSearch');var snapshot=paginado.slice();var baseCompleta=list.slice();if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var filtrados=q?baseCompleta.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q));}):baseCompleta;var tp=Math.ceil(filtrados.length/ITENS_POR_PAGINA);var pg=1;var ini=(pg-1)*ITENS_POR_PAGINA;var pag=filtrados.slice(ini,ini+ITENS_POR_PAGINA);var at=Math.min(ini+ITENS_POR_PAGINA,filtrados.length);renderCards('cliCards',pag,hoje);var pagDiv=document.getElementById('cliPaginacao');if(pagDiv)pagDiv.innerHTML=gerarPaginacao(pg,tp);var infoDiv=document.querySelector('.page-info');if(infoDiv)infoDiv.textContent=(filtrados.length>0?(ini+1)+'–'+at+' de '+filtrados.length:'0 resultados');});var pagDiv=document.getElementById('cliPaginacao');if(pagDiv){pagDiv.querySelectorAll('.page-btn').forEach(function(btn){btn.addEventListener('click',function(){var p=parseInt(this.dataset.page);if(!isNaN(p)){cliPage=p;render('clientes');}});});}}
 function gerarPaginacao(pagAtual,totalPages){if(totalPages<=1)return'';var html='';html+='<button class="page-btn" data-page="'+(pagAtual-1)+'"'+(pagAtual===1?' disabled':'')+'>‹</button>';var paginas=[];if(totalPages<=7){for(var i=1;i<=totalPages;i++)paginas.push(i);}else{paginas.push(1);if(pagAtual>3)paginas.push('...');var inicio=Math.max(2,pagAtual-1);var fim=Math.min(totalPages-1,pagAtual+1);for(var i=inicio;i<=fim;i++)paginas.push(i);if(pagAtual<totalPages-2)paginas.push('...');paginas.push(totalPages);}paginas.forEach(function(p){if(p==='...')html+='<span class="page-btn" style="border:none;background:none;pointer-events:none">…</span>';else html+='<button class="page-btn'+(p===pagAtual?' active':'')+'" data-page="'+p+'">'+p+'</button>';});html+='<button class="page-btn" data-page="'+(pagAtual+1)+'"'+(pagAtual===totalPages?' disabled':'')+'>›</button>';return html;}
-function renderCards(containerId,list,hoje){var cont=document.getElementById(containerId);if(!cont)return;if(list.length===0){cont.innerHTML='<div class="empty-state"><i data-lucide="user-round" width="48" height="48"></i><p>Nenhum cliente encontrado</p></div>';icons();return;}var sorted=list.slice().sort(function(a,b){return a.vencimento.localeCompare(b.vencimento);});cont.innerHTML=sorted.map(function(c,i){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};var servidoresIds=c.servidoresIds||(c.servidorId?[c.servidorId]:[]);var servsNomes=servidoresIds.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(', ');var ini=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0;});var iniTxt=(ini.length>=2?ini[0][0]+ini[ini.length-1][0]:(ini[0]||'?').substring(0,2)).toUpperCase();var badge=c.vencimento<hoje?'<span class="badge badge-exp">Vencido</span>':c.vencimento===hoje?'<span class="badge badge-today">Hoje</span>':'<span class="badge badge-ok">Ativo</span>';var valor=((plano.valor||0)-(c.desconto||0));var cid=esc(c.id);var temNota=(c.anotacoes&&c.anotacoes.trim())?' nota-destaque':'';return'<div class="client-card" style="animation-delay:'+(i*0.035)+'s"><div class="client-card-header"><div class="avatar">'+iniTxt+'</div><div style="flex:1;min-width:0"><div class="client-name">'+esc(c.nome)+'</div><div class="client-sub">'+esc(plano.nome||'Sem plano')+' · '+(servsNomes||'Sem servidor')+'</div></div>'+badge+'</div><div class="client-footer"><span>📅 '+fmtDate(c.vencimento)+'</span><span>R$ '+fmt(valor)+'</span></div><div class="client-actions">'+(c.whatsapp?'<button class="action-btn" onclick="window._wp(\''+cid+'\')"><i data-lucide="message-circle" width="13" height="13"></i>WhatsApp</button>':'')+'<button class="action-btn" onclick="window._renovar(\''+cid+'\')"><i data-lucide="rotate-cw" width="13" height="13"></i>Renovar</button><button class="action-btn'+temNota+'" onclick="window._nota(\''+cid+'\')"><i data-lucide="file-text" width="13" height="13"></i>Nota</button><button class="action-btn" onclick="window._editar(\''+cid+'\')"><i data-lucide="pencil" width="13" height="13"></i>Editar</button><button class="action-btn" onclick="window._excluir(\''+cid+'\')"><i data-lucide="trash-2" width="13" height="13"></i></button></div></div>';}).join('');icons();}
+function renderCards(containerId,list,hoje){var cont=document.getElementById(containerId);if(!cont)return;if(list.length===0){cont.innerHTML='<div class="empty-state"><i data-lucide="user-round" width="48" height="48"></i><p>Nenhum cliente encontrado</p></div>';icons();return;}var sorted=list.slice().sort(function(a,b){return a.vencimento.localeCompare(b.vencimento);});cont.innerHTML=sorted.map(function(c,i){var plano=db.planos.find(function(p){return p.id===c.planoId;})||{};var servidoresIds=c.servidoresIds||(c.servidorId?[c.servidorId]:[]);var servsNomes=servidoresIds.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?s.nome:'';}).filter(Boolean).join(', ');var ini=(c.nome||'?').trim().split(' ').filter(function(n){return n.length>0;});var iniTxt=(ini.length>=2?ini[0][0]+ini[ini.length-1][0]:(ini[0]||'?').substring(0,2)).toUpperCase();var badge=c.vencimento<hoje?'<span class="badge badge-exp">Vencido</span>':c.vencimento===hoje?'<span class="badge badge-today">Hoje</span>':'<span class="badge badge-ok">Ativo</span>';var valor=((plano.valor||0)-(c.desconto||0));var cid=esc(c.id);var temNota=(c.anotacoes&&c.anotacoes.trim())?' nota-destaque':'';return'<div class="client-card"><div class="client-card-header"><div class="avatar">'+iniTxt+'</div><div style="flex:1;min-width:0"><div class="client-name">'+esc(c.nome)+'</div><div class="client-sub">'+esc(plano.nome||'Sem plano')+' · '+(servsNomes||'Sem servidor')+'</div></div>'+badge+'</div><div class="client-footer"><span>📅 '+fmtDate(c.vencimento)+'</span><span>R$ '+fmt(valor)+'</span></div><div class="client-actions">'+(c.whatsapp?'<button class="action-btn" onclick="window._wp(\''+cid+'\')"><i data-lucide="message-circle" width="13" height="13"></i>WhatsApp</button>':'')+'<button class="action-btn" onclick="window._renovar(\''+cid+'\')"><i data-lucide="rotate-cw" width="13" height="13"></i>Renovar</button><button class="action-btn'+temNota+'" onclick="window._nota(\''+cid+'\')"><i data-lucide="file-text" width="13" height="13"></i>Nota</button><button class="action-btn" onclick="window._editar(\''+cid+'\')"><i data-lucide="pencil" width="13" height="13"></i>Editar</button><button class="action-btn" onclick="window._excluir(\''+cid+'\')"><i data-lucide="trash-2" width="13" height="13"></i></button></div></div>';}).join('');icons();}
 
 function renderPlanos(mc){var html='';if(db.planos.length===0){html='<div class="empty-state"><i data-lucide="layers" width="48" height="48"></i><p>Nenhum plano cadastrado</p></div>';}else{db.planos.forEach(function(p){var count=db.clientes.filter(function(c){return c.planoId===p.id;}).length;html+='<div class="list-item"><div><div class="list-item-main">'+esc(p.nome)+'</div><div class="list-item-sub">R$ '+fmt(p.valor)+(count>0?' · '+count+' cliente'+(count>1?'s':'')+' vinculado'+(count>1?'s':'')+'':'')+'</div></div><div class="list-item-actions"><button class="icon-btn" onclick="window._editPlano(\''+p.id+'\')"><i data-lucide="pencil" width="15" height="15"></i></button><button class="icon-btn" onclick="window._delPlano(\''+p.id+'\')"><i data-lucide="trash-2" width="15" height="15"></i></button></div></div>';});}mc.innerHTML=html;}
 function renderServidores(mc){var html='';if(db.servidores.length===0){html='<div class="empty-state"><i data-lucide="server" width="48" height="48"></i><p>Nenhum servidor cadastrado</p></div>';}else{db.servidores.forEach(function(s){var count=db.clientes.filter(function(c){return (c.servidoresIds&&c.servidoresIds.includes(s.id))||c.servidorId===s.id;}).length;html+='<div class="list-item"><div><div class="list-item-main">'+esc(s.nome)+'</div><div class="list-item-sub">'+(s.valor?'Custo: R$ '+fmt(s.valor):'Sem custo')+(count>0?' · '+count+' cliente'+(count>1?'s':'')+' vinculado'+(count>1?'s':'')+'':'')+'</div></div><div class="list-item-actions"><button class="icon-btn" onclick="window._editServ(\''+s.id+'\')"><i data-lucide="pencil" width="15" height="15"></i></button><button class="icon-btn" onclick="window._delServ(\''+s.id+'\')"><i data-lucide="trash-2" width="15" height="15"></i></button></div></div>';});}mc.innerHTML=html;}
@@ -789,6 +962,7 @@ function renderFinancas(mc){
   var entA=sumTrans('entrada',mant),saiA=sumTrans('saida',mant),lucA=entA-saiA;
   var cresc=lucA!==0?((luc-lucA)/Math.abs(lucA)*100):(luc>0?100:0);
   var crescTxt=(cresc>=0?'+':'')+cresc.toFixed(1)+'%';
+  var crescClasse=cresc>=0?'positive':'negative';
   
   var agrupado={};
   db.transacoes.slice().sort(function(a,b){if(a.data>b.data)return -1;if(a.data<b.data)return 1;return 0;}).forEach(function(t){
@@ -831,11 +1005,60 @@ function renderFinancas(mc){
   
   if(!transHtml) transHtml='<p style="color:var(--text3);font-size:.85rem;padding:12px 0;">Nenhuma transação</p>';
   
-  mc.innerHTML='<div class="finance-stat-row">'+finStat('Entradas','R$ '+fmt(ent),'var(--accent)')+finStat('Saídas','R$ '+fmt(sai),'var(--danger)')+finStat('Lucro','R$ '+fmt(luc),luc>=0?'var(--success)':'var(--danger)')+'</div><div class="card" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><div style="font-size:.8rem;font-weight:700;color:var(--text3);">vs mês anterior</div><div style="font-size:.85rem;font-weight:700;color:'+(cresc>=0?'var(--success)':'var(--danger)')+';">'+crescTxt+'</div></div><div style="position:relative;height:170px;"><canvas id="finChart"></canvas></div></div><div class="card" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-weight:700;">Transações Recentes</div><button onclick="window._addTrans()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;"><i data-lucide="plus" width="12" height="12"></i>Adicionar</button></div>'+transHtml+'</div><div style="display:flex;gap:8px;"><button class="btn btn-danger btn-full" onclick="window._resetFin()"><i data-lucide="trash-2" width="15" height="15"></i>Resetar Financeiro</button></div>';
+  mc.innerHTML='<div class="finance-stat-row">'+finStat('Entradas','R$ '+fmt(ent),'var(--accent)')+finStat('Saídas','R$ '+fmt(sai),'var(--danger)')+finStat('Lucro','R$ '+fmt(luc),luc>=0?'var(--success)':'var(--danger)')+'</div><div class="card finance-chart-card" style="margin-bottom:12px;"><div class="finance-chart-head"><div><div class="finance-chart-title">Gráfico financeiro</div><div class="finance-chart-sub">Entradas, saídas e lucro</div></div><div class="finance-growth '+crescClasse+'"><span>vs mês anterior</span><strong>'+crescTxt+'</strong></div></div><div class="finance-chart-wrap"><canvas id="finChart"></canvas></div></div><div class="card" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-weight:700;">Transações Recentes</div><button onclick="window._addTrans()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;"><i data-lucide="plus" width="12" height="12"></i>Adicionar</button></div>'+transHtml+'</div><div style="display:flex;gap:8px;"><button class="btn btn-danger btn-full" onclick="window._resetFin()"><i data-lucide="trash-2" width="15" height="15"></i>Resetar Financeiro</button></div>';
   icons();
   renderChart();
 }
-function renderChart(){setTimeout(function(){var ctx=document.getElementById('finChart');if(!ctx||!window.Chart)return;if(chartInst){try{chartInst.destroy();}catch(e){}chartInst=null;}var labels=[],ents=[],sais=[],lucs=[];for(var i=5;i>=0;i--){var ms=monthStr(-i);var d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);var lbl=d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'});var e=sumTrans('entrada',ms),s=sumTrans('saida',ms);labels.push(lbl);ents.push(e);sais.push(s);lucs.push(e-s);}var gridColor=darkMode?'rgba(255,255,255,.07)':'rgba(0,0,0,.06)';var textColor=darkMode?'#94A3B8':'#718096';chartInst=new Chart(ctx,{type:'bar',data:{labels:labels,datasets:[{label:'Entradas',data:ents,backgroundColor:'#0288D1',borderRadius:5,borderSkipped:false},{label:'Saídas',data:sais,backgroundColor:'#EF5350',borderRadius:5,borderSkipped:false},{label:'Lucro',data:lucs,backgroundColor:'#43A047',borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:textColor,font:{size:10},boxWidth:10}}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:9}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:9},callback:function(v){return'R$'+v;}}}}}});},80);}
+
+// ========== FUNÇÃO RENDERCHART ORIGINAL MODIFICADA ==========
+// Barras mais finas (barPercentage: 0.65) e labels apenas com mês (jan, fev, mar...)
+function renderChart(){setTimeout(function(){
+  var ctx=document.getElementById('finChart');if(!ctx||!window.Chart)return;
+  var labels=[],ents=[],sais=[],lucs=[];
+  var mesesAbreviados = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  for(var i=5;i>=0;i--){
+    var ms=monthStr(-i);
+    var d=new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth()-i);
+    var lbl = mesesAbreviados[d.getMonth()];
+    var e=sumTrans('entrada',ms),s=sumTrans('saida',ms);
+    labels.push(lbl);
+    ents.push(e);
+    sais.push(s);
+    lucs.push(e-s);
+  }
+  var newKey=JSON.stringify(ents)+JSON.stringify(sais);
+  if(chartInst&&chartDataKey===newKey){return;}
+  chartDataKey=newKey;
+  if(chartInst){try{chartInst.destroy();}catch(e){}chartInst=null;}
+  var gridColor=darkMode?'rgba(255,255,255,.07)':'rgba(0,0,0,.06)';
+  var textColor=darkMode?'#94A3B8':'#718096';
+  chartInst=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:labels,
+      datasets:[
+        {label:'Entradas',data:ents,backgroundColor:'#0288D1',borderRadius:5,borderSkipped:false},
+        {label:'Saídas',data:sais,backgroundColor:'#EF5350',borderRadius:5,borderSkipped:false},
+        {label:'Lucro',data:lucs,backgroundColor:'#43A047',borderRadius:5,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{color:textColor,font:{size:10},boxWidth:10}}
+      },
+      scales:{
+        x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:9}}},
+        y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:9},callback:function(v){return'R$'+v;}}}
+      },
+      barPercentage:0.65,
+      categoryPercentage:0.8
+    }
+  });
+},80);}
 
 function showModal(id,title,body,actions){closeModal(id);var el=document.createElement('div');el.className='modal-overlay';el.id='mo_'+id;el.innerHTML='<div class="modal"><div class="modal-handle"></div><div class="modal-title">'+title+'</div>'+body+'<div class="modal-actions">'+actions+'</div></div>';document.body.appendChild(el);el.addEventListener('click',function(e){if(e.target===el)closeModal(id);});icons();return el;}
 function closeModal(id){var el=document.getElementById('mo_'+id);if(el)el.remove();}
@@ -1140,7 +1363,23 @@ function applyDark(){document.documentElement.setAttribute('data-theme',darkMode
 
 window._filter=function(f){if(cliFilterDash===f){cliFilterDash=null;}else{cliFilterDash=f;}render('dashboard');};
 window._clearFilter=function(){navigateTo('clientes');};
-window._toggleLucro=function(){lucroOculto=!lucroOculto;localStorage.setItem('ow_lucroOc',lucroOculto?'1':'0');render('dashboard');};
+window._toggleLucro=function(){
+  lucroOculto=!lucroOculto;
+  localStorage.setItem('ow_lucroOc',lucroOculto?'1':'0');
+  var valEl=document.getElementById('lucroVal');
+  if(valEl){
+    var hoje=today(),mesAtual=hoje.slice(0,7);
+    var ent=sumTrans('entrada',mesAtual),sai=sumTrans('saida',mesAtual),lucro=ent-sai;
+    valEl.style.opacity='0';
+    setTimeout(function(){
+      valEl.textContent=lucroOculto?'••••••':'R$ '+fmt(lucro);
+      valEl.className='lucro-value'+(lucroOculto?' oculto':'');
+      valEl.style.opacity='';
+      var eyeEl=document.querySelector('.lucro-eye [data-lucide]');
+      if(eyeEl){eyeEl.setAttribute('data-lucide',lucroOculto?'eye-off':'eye');icons();}
+    },120);
+  }
+};
 window._addTrans=function(){modalTrans();};
 window._resetFin=function(){confirmModal('Resetar Financeiro?','Todas as transações serão apagadas.',function(){db.transacoes=[];addLog('Financeiro resetado');saveDB();render('financas');toast('Financeiro resetado','success');});};
 window._closeModal=function(id){closeModal(id);};
@@ -1199,13 +1438,23 @@ document.getElementById('btnCompartilhar').addEventListener('click',function(){
     +'</div></div>';
   document.body.appendChild(overlay);
   document.getElementById('btnCopyShare').onclick=function(){
-    var ta=document.createElement('textarea');
-    ta.value=msg;ta.style.position='fixed';ta.style.opacity='0';
-    document.body.appendChild(ta);ta.focus();ta.select();
-    try{document.execCommand('copy');}catch(e){}
-    document.body.removeChild(ta);
-    overlay.remove();
-    toast('Link copiado!','success');
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(msg).then(function(){
+        overlay.remove();
+        toast('Link copiado!','success');
+      }).catch(function(){
+        overlay.remove();
+        toast('Não foi possível copiar','error');
+      });
+    }else{
+      var ta=document.createElement('textarea');
+      ta.value=msg;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.focus();ta.select();
+      try{document.execCommand('copy');}catch(e){}
+      document.body.removeChild(ta);
+      overlay.remove();
+      toast('Link copiado!','success');
+    }
   };
   document.getElementById('btnCancelShare').onclick=function(){overlay.remove();};
 });
@@ -1214,6 +1463,7 @@ document.getElementById('btnMensagens').addEventListener('click',function(){clos
 document.getElementById('btnLogout').addEventListener('click',function(){closeSidebar();logout();});
 
 initApp();
+setTimeout(hideSplash,1600);
 })();
 </script>
 </body>
