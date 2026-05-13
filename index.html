@@ -71,7 +71,7 @@ if('serviceWorker' in navigator){
       --border:#334155; 
       --text:#F1F5F9; 
       --text2:#94A3B8; 
-      --text3:#64748B; 
+      --text3:#8899A6; 
       --accent-light:#1E3A5F; 
       --shadow:0 2px 12px rgba(0,0,0,.3);
       
@@ -227,6 +227,7 @@ if('serviceWorker' in navigator){
     .client-actions{display:flex;gap:5px;margin-top:10px}
     .action-btn{display:flex;align-items:center;justify-content:center;gap:4px;padding:7px 6px;border-radius:var(--radius-sm);border:1px solid var(--border);background:none;color:var(--text2);font-size:.65rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap}
     .action-btn:active{background:var(--surface2)}
+    [data-theme="dark"] .action-btn{border-color:#4A5568;}
     .action-btn.nota-destaque{border-color:#EF5350;background:var(--danger-bg);color:var(--danger);font-weight:700}
     [data-theme="dark"] .action-btn.nota-destaque{background:rgba(198,40,40,.15);border-color:#EF5350;color:#EF5350}
     
