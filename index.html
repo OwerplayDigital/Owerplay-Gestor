@@ -673,7 +673,7 @@ var darkMode=false;var lucroOculto=true;var chartInst=null;var chartDataKey=null
 var ITENS_POR_PAGINA=25;
 var metaMensal = { valor: 5000 };
 
-function today(){var d=new Date();d.setHours(d.getHours()-3);return d.toISOString().split('T')[0];}
+function today(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo'}).format(new Date());}
 function monthStr(offset){var d=new Date();d.setDate(1);d.setMonth(d.getMonth()+(offset||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
 function sumTrans(tipo,prefix){return db.transacoes.filter(function(t){return t.tipo===tipo&&t.data&&t.data.startsWith(prefix);}).reduce(function(s,t){return s+t.valor;},0);}
 function fmt(n){return(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -1006,7 +1006,6 @@ function renderFinancas(mc){
   if(!transHtml) transHtml='<p style="color:var(--text3);font-size:.85rem;padding:12px 0;">Nenhuma transação</p>';
   
   mc.innerHTML='<div class="finance-stat-row">'+finStat('Entradas','R$ '+fmt(ent),'var(--accent)')+finStat('Saídas','R$ '+fmt(sai),'var(--danger)')+finStat('Lucro','R$ '+fmt(luc),luc>=0?'var(--success)':'var(--danger)')+'</div><div class="card finance-chart-card" style="margin-bottom:12px;"><div class="finance-chart-head"><div><div class="finance-chart-title">Gráfico financeiro</div><div class="finance-chart-sub">Entradas, saídas e lucro</div></div><div class="finance-growth '+crescClasse+'"><span>vs mês anterior</span><strong>'+crescTxt+'</strong></div></div><div class="finance-chart-wrap"><canvas id="finChart"></canvas></div></div><div class="card" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-weight:700;">Transações Recentes</div><button onclick="window._addTrans()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;"><i data-lucide="plus" width="12" height="12"></i>Adicionar</button></div>'+transHtml+'</div><div style="display:flex;gap:8px;"><button class="btn btn-danger btn-full" onclick="window._resetFin()"><i data-lucide="trash-2" width="15" height="15"></i>Resetar Financeiro</button></div>';
-  icons();
   renderChart();
 }
 
@@ -1060,7 +1059,7 @@ function renderChart(){setTimeout(function(){
   });
 },80);}
 
-function showModal(id,title,body,actions){closeModal(id);var el=document.createElement('div');el.className='modal-overlay';el.id='mo_'+id;el.innerHTML='<div class="modal"><div class="modal-handle"></div><div class="modal-title">'+title+'</div>'+body+'<div class="modal-actions">'+actions+'</div></div>';document.body.appendChild(el);el.addEventListener('click',function(e){if(e.target===el)closeModal(id);});icons();return el;}
+function showModal(id,title,body,actions){closeModal(id);var el=document.createElement('div');el.className='modal-overlay';el.id='mo_'+id;el.innerHTML='<div class="modal"><div class="modal-handle"></div><div class="modal-title">'+title+'</div>'+body+'<div class="modal-actions">'+actions+'</div></div>';document.body.appendChild(el);el.addEventListener('click',function(e){if(e.target===el)closeModal(id);});icons(el);return el;}
 function closeModal(id){var el=document.getElementById('mo_'+id);if(el)el.remove();}
 function confirmModal(title,msg,onConfirm){var el=showModal('confirm',title,'<p style="color:var(--text2);font-size:.9rem;margin-bottom:0;">'+msg+'</p>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'confirm\')">Cancelar</button><button class="btn btn-danger btn-full" id="confirmOk">Confirmar</button>');document.getElementById('confirmOk').addEventListener('click',function(){closeModal('confirm');onConfirm();});}
 
