@@ -632,12 +632,6 @@ if('serviceWorker' in navigator){
 <button class="sidebar-item" id="btnMensagens"><i data-lucide="message-square" height="17" width="17"></i> Mensagens WhatsApp</button>
 <button class="sidebar-item" id="btnDarkMode"><i data-lucide="moon" height="17" width="17"></i> <span id="darkModeLabel">Modo Escuro</span></button>
 </div>
-<!-- Backup manual -->
-<div class="sidebar-divider"></div>
-<div class="sidebar-section"><div class="sidebar-section-label">Backup</div>
-<button class="sidebar-item" id="btnExportBackup"><i data-lucide="download" height="17" width="17"></i> Exportar Backup</button>
-<button class="sidebar-item" id="btnImportBackup"><i data-lucide="upload" height="17" width="17"></i> Importar Backup</button>
-</div>
 <div class="sidebar-divider"></div>
 <div class="sidebar-section"><div class="sidebar-section-label">Ferramentas</div>
 <button class="sidebar-item" id="btnMetaMensal"><i data-lucide="target" height="17" width="17"></i> Meta Mensal</button>
@@ -959,7 +953,6 @@ function obterListaFiltrada(){
       return c.servidorId === cliFilterServidor;
     });
   }
-  // Ordenação original: por vencimento (sem opção de mudança)
   list.sort(function(a,b){ return a.vencimento.localeCompare(b.vencimento); });
   return list;
 }
@@ -1148,7 +1141,7 @@ function modalCliente(id){
     var modalEl=showModal('servidoresModal','🖥️ Selecionar Servidores','<div style="max-height:50vh;overflow-y:auto;">'+checks+'</div>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'servidoresModal\')">Cancelar</button><button class="btn btn-primary btn-full" id="servModalOk">OK</button>');
     document.getElementById('servModalOk').addEventListener('click',function(){servidoresSelecionados=[];document.querySelectorAll('.modalServCheck:checked').forEach(function(chk){servidoresSelecionados.push(chk.value);});closeModal('servidoresModal');atualizarBotao();});
   });
-  // Máscara de WhatsApp (melhoria)
+  // Máscara de WhatsApp
   var waInput = document.getElementById('cliWa');
   if(waInput) {
     waInput.addEventListener('input', function(e) {
@@ -1424,42 +1417,6 @@ function autoSincTrans(){
 }
 function addLog(msg){db.log.unshift({msg:msg,ts:new Date().toLocaleString('pt-BR')});if(db.log.length>80)db.log.pop();}
 function applyDark(){document.documentElement.setAttribute('data-theme',darkMode?'dark':'light');localStorage.setItem('ow_dark',darkMode?'1':'0');var el=document.getElementById('darkModeLabel');if(el)el.textContent=darkMode?'Modo Claro':'Modo Escuro';}
-
-// Backup manual (melhoria)
-function exportarBackup() {
-  const dados = JSON.stringify(db, null, 2);
-  const blob = new Blob([dados], {type: 'application/json'});
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `owerplay_backup_${new Date().toISOString().slice(0,19)}.json`;
-  link.click();
-  toast('Backup exportado!', 'success');
-}
-function importarBackup(file) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const novoDb = JSON.parse(e.target.result);
-      if (novoDb.clientes && novoDb.planos && novoDb.transacoes && novoDb.servidores && novoDb.lembretes && novoDb.templates) {
-        Object.assign(db, novoDb);
-        saveDB();
-        toast('Backup restaurado com sucesso!', 'success');
-        render(currentSec);
-      } else throw new Error('Estrutura inválida');
-    } catch (err) { toast('Arquivo inválido ou corrompido', 'error'); }
-  };
-  reader.readAsText(file);
-}
-// Eventos backup
-document.getElementById('btnExportBackup').addEventListener('click', function(){ closeSidebar(); exportarBackup(); });
-document.getElementById('btnImportBackup').addEventListener('click', function(){
-  closeSidebar();
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'application/json';
-  input.onchange = e => { if(e.target.files[0]) importarBackup(e.target.files[0]); };
-  input.click();
-});
 
 window._filter=function(f){if(cliFilterDash===f){cliFilterDash=null;}else{cliFilterDash=f;}render('dashboard');};
 window._clearFilter=function(){navigateTo('clientes');};
