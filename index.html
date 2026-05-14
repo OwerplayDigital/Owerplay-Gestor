@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html data-theme="light" lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
@@ -26,36 +25,36 @@ if('serviceWorker' in navigator){
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
     .lucro-eye {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: transparent;
-  border: none;
-  color: #fff;
-  opacity: 0.7;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  font-size: 1.2rem;
-  padding: 0;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  z-index: 10;
-  -webkit-touch-callout: none;
-  user-select: none;
-}
-.client-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 12px;
-  margin-bottom: 10px;
-  box-shadow: var(--shadow);
-}
-:root {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      opacity: 0.7;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      font-size: 1.2rem;
+      padding: 0;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 10;
+      -webkit-touch-callout: none;
+      user-select: none;
+    }
+    .client-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+    }
+    :root {
       --accent:       #0288D1; --accent-light: #E1F5FE; --accent-dark:  #01579B;
       --success:      #2E7D32; --success-bg:   #E8F5E9; --warning:      #E65100;
       --warning-bg:   #FFF3E0; --danger:       #C62828; --danger-bg:    #FFEBEE;
@@ -74,10 +73,12 @@ if('serviceWorker' in navigator){
       --text3:#8899A6; 
       --accent-light:#1E3A5F; 
       --shadow:0 2px 12px rgba(0,0,0,.3);
-      
-      /* CORREÇÕES PARA O MODO ESCURO - TOPBAR E BOTTOM NAV */
       --topbar-bg: rgba(15, 23, 42, 0.85);
       --bottom-nav-bg: rgba(15, 23, 42, 0.88);
+    }
+    /* MELHORIA: Gradiente mais vibrante no modo escuro para o card de lucro */
+    [data-theme="dark"] .lucro-card {
+      background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%) !important;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{background:#000;color-scheme:light}
@@ -259,7 +260,8 @@ if('serviceWorker' in navigator){
     .page-btn:disabled{opacity:.4;pointer-events:none}
     .page-info{font-size:.72rem;color:var(--text3);margin-top:6px;text-align:center}
     
-    #toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--surface);color:var(--text);padding:14px 18px;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.15);font-size:.85rem;font-weight:600;z-index:9999;opacity:0;transition:all .35s cubic-bezier(.175,.885,.32,1.275);white-space:nowrap;pointer-events:none;display:flex;align-items:center;gap:12px;border-left:4px solid var(--border);max-width:90vw}
+    /* TOAST CORRIGIDO: white-space normal */
+    #toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--surface);color:var(--text);padding:14px 18px;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.15);font-size:.85rem;font-weight:600;z-index:9999;opacity:0;transition:all .35s cubic-bezier(.175,.885,.32,1.275);pointer-events:none;display:flex;align-items:center;gap:12px;border-left:4px solid var(--border);max-width:90vw;white-space:normal;word-break:break-word}
     [data-theme="dark"] #toast{box-shadow:0 8px 32px rgba(0,0,0,.4)}
     #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700}
@@ -630,6 +632,12 @@ if('serviceWorker' in navigator){
 <button class="sidebar-item" id="btnMensagens"><i data-lucide="message-square" height="17" width="17"></i> Mensagens WhatsApp</button>
 <button class="sidebar-item" id="btnDarkMode"><i data-lucide="moon" height="17" width="17"></i> <span id="darkModeLabel">Modo Escuro</span></button>
 </div>
+<!-- Backup manual -->
+<div class="sidebar-divider"></div>
+<div class="sidebar-section"><div class="sidebar-section-label">Backup</div>
+<button class="sidebar-item" id="btnExportBackup"><i data-lucide="download" height="17" width="17"></i> Exportar Backup</button>
+<button class="sidebar-item" id="btnImportBackup"><i data-lucide="upload" height="17" width="17"></i> Importar Backup</button>
+</div>
 <div class="sidebar-divider"></div>
 <div class="sidebar-section"><div class="sidebar-section-label">Ferramentas</div>
 <button class="sidebar-item" id="btnMetaMensal"><i data-lucide="target" height="17" width="17"></i> Meta Mensal</button>
@@ -729,13 +737,10 @@ function iniciarNotificacoes(){
 
 function verificarNotificacoes(){
   if(Notification.permission!=='granted') return;
-
   var hoje=today();
-
   var vencendoHoje=db.clientes.filter(function(c){
     return c.vencimento===hoje;
   });
-
   if(vencendoHoje.length){
     new Notification('Owerplay Gestor',{
       body:vencendoHoje.length+' cliente(s) vencem hoje.',
@@ -756,32 +761,23 @@ function logout(){supabase.auth.signOut();}
 async function carregarDados(){var uid=currentUser.id;var resp=await supabase.from('backups').select('dados').eq('token',uid).maybeSingle();if(resp.data&&resp.data.dados){db=Object.assign(db,resp.data.dados);if(!db.templates)db.templates=Object.assign({},DEFAULT_TEMPLATES);if(!db.lembretes)db.lembretes=[];saveLocal();return;}var local=localStorage.getItem(STORAGE_KEY+'_'+uid);if(local){try{var parsed=JSON.parse(local);db=Object.assign(db,parsed);if(!db.templates)db.templates=Object.assign({},DEFAULT_TEMPLATES);if(!db.lembretes)db.lembretes=[];}catch(e){}}}
 function saveLocal(){if(!currentUser)return;try{localStorage.setItem(STORAGE_KEY+'_'+currentUser.id,JSON.stringify(db));}catch(e){}}
 function salvarNuvem(){
-
 if(!currentUser)return;
-
 var sync=document.getElementById('syncStatus');
-
 if(sync){
 sync.innerHTML='🟡 Salvando...';
 }
-
 saveLocal();
-
 supabase.from('backups').upsert(
 {token:currentUser.id,dados:db},
 {onConflict:'token'}
 ).then(function(res){
-
 if(sync){
 sync.innerHTML=res.error
 ?'🔴 Erro ao sincronizar'
 :'🟢 Sincronizado';
 }
-
 });
-
 }
-
 function saveDB(){saveLocal();salvarNuvem();}
 
 function loginAction(isCadastro){var email=document.getElementById('loginEmail').value.trim();var pass=document.getElementById('loginPass').value.trim();if(!email||!email.includes('@')){toast('Digite um e-mail válido','warning');return;}if(!pass||pass.length<6){toast('Senha deve ter 6+ caracteres','warning');return;}if(isCadastro){var pass2=document.getElementById('loginPass2').value.trim();if(pass!==pass2){toast('Senhas não conferem','error');return;}supabase.auth.signUp({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else{toast('Conta criada! Faça login.','success');renderLogin('login');}});}else{supabase.auth.signInWithPassword({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else toast('Login feito!','success');});}}
@@ -955,26 +951,22 @@ function obterListaFiltrada(){
   if(cliFilter==='expired') list=list.filter(function(c){ return c.vencimento<hoje; });
   if(cliFilter==='today') list=list.filter(function(c){ return c.vencimento===hoje; });
   if(cliFilterPlano) list=list.filter(function(c){ return c.planoId===cliFilterPlano; });
-  
-  // CORREÇÃO: filtro por servidor - verifica se o servidor está em servidoresIds OU no antigo servidorId
   if(cliFilterServidor){
     list=list.filter(function(c){
-      // Se tiver servidoresIds (array moderno)
       if(c.servidoresIds && Array.isArray(c.servidoresIds)){
         return c.servidoresIds.includes(cliFilterServidor);
       }
-      // Fallback para campo antigo servidorId
       return c.servidorId === cliFilterServidor;
     });
   }
+  // Ordenação original: por vencimento (sem opção de mudança)
+  list.sort(function(a,b){ return a.vencimento.localeCompare(b.vencimento); });
   return list;
 }
 
 function renderClientes(mc){
   var hoje=today();
   var list=obterListaFiltrada();
-  // ORDENAÇÃO GLOBAL por vencimento (do mais antigo para o mais novo)
-  list.sort(function(a,b){ return a.vencimento.localeCompare(b.vencimento); });
   var totalRegistros=list.length;
   var totalPages=Math.ceil(totalRegistros/ITENS_POR_PAGINA);
   if(cliPage>totalPages)cliPage=1;
@@ -1088,8 +1080,6 @@ function renderFinancas(mc){
   renderChart();
 }
 
-// ========== FUNÇÃO RENDERCHART ORIGINAL MODIFICADA ==========
-// Barras mais finas (barPercentage: 0.65) e labels apenas com mês (jan, fev, mar...)
 function renderChart(){setTimeout(function(){
   var ctx=document.getElementById('finChart');if(!ctx||!window.Chart)return;
   var labels=[],ents=[],sais=[],lucs=[];
@@ -1150,7 +1140,7 @@ function modalCliente(id){
   var servidoresSelecionados=c?c.servidoresIds||(c.servidorId?[c.servidorId]:[]):[];
   function getServsNomes(){return servidoresSelecionados.map(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});return s?esc(s.nome):'';}).filter(Boolean).join(', ')||'Nenhum';}
   function getServsCusto(){return servidoresSelecionados.reduce(function(soma,sid){var s=db.servidores.find(function(x){return x.id===sid;});return soma+(s?s.valor||0:0);},0);}
-  var body='<div class="field"><label class="field-label">Nome *</label><input class="input" id="cliNome" value="'+esc(c?c.nome:'')+'" placeholder="Nome do cliente"></div><div class="field"><label class="field-label">WhatsApp</label><input class="input" id="cliWa" value="'+esc(c?c.whatsapp||'':'')+'" placeholder="55119..." inputmode="numeric"></div><div class="field"><label class="field-label">Vencimento *</label><input type="date" class="input" id="cliVenc" value="'+(c?c.vencimento:'')+'"></div><div class="field"><label class="field-label">Plano</label><select class="input" id="cliPlano"><option value="">Selecione</option>'+planOpts+'</select></div><div class="field"><label class="field-label">Servidores</label><button class="btn btn-ghost btn-full" id="btnSelServidores" style="justify-content:space-between;"><span id="servSelLabel">'+getServsNomes()+'</span><span id="servCustoTotal" style="color:var(--accent);font-size:.78rem;">R$ '+fmt(getServsCusto())+'</span></button></div><div class="field"><label class="field-label">Desconto (R$)</label><input type="number" class="input" id="cliDesc" value="'+(c?c.desconto||'':'')+'" placeholder="0"></div>';
+  var body='<div class="field"><label class="field-label">Nome *</label><input class="input" id="cliNome" value="'+esc(c?c.nome:'')+'" placeholder="Nome do cliente"></div><div class="field"><label class="field-label">WhatsApp</label><input class="input" id="cliWa" value="'+esc(c?c.whatsapp||'':'')+'" placeholder="(11) 99999-9999" inputmode="numeric"></div><div class="field"><label class="field-label">Vencimento *</label><input type="date" class="input" id="cliVenc" value="'+(c?c.vencimento:'')+'"></div><div class="field"><label class="field-label">Plano</label><select class="input" id="cliPlano"><option value="">Selecione</option>'+planOpts+'</select></div><div class="field"><label class="field-label">Servidores</label><button class="btn btn-ghost btn-full" id="btnSelServidores" style="justify-content:space-between;"><span id="servSelLabel">'+getServsNomes()+'</span><span id="servCustoTotal" style="color:var(--accent);font-size:.78rem;">R$ '+fmt(getServsCusto())+'</span></button></div><div class="field"><label class="field-label">Desconto (R$)</label><input type="number" class="input" id="cliDesc" value="'+(c?c.desconto||'':'')+'" placeholder="0"></div>';
   var el=showModal('cli',id?'Editar Cliente':'Novo Cliente',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'cli\')">Cancelar</button><button class="btn btn-primary btn-full" id="cliSave">Salvar</button>');
   function atualizarBotao(){document.getElementById('servSelLabel').textContent=getServsNomes();document.getElementById('servCustoTotal').textContent='R$ '+fmt(getServsCusto());}
   document.getElementById('btnSelServidores').addEventListener('click',function(){
@@ -1158,10 +1148,26 @@ function modalCliente(id){
     var modalEl=showModal('servidoresModal','🖥️ Selecionar Servidores','<div style="max-height:50vh;overflow-y:auto;">'+checks+'</div>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'servidoresModal\')">Cancelar</button><button class="btn btn-primary btn-full" id="servModalOk">OK</button>');
     document.getElementById('servModalOk').addEventListener('click',function(){servidoresSelecionados=[];document.querySelectorAll('.modalServCheck:checked').forEach(function(chk){servidoresSelecionados.push(chk.value);});closeModal('servidoresModal');atualizarBotao();});
   });
+  // Máscara de WhatsApp (melhoria)
+  var waInput = document.getElementById('cliWa');
+  if(waInput) {
+    waInput.addEventListener('input', function(e) {
+      var val = e.target.value.replace(/\D/g, '');
+      if (val.length <= 10) {
+        val = val.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+      } else {
+        val = val.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+      }
+      e.target.value = val;
+    });
+  }
   document.getElementById('cliSave').addEventListener('click',function(){
-    var nome=document.getElementById('cliNome').value.trim();var wa=document.getElementById('cliWa').value.replace(/\D/g,'');var venc=document.getElementById('cliVenc').value;var plano=document.getElementById('cliPlano').value;var desc=parseFloat(document.getElementById('cliDesc').value)||0;
+    var nome=document.getElementById('cliNome').value.trim();
+    var waRaw=document.getElementById('cliWa').value;
+    var wa = waRaw.replace(/\D/g,'');
+    var venc=document.getElementById('cliVenc').value;var plano=document.getElementById('cliPlano').value;var desc=parseFloat(document.getElementById('cliDesc').value)||0;
     if(!nome||!venc){toast('Preencha nome e vencimento','error');return;}
-    if(wa&&(wa.length<10||wa.length>15)){toast('WhatsApp inválido (inclua DDD)','warning');return;}
+    if(wa && (wa.length<10||wa.length>13)){toast('WhatsApp inválido (inclua DDD)','warning');return;}
     var novo={id:id||'c'+Date.now(),nome:nome,whatsapp:wa,vencimento:venc,planoId:plano,servidoresIds:servidoresSelecionados,desconto:desc,anotacoes:c?c.anotacoes||'':'',cadastradoEm:c?c.cadastradoEm||today():today(),renovacoes:c?c.renovacoes||[]:[]};
     if(id){db.clientes=db.clientes.map(function(x){return x.id===id?novo:x;});}else{db.clientes.push(novo);}
     addLog(nome+(id?' atualizado':' cadastrado'));
@@ -1239,9 +1245,9 @@ function modalWhatsApp(id){
     }(key));
   }
 }
-function modalPlano(id){var p=id?db.planos.find(function(x){return x.id===id;}):null;var body='<div class="field"><label class="field-label">Nome do plano *</label><input class="input" id="plNome" value="'+esc(p?p.nome:'')+'" placeholder="Ex: Mensal HD"></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="plValor" value="'+(p?p.valor:'')+'" placeholder="0.00" step="0.01"></div>';var el=showModal('plano',id?'Editar Plano':'Novo Plano',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'plano\')">Cancelar</button><button class="btn btn-primary btn-full" id="plSave">Salvar</button>');document.getElementById('plSave').addEventListener('click',function(){var nome=document.getElementById('plNome').value.trim(),valor=parseFloat(document.getElementById('plValor').value)||0;if(!nome){toast('Informe o nome do plano','error');return;}if(id){db.planos=db.planos.map(function(x){return x.id===id?{id:id,nome:nome,valor:valor}:x;});}else{db.planos.push({id:'p'+Date.now(),nome:nome,valor:valor});}addLog('Plano '+(id?'atualizado':'criado')+': '+nome);saveDB();closeModal('plano');render(currentSec);toast(id?'Plano atualizado!':'Plano criado!','success');});}
-function modalServ(id){var s=id?db.servidores.find(function(x){return x.id===id;}):null;var body='<div class="field"><label class="field-label">Nome do servidor *</label><input class="input" id="servNome" value="'+esc(s?s.nome:'')+'" placeholder="Ex: Servidor Alpha"></div><div class="field"><label class="field-label">Custo mensal (R$)</label><input type="number" class="input" id="servValor" value="'+(s?s.valor||'':'')+'" placeholder="0.00" step="0.01"></div>';var el=showModal('serv',id?'Editar Servidor':'Novo Servidor',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'serv\')">Cancelar</button><button class="btn btn-primary btn-full" id="servSave">Salvar</button>');document.getElementById('servSave').addEventListener('click',function(){var nome=document.getElementById('servNome').value.trim();if(!nome){toast('Informe o nome','error');return;}var sval=parseFloat(document.getElementById('servValor').value)||0;if(id){db.servidores=db.servidores.map(function(x){return x.id===id?{id:id,nome:nome,valor:sval}:x;});}else{db.servidores.push({id:'s'+Date.now(),nome:nome,valor:sval});}addLog('Servidor '+(id?'atualizado':'criado')+': '+nome);saveDB();autoSincTrans();saveDB();closeModal('serv');render(currentSec);toast(id?'Servidor atualizado!':'Servidor criado!','success');});}
-function modalTrans(){var body='<div class="field"><label class="field-label">Tipo</label><select class="input" id="transType"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="transVal" placeholder="0.00" step="0.01"></div><div class="field"><label class="field-label">Descrição</label><input class="input" id="transDesc" placeholder="Ex: Mensalidade extra"></div><div class="field"><label class="field-label">Data</label><input type="date" class="input" id="transData" value="'+today()+'"></div>';showModal('trans','Adicionar Transação',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'trans\')">Cancelar</button><button class="btn btn-primary btn-full" id="transSave">Salvar</button>');document.getElementById('transSave').addEventListener('click',function(){var tipo=document.getElementById('transType').value,val=parseFloat(document.getElementById('transVal').value)||0,desc=document.getElementById('transDesc').value.trim(),data=document.getElementById('transData').value;if(!val||!data){toast('Informe valor e data','error');return;}db.transacoes.push({id:'t'+Date.now()+Math.random().toString(36).slice(2),tipo:tipo,valor:val,data:data,desc:desc});addLog('Transação manual: '+tipo+' R$'+fmt(val));saveDB();closeModal('trans');render('financas');toast('Transação salva!','success');});}
+function modalPlano(id){var p=id?db.planos.find(function(x){return x.id===id;}):null;var body='<div class="field"><label class="field-label">Nome do plano *</label><input class="input" id="plNome" value="'+esc(p?p.nome:'')+'" placeholder="Ex: Mensal HD"></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="plValor" value="'+(p?p.valor:'')+'" placeholder="0.00" step="0.01" inputmode="decimal"></div>';var el=showModal('plano',id?'Editar Plano':'Novo Plano',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'plano\')">Cancelar</button><button class="btn btn-primary btn-full" id="plSave">Salvar</button>');document.getElementById('plSave').addEventListener('click',function(){var nome=document.getElementById('plNome').value.trim(),valor=parseFloat(document.getElementById('plValor').value)||0;if(!nome){toast('Informe o nome do plano','error');return;}if(id){db.planos=db.planos.map(function(x){return x.id===id?{id:id,nome:nome,valor:valor}:x;});}else{db.planos.push({id:'p'+Date.now(),nome:nome,valor:valor});}addLog('Plano '+(id?'atualizado':'criado')+': '+nome);saveDB();closeModal('plano');render(currentSec);toast(id?'Plano atualizado!':'Plano criado!','success');});}
+function modalServ(id){var s=id?db.servidores.find(function(x){return x.id===id;}):null;var body='<div class="field"><label class="field-label">Nome do servidor *</label><input class="input" id="servNome" value="'+esc(s?s.nome:'')+'" placeholder="Ex: Servidor Alpha"></div><div class="field"><label class="field-label">Custo mensal (R$)</label><input type="number" class="input" id="servValor" value="'+(s?s.valor||'':'')+'" placeholder="0.00" step="0.01" inputmode="decimal"></div>';var el=showModal('serv',id?'Editar Servidor':'Novo Servidor',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'serv\')">Cancelar</button><button class="btn btn-primary btn-full" id="servSave">Salvar</button>');document.getElementById('servSave').addEventListener('click',function(){var nome=document.getElementById('servNome').value.trim();if(!nome){toast('Informe o nome','error');return;}var sval=parseFloat(document.getElementById('servValor').value)||0;if(id){db.servidores=db.servidores.map(function(x){return x.id===id?{id:id,nome:nome,valor:sval}:x;});}else{db.servidores.push({id:'s'+Date.now(),nome:nome,valor:sval});}addLog('Servidor '+(id?'atualizado':'criado')+': '+nome);saveDB();autoSincTrans();saveDB();closeModal('serv');render(currentSec);toast(id?'Servidor atualizado!':'Servidor criado!','success');});}
+function modalTrans(){var body='<div class="field"><label class="field-label">Tipo</label><select class="input" id="transType"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="transVal" placeholder="0.00" step="0.01" inputmode="decimal"></div><div class="field"><label class="field-label">Descrição</label><input class="input" id="transDesc" placeholder="Ex: Mensalidade extra"></div><div class="field"><label class="field-label">Data</label><input type="date" class="input" id="transData" value="'+today()+'"></div>';showModal('trans','Adicionar Transação',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'trans\')">Cancelar</button><button class="btn btn-primary btn-full" id="transSave">Salvar</button>');document.getElementById('transSave').addEventListener('click',function(){var tipo=document.getElementById('transType').value,val=parseFloat(document.getElementById('transVal').value)||0,desc=document.getElementById('transDesc').value.trim(),data=document.getElementById('transData').value;if(!val||!data){toast('Informe valor e data','error');return;}db.transacoes.push({id:'t'+Date.now()+Math.random().toString(36).slice(2),tipo:tipo,valor:val,data:data,desc:desc});addLog('Transação manual: '+tipo+' R$'+fmt(val));saveDB();closeModal('trans');render('financas');toast('Transação salva!','success');});}
 
 function modalInadimplencia(){
   var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje;}).sort(function(a,b){return a.vencimento.localeCompare(b.vencimento);});
@@ -1387,26 +1393,6 @@ window._excluirTemplate = function(nome){
     toast('Template excluído!', 'success');
   });
 };
-window._editarTemplate = function(nome){
-  var template = db.templates[nome];
-  if(!template) return;
-  var body = '<div class="field"><label class="field-label">Nome do template</label><input class="input" id="editTemplateName" value="'+esc(nome)+'"></div>';
-  body += '<div class="field"><label class="field-label">Mensagem</label><textarea class="input" id="editTemplateMsg" rows="6">'+esc(template)+'</textarea></div>';
-  body += '<div style="font-size:.72rem;color:var(--text3);">Use: {nome} · {primeiro_nome} · {vencimento} · {valor}</div>';
-  showModal('editTemplate', '✏️ Editar Template', body, '<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'editTemplate\')">Cancelar</button><button class="btn btn-primary btn-full" id="editTemplateSave">Salvar</button>');
-  document.getElementById('editTemplateSave').addEventListener('click', function(){
-    var novoNome = document.getElementById('editTemplateName').value.trim();
-    var novaMsg = document.getElementById('editTemplateMsg').value.trim();
-    if(!novoNome || !novaMsg){ toast('Preencha nome e mensagem', 'warning'); return; }
-    if(novoNome !== nome && db.templates[novoNome]){ toast('Já existe um template com este nome', 'error'); return; }
-    delete db.templates[nome];
-    db.templates[novoNome] = novaMsg;
-    saveDB();
-    closeModal('editTemplate');
-    setTimeout(function(){ modalMensagens(); }, 100);
-    toast('Template atualizado!', 'success');
-  });
-};
 
 function modalResumoAnual(){var anoAtual=new Date().getFullYear();var mesesComAtividade=[];var todasDatas=[];db.transacoes.forEach(function(t){if(t.data)todasDatas.push(t.data.slice(0,7));});db.clientes.forEach(function(c){if(c.cadastradoEm)todasDatas.push(c.cadastradoEm.slice(0,7));});if(todasDatas.length===0){showModal('resumo','📊 Resumo Anual','<div class="empty-state"><i data-lucide="trending-up" width="40" height="40"></i><p>Sem dados suficientes para o resumo anual.</p></div>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'resumo\')">Fechar</button>');return;}todasDatas.sort();var primeiroMes=todasDatas[0];var mesAtual=anoAtual+'-'+String(new Date().getMonth()+1).padStart(2,'0');var partes=primeiroMes.split('-');var anoIni=parseInt(partes[0]);var mesIni=parseInt(partes[1]);var partesFim=mesAtual.split('-');var anoFim=parseInt(partesFim[0]);var mesFim=parseInt(partesFim[1]);for(var a=anoIni;a<=anoFim;a++){var mStart=(a===anoIni)?mesIni:1;var mEnd=(a===anoFim)?mesFim:12;for(var m=mStart;m<=mEnd;m++){var ms=a+'-'+String(m).padStart(2,'0');mesesComAtividade.push(ms);}}var entradasAno=0,saidasAno=0;var dadosMensais=[],labelsMeses=[];mesesComAtividade.forEach(function(ms){var ent=sumTrans('entrada',ms),sai=sumTrans('saida',ms);entradasAno+=ent;saidasAno+=sai;var luc=ent-sai;var partesMs=ms.split('-');var nomeMes=new Date(parseInt(partesMs[0]),parseInt(partesMs[1])-1,1).toLocaleDateString('pt-BR',{month:'short'});labelsMeses.push(nomeMes);dadosMensais.push({ms:ms,entrada:ent,saida:sai,lucro:luc});});var lucroAno=entradasAno-saidasAno;var numMeses=mesesComAtividade.length;var mediaMensal=numMeses>0?lucroAno/numMeses:0;var melhorMes=null,piorMes=null;dadosMensais.forEach(function(d){if(!melhorMes||d.lucro>melhorMes.lucro)melhorMes=d;if(!piorMes||d.lucro<piorMes.lucro)piorMes=d;});var crescimentoHtml='';if(dadosMensais.length>=6){var metade=Math.floor(dadosMensais.length/2);var primeiroBloco=dadosMensais.slice(0,metade);var segundoBloco=dadosMensais.slice(metade);var lucroPrimeiro=primeiroBloco.reduce(function(s,d){return s+d.lucro;},0);var lucroSegundo=segundoBloco.reduce(function(s,d){return s+d.lucro;},0);var cresc=lucroPrimeiro!==0?((lucroSegundo-lucroPrimeiro)/Math.abs(lucroPrimeiro)*100):(lucroSegundo>0?100:0);var seta=cresc>=0?'↑':'↓';var corCresc=cresc>=0?'var(--success)':'var(--danger)';crescimentoHtml='<div class="resumo-anual-crescimento"><span style="color:'+corCresc+'">'+seta+' '+(cresc>=0?'+':'')+cresc.toFixed(1)+'%</span><span style="font-size:.7rem;color:var(--text3);">último semestre vs anterior</span></div>';}var dadosParaGrafico=dadosMensais.slice(-7);var labelsParaGrafico=labelsMeses.slice(-7);var body='<div class="resumo-anual-grid"><div class="resumo-anual-stat"><div class="resumo-anual-stat-valor" style="color:var(--accent)">R$ '+fmt(entradasAno)+'</div><div class="resumo-anual-stat-label">Entradas</div></div><div class="resumo-anual-stat"><div class="resumo-anual-stat-valor" style="color:var(--danger)">R$ '+fmt(saidasAno)+'</div><div class="resumo-anual-stat-label">Saídas</div></div><div class="resumo-anual-stat"><div class="resumo-anual-stat-valor" style="color:'+(lucroAno>=0?'var(--success)':'var(--danger)')+'">R$ '+fmt(lucroAno)+'</div><div class="resumo-anual-stat-label">Lucro</div></div></div><div class="resumo-anual-media">📊 Média mensal: <strong>R$ '+fmt(mediaMensal)+'</strong> (considerando '+numMeses+' mês'+(numMeses>1?'es':'')+' de uso)</div><div class="resumo-anual-destaques">'+(melhorMes?'<div class="resumo-anual-destaque"><div class="resumo-anual-destaque-emoji">🏆</div><div class="resumo-anual-destaque-info">Melhor mês<span>'+new Date(melhorMes.ms+'-01').toLocaleDateString('pt-BR',{month:'long',year:'numeric'})+' · R$ '+fmt(melhorMes.lucro)+'</span></div></div>':'')+(piorMes?'<div class="resumo-anual-destaque"><div class="resumo-anual-destaque-emoji">📉</div><div class="resumo-anual-destaque-info">Pior mês<span>'+new Date(piorMes.ms+'-01').toLocaleDateString('pt-BR',{month:'long',year:'numeric'})+' · R$ '+fmt(piorMes.lucro)+'</span></div></div>':'')+'</div>'+crescimentoHtml+'<div class="card" style="margin-bottom:0;"><div style="font-weight:700;font-size:.8rem;margin-bottom:8px;">📊 Gráfico Mensal</div><div style="position:relative;height:200px;"><canvas id="resumoChart"></canvas></div></div>';showModal('resumo','📊 Resumo Anual',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'resumo\')">Fechar</button>');renderResumoChart(dadosParaGrafico,labelsParaGrafico);}
 function renderResumoChart(dados,labels){setTimeout(function(){var ctx=document.getElementById('resumoChart');if(!ctx||!window.Chart)return;if(chartInstResumo){try{chartInstResumo.destroy();}catch(e){}chartInstResumo=null;}var gridColor=darkMode?'rgba(255,255,255,.07)':'rgba(0,0,0,.06)';var textColor=darkMode?'#94A3B8':'#718096';chartInstResumo=new Chart(ctx,{type:'bar',data:{labels:labels,datasets:[{label:'Entradas',data:dados.map(function(d){return d.entrada;}),backgroundColor:'#0288D1',borderRadius:5,borderSkipped:false},{label:'Saídas',data:dados.map(function(d){return d.saida;}),backgroundColor:'#EF5350',borderRadius:5,borderSkipped:false},{label:'Lucro',data:dados.map(function(d){return d.lucro;}),backgroundColor:'#43A047',borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:textColor,font:{size:9},boxWidth:10}}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:8}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:8},callback:function(v){return'R$'+v;}}}}}});},100);}
@@ -1438,6 +1424,42 @@ function autoSincTrans(){
 }
 function addLog(msg){db.log.unshift({msg:msg,ts:new Date().toLocaleString('pt-BR')});if(db.log.length>80)db.log.pop();}
 function applyDark(){document.documentElement.setAttribute('data-theme',darkMode?'dark':'light');localStorage.setItem('ow_dark',darkMode?'1':'0');var el=document.getElementById('darkModeLabel');if(el)el.textContent=darkMode?'Modo Claro':'Modo Escuro';}
+
+// Backup manual (melhoria)
+function exportarBackup() {
+  const dados = JSON.stringify(db, null, 2);
+  const blob = new Blob([dados], {type: 'application/json'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `owerplay_backup_${new Date().toISOString().slice(0,19)}.json`;
+  link.click();
+  toast('Backup exportado!', 'success');
+}
+function importarBackup(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const novoDb = JSON.parse(e.target.result);
+      if (novoDb.clientes && novoDb.planos && novoDb.transacoes && novoDb.servidores && novoDb.lembretes && novoDb.templates) {
+        Object.assign(db, novoDb);
+        saveDB();
+        toast('Backup restaurado com sucesso!', 'success');
+        render(currentSec);
+      } else throw new Error('Estrutura inválida');
+    } catch (err) { toast('Arquivo inválido ou corrompido', 'error'); }
+  };
+  reader.readAsText(file);
+}
+// Eventos backup
+document.getElementById('btnExportBackup').addEventListener('click', function(){ closeSidebar(); exportarBackup(); });
+document.getElementById('btnImportBackup').addEventListener('click', function(){
+  closeSidebar();
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json';
+  input.onchange = e => { if(e.target.files[0]) importarBackup(e.target.files[0]); };
+  input.click();
+});
 
 window._filter=function(f){if(cliFilterDash===f){cliFilterDash=null;}else{cliFilterDash=f;}render('dashboard');};
 window._clearFilter=function(){navigateTo('clientes');};
