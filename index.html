@@ -279,6 +279,8 @@ if('serviceWorker' in navigator){
     .login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(2,136,209,0.12)}
     .login-link{font-size:.75rem;color:var(--accent);font-weight:600;cursor:pointer;margin-top:12px;text-align:center}
     .login-link:hover{text-decoration:underline}
+    .login-forgot{font-size:.72rem;color:var(--text3);font-weight:500;cursor:pointer;margin-top:8px;text-align:center;transition:color .15s}
+    .login-forgot:hover{color:var(--accent);text-decoration:underline}
     
     .finance-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
     .fin-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
@@ -980,7 +982,7 @@ function initApp(){
   var savedMeta = localStorage.getItem('owerplay_meta_mensal');
   if(savedMeta) metaMensal = JSON.parse(savedMeta);
   supabase.auth.getSession().then(function(res){if(res.data.session){currentUser=res.data.session.user;afterLogin();}else{authLoaded=true;renderLogin();}});
-  supabase.auth.onAuthStateChange(function(event,session){if(event==='SIGNED_IN'&&session){currentUser=session.user;afterLogin();}else if(event==='SIGNED_OUT'){currentUser=null;db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};renderLogin();}});
+  supabase.auth.onAuthStateChange(function(event,session){if(event==='PASSWORD_RECOVERY'){renderPasswordRecovery();}else if(event==='SIGNED_IN'&&session){currentUser=session.user;afterLogin();}else if(event==='SIGNED_OUT'){currentUser=null;db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};renderLogin();}});
 }
 function afterLogin(){iniciarNotificacoes();carregarDados().then(function(){if(corrigirTemplatesPadrao())saveDB();authLoaded=true;setLoginMode(false);navigateTo('dashboard');hideSplash();setTimeout(verificarNotificacoes,1500);agendarVerificacaoNotificacoes();});}
 function logout(){supabase.auth.signOut();}
@@ -1065,8 +1067,60 @@ supabase.from('backups').upsert(
 }
 function saveDB(){saveLocal();salvarNuvem();}
 
+function renderPasswordRecovery(){
+  setLoginMode(true);
+  var mc=document.getElementById('mainContent');
+  if(!mc)return;
+  mc.innerHTML='<div class="login-container">'
+    +'<img class="login-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display=\'none\'">'
+    +'<div class="login-title">Owerplay Gestor</div>'
+    +'<div class="login-subtitle">Digite sua nova senha</div>'
+    +'<div class="login-card">'
+    +'<input class="login-input" id="novaSenha" type="password" placeholder="Nova senha (mín. 6 caracteres)" autocomplete="new-password">'
+    +'<input class="login-input" id="novaSenha2" type="password" placeholder="Repita a nova senha" autocomplete="new-password">'
+    +'<button class="btn btn-primary btn-full" id="btnSalvarSenha">Salvar nova senha</button>'
+    +'</div></div>';
+  document.getElementById('btnSalvarSenha').addEventListener('click', salvarNovaSenha);
+  document.getElementById('novaSenha2').addEventListener('keydown', function(e){if(e.key==='Enter')salvarNovaSenha();});
+  hideSplash();
+}
+function salvarNovaSenha(){
+  var s1=document.getElementById('novaSenha').value.trim();
+  var s2=document.getElementById('novaSenha2').value.trim();
+  if(!s1||s1.length<6){toast('A senha deve ter pelo menos 6 caracteres','warning');return;}
+  if(s1!==s2){toast('As senhas não conferem','error');return;}
+  var btn=document.getElementById('btnSalvarSenha');
+  if(btn){btn.disabled=true;btn.textContent='Salvando...';}
+  supabase.auth.updateUser({password:s1}).then(function(res){
+    if(res.error){
+      toast('Erro: '+res.error.message,'error');
+      if(btn){btn.disabled=false;btn.textContent='Salvar nova senha';}
+    }else{
+      toast('✅ Senha alterada com sucesso! Fazendo login...','success');
+      setTimeout(function(){supabase.auth.signOut().then(function(){renderLogin();});},1800);
+    }
+  });
+}
+function esqueceuSenha(){
+  var emailEl=document.getElementById('loginEmail');
+  var email=emailEl?emailEl.value.trim():'';
+  if(!email||!email.includes('@')){
+    toast('Digite seu e-mail antes de recuperar a senha','warning');
+    if(emailEl)emailEl.focus();
+    return;
+  }
+  supabase.auth.resetPasswordForEmail(email,{
+    redirectTo: window.location.origin+window.location.pathname
+  }).then(function(res){
+    if(res.error){
+      toast('Erro: '+res.error.message,'error');
+    }else{
+      toast('📧 Link de recuperação enviado para '+email,'success');
+    }
+  });
+}
 function loginAction(isCadastro){var email=document.getElementById('loginEmail').value.trim();var pass=document.getElementById('loginPass').value.trim();if(!email||!email.includes('@')){toast('Digite um e-mail válido','warning');return;}if(!pass||pass.length<6){toast('Senha deve ter 6+ caracteres','warning');return;}if(isCadastro){var pass2=document.getElementById('loginPass2').value.trim();if(pass!==pass2){toast('Senhas não conferem','error');return;}supabase.auth.signUp({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else{toast('Conta criada! Faça login.','success');renderLogin('login');}});}else{supabase.auth.signInWithPassword({email:email,password:pass}).then(function(res){if(res.error)toast('Erro: '+res.error.message,'error');else toast('Login feito!','success');});}}
-function renderLogin(mode){setLoginMode(true);var mc=document.getElementById('mainContent');if(!mc)return;var isCadastro=(mode==='cadastro');mc.innerHTML='<div class="login-container"><img class="login-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display=\'none\';var fb=document.createElement(\'span\');fb.style.cssText=\'width:70px;height:70px;border-radius:18px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2rem\';fb.textContent=\'✦\';this.parentNode.replaceChild(fb,this)"><div class="login-title">Owerplay Gestor</div><div class="login-subtitle">'+(isCadastro?'Crie sua conta':'Faça login')+'</div><div class="login-card"><input class="login-input" id="loginEmail" type="email" placeholder="Seu e-mail" autocomplete="email"><input class="login-input" id="loginPass" type="password" placeholder="Senha" autocomplete="'+(isCadastro?'new-password':'current-password')+'">'+(isCadastro?'<input class="login-input" id="loginPass2" type="password" placeholder="Repita a senha">':'')+'<button class="btn btn-primary btn-full" id="loginBtn">'+(isCadastro?'Criar Conta':'Entrar')+'</button><div class="login-link" id="toggleLogin">'+(isCadastro?'Já tem conta? Entrar':'Criar conta')+'</div></div></div>';document.getElementById('toggleLogin').addEventListener('click',function(){renderLogin(isCadastro?'login':'cadastro');});document.getElementById('loginBtn').addEventListener('click',function(){loginAction(isCadastro);});var pf=document.getElementById('loginPass');if(pf)pf.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});var p2=document.getElementById('loginPass2');if(p2)p2.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});setTimeout(hideSplash,650);}
+function renderLogin(mode){setLoginMode(true);var mc=document.getElementById('mainContent');if(!mc)return;var isCadastro=(mode==='cadastro');mc.innerHTML='<div class="login-container"><img class="login-logo" src="IMG_20260501_113710.png" alt="Owerplay" onerror="this.style.display=\'none\';var fb=document.createElement(\'span\');fb.style.cssText=\'width:70px;height:70px;border-radius:18px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2rem\';fb.textContent=\'✦\';this.parentNode.replaceChild(fb,this)"><div class="login-title">Owerplay Gestor</div><div class="login-subtitle">'+(isCadastro?'Crie sua conta':'Faça login')+'</div><div class="login-card"><input class="login-input" id="loginEmail" type="email" placeholder="Seu e-mail" autocomplete="email"><input class="login-input" id="loginPass" type="password" placeholder="Senha" autocomplete="'+(isCadastro?'new-password':'current-password')+'">'+(isCadastro?'<input class="login-input" id="loginPass2" type="password" placeholder="Repita a senha">':'')+'<button class="btn btn-primary btn-full" id="loginBtn">'+(isCadastro?'Criar Conta':'Entrar')+'</button><div class="login-link" id="toggleLogin">'+(isCadastro?'Já tem conta? Entrar':'Criar conta')+'</div>'+(isCadastro?'':'<div class=\"login-forgot\" id=\"btnEsqueceuSenha\">Esqueci minha senha</div>')+'</div></div>';document.getElementById('toggleLogin').addEventListener('click',function(){renderLogin(isCadastro?'login':'cadastro');});document.getElementById('loginBtn').addEventListener('click',function(){loginAction(isCadastro);});if(!isCadastro){var btnEsq=document.getElementById('btnEsqueceuSenha');if(btnEsq)btnEsq.addEventListener('click',esqueceuSenha);}var pf=document.getElementById('loginPass');if(pf)pf.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});var p2=document.getElementById('loginPass2');if(p2)p2.addEventListener('keydown',function(e){if(e.key==='Enter')loginAction(isCadastro);});setTimeout(hideSplash,650);}
 
 function atualizarBadgeInadimplencia(){var badge=document.getElementById('badgeInadimplencia');if(!badge)return;var hoje=today();var vencidos=db.clientes.filter(function(c){return c.vencimento<hoje;}).length;if(vencidos>0){badge.textContent=vencidos>99?'99+':vencidos;badge.classList.remove('hidden');}else{badge.classList.add('hidden');}}
 function openSidebar(){atualizarBadgeInadimplencia();document.getElementById('sidebar').classList.add('open');}
