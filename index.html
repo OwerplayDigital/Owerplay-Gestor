@@ -771,7 +771,7 @@ var DEFAULT_TEMPLATES={
 };
 var db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES),templateNames:{cobranca:'Cobrança',renovacao:'Renovação'}};
 var currentSec='dashboard';var cliFilter=null;var cliFilterDash=null;var cliPage=1;var cliFilterPlano=null;var cliFilterServidor=null;
-var darkMode=false;var lucroOculto=true;var chartInst=null;var chartDataKey=null;var chartInstResumo=null;var currentUser=null;var authLoaded=false;
+var darkMode=false;var lucroOculto=true;var chartInst=null;var chartDataKey=null;var chartInstResumo=null;var currentUser=null;var authLoaded=false;var emRecuperacao=false;
 var ITENS_POR_PAGINA=25;
 var metaMensal = { valor: 5000 };
 
@@ -982,7 +982,7 @@ function initApp(){
   var savedMeta = localStorage.getItem('owerplay_meta_mensal');
   if(savedMeta) metaMensal = JSON.parse(savedMeta);
   supabase.auth.getSession().then(function(res){if(res.data.session){currentUser=res.data.session.user;afterLogin();}else{authLoaded=true;renderLogin();}});
-  supabase.auth.onAuthStateChange(function(event,session){if(event==='PASSWORD_RECOVERY'){renderPasswordRecovery();}else if(event==='SIGNED_IN'&&session){currentUser=session.user;afterLogin();}else if(event==='SIGNED_OUT'){currentUser=null;db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};renderLogin();}});
+  supabase.auth.onAuthStateChange(function(event,session){if(event==='PASSWORD_RECOVERY'){emRecuperacao=true;renderPasswordRecovery();}else if(event==='SIGNED_IN'&&session){if(emRecuperacao)return;currentUser=session.user;afterLogin();}else if(event==='SIGNED_OUT'){emRecuperacao=false;currentUser=null;db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};renderLogin();}});
 }
 function afterLogin(){iniciarNotificacoes();carregarDados().then(function(){if(corrigirTemplatesPadrao())saveDB();authLoaded=true;setLoginMode(false);navigateTo('dashboard');hideSplash();setTimeout(verificarNotificacoes,1500);agendarVerificacaoNotificacoes();});}
 function logout(){supabase.auth.signOut();}
@@ -1097,7 +1097,7 @@ function salvarNovaSenha(){
       if(btn){btn.disabled=false;btn.textContent='Salvar nova senha';}
     }else{
       toast('✅ Senha alterada com sucesso! Fazendo login...','success');
-      setTimeout(function(){supabase.auth.signOut().then(function(){renderLogin();});},1800);
+      setTimeout(function(){emRecuperacao=false;supabase.auth.signOut().then(function(){renderLogin();});},1800);
     }
   });
 }
