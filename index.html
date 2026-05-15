@@ -985,7 +985,57 @@ function initApp(){
 function afterLogin(){iniciarNotificacoes();carregarDados().then(function(){if(corrigirTemplatesPadrao())saveDB();authLoaded=true;setLoginMode(false);navigateTo('dashboard');hideSplash();setTimeout(verificarNotificacoes,1500);agendarVerificacaoNotificacoes();});}
 function logout(){supabase.auth.signOut();}
 
-async function carregarDados(){var uid=currentUser.id;var resp=await supabase.from('backups').select('dados').eq('token',uid).maybeSingle();if(resp.data&&resp.data.dados){db=Object.assign(db,resp.data.dados);if(!db.templates)db.templates=Object.assign({},DEFAULT_TEMPLATES);if(!db.templateNames)db.templateNames={cobranca:'Cobrança',renovacao:'Renovação'};if(!db.lembretes)db.lembretes=[];saveLocal();return;}var local=localStorage.getItem(STORAGE_KEY+'_'+uid);if(local){try{var parsed=JSON.parse(local);db=Object.assign(db,parsed);if(!db.templates)db.templates=Object.assign({},DEFAULT_TEMPLATES);if(!db.templateNames)db.templateNames={cobranca:'Cobrança',renovacao:'Renovação'};if(!db.lembretes)db.lembretes=[];}catch(e){}}}
+async function carregarDados(){
+  var uid=currentUser.id;
+
+  var resp=await supabase
+    .from('backups')
+    .select('dados')
+    .eq('user_id', uid)
+    .maybeSingle();
+
+  if(resp.data&&resp.data.dados){
+    db=Object.assign(db,resp.data.dados);
+
+    if(!db.templates)
+      db.templates=Object.assign({},DEFAULT_TEMPLATES);
+
+    if(!db.templateNames)
+      db.templateNames={
+        cobranca:'Cobrança',
+        renovacao:'Renovação'
+      };
+
+    if(!db.lembretes)
+      db.lembretes=[];
+
+    saveLocal();
+    return;
+  }
+
+  var local=localStorage.getItem(STORAGE_KEY+'_'+uid);
+
+  if(local){
+    try{
+      var parsed=JSON.parse(local);
+
+      db=Object.assign(db,parsed);
+
+      if(!db.templates)
+        db.templates=Object.assign({},DEFAULT_TEMPLATES);
+
+      if(!db.templateNames)
+        db.templateNames={
+          cobranca:'Cobrança',
+          renovacao:'Renovação'
+        };
+
+      if(!db.lembretes)
+        db.lembretes=[];
+
+    }catch(e){}
+  }
+}
 function saveLocal(){if(!currentUser)return;try{localStorage.setItem(STORAGE_KEY+'_'+currentUser.id,JSON.stringify(db));}catch(e){}}
 function salvarNuvem(){
 if(!currentUser)return;
@@ -994,15 +1044,23 @@ if(sync){
 sync.innerHTML='🟡 Salvando...';
 }
 saveLocal();
+
 supabase.from('backups').upsert(
-{token:currentUser.id,dados:db},
-{onConflict:'token'}
-).then(function(res){
-if(sync){
-sync.innerHTML=res.error
-?'🔴 Erro ao sincronizar'
-:'🟢 Sincronizado';
+{
+  user_id: currentUser.id,
+  dados: db
+},
+{
+  onConflict: 'user_id'
 }
+).then(function(res){
+
+  if(sync){
+    sync.innerHTML=res.error
+    ? '🔴 Erro ao sincronizar'
+    : '🟢 Sincronizado';
+  }
+
 });
 }
 function saveDB(){saveLocal();salvarNuvem();}
