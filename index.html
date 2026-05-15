@@ -794,7 +794,8 @@ function normalizarTextoWhatsApp(msg){
 }
 function previewTemplateText(msg){
   var txt=normalizarTextoWhatsApp(msg).replace(/\n+/g,' • ');
-  return txt.length>90?txt.substring(0,90)+'...':txt;
+  var chars=Array.from(txt);
+  return chars.length>90?chars.slice(0,90).join('')+'...':txt;
 }
 function renderTemplateName(key){
   if(db.templateNames&&db.templateNames[key])return db.templateNames[key];
