@@ -86,7 +86,7 @@ if('serviceWorker' in navigator){
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{background:#000;color-scheme:light}
-    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans','Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;text-rendering:optimizeLegibility;font-variant-ligatures:none}
     #app{display:flex;height:100dvh;overflow:hidden}
     
     .sidebar{position:fixed;inset:0;z-index:200;display:flex;pointer-events:none}
@@ -885,6 +885,21 @@ function openWhatsApp(num,msg){
   var opened=window.open(url,'_blank');
   if(!opened)window.location.href=url;
 }
+function hasBrokenUnicode(text){
+  var value=String(text||'');
+  if(value.indexOf('�')!==-1)return true;
+  for(var i=0;i<value.length;i++){
+    var code=value.charCodeAt(i);
+    if(code>=0xD800&&code<=0xDBFF){
+      var next=value.charCodeAt(i+1);
+      if(!(next>=0xDC00&&next<=0xDFFF))return true;
+      i++;
+    }else if(code>=0xDC00&&code<=0xDFFF){
+      return true;
+    }
+  }
+  return false;
+}
 function corrigirTemplatesPadrao(){
   var alterou=false;
   if(!db.templates){db.templates={};alterou=true;}
@@ -900,11 +915,15 @@ function corrigirTemplatesPadrao(){
   });
   db.templates=templatesNormalizados;
   var cob=db.templates.cobranca||'';
-  if(!cob || cob.indexOf('*Na data do vencimento')!==-1 || cob.indexOf('*Favor enviar comprovante')!==-1 || cob.indexOf('R${valor}')!==-1){
+  if(!cob || hasBrokenUnicode(cob) || cob.indexOf('*Na data do vencimento')!==-1 || cob.indexOf('*Favor enviar comprovante')!==-1 || cob.indexOf('R${valor}')!==-1){
     db.templates.cobranca=DEFAULT_TEMPLATES.cobranca;
     alterou=true;
   }
-  if(!db.templates.renovacao){db.templates.renovacao=DEFAULT_TEMPLATES.renovacao;alterou=true;}
+  var ren=db.templates.renovacao||'';
+  if(!ren || hasBrokenUnicode(ren)){
+    db.templates.renovacao=DEFAULT_TEMPLATES.renovacao;
+    alterou=true;
+  }
   return alterou;
 }
 function toast(msg,type){
