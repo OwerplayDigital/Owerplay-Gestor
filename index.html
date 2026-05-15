@@ -1547,26 +1547,7 @@ function modalCliente(id){
     var modalEl=showModal('servidoresModal','🖥️ Selecionar Servidores','<div style="max-height:50vh;overflow-y:auto;">'+checks+'</div>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'servidoresModal\')">Cancelar</button><button class="btn btn-primary btn-full" id="servModalOk">OK</button>');
     document.getElementById('servModalOk').addEventListener('click',function(){servidoresSelecionados=[];document.querySelectorAll('.modalServCheck:checked').forEach(function(chk){servidoresSelecionados.push(chk.value);});closeModal('servidoresModal');atualizarBotao();});
   });
-  // Máscara de WhatsApp
-  var waInput = document.getElementById('cliWa');
-  if(waInput) {
-    waInput.addEventListener('input', function(e) {
-      var digits = e.target.value.replace(/\D/g, '');
-      var val;
-      if (digits.length === 0) {
-        val = '';
-      } else if (digits.length <= 2) {
-        val = '(' + digits;
-      } else if (digits.length <= 6) {
-        val = '(' + digits.slice(0,2) + ') ' + digits.slice(2);
-      } else if (digits.length <= 10) {
-        val = '(' + digits.slice(0,2) + ') ' + digits.slice(2,6) + '-' + digits.slice(6);
-      } else {
-        val = '(' + digits.slice(0,2) + ') ' + digits.slice(2,7) + '-' + digits.slice(7,11);
-      }
-      e.target.value = val;
-    });
-  }
+  // Campo WhatsApp sem máscara: aceita qualquer formato (número copiado do WhatsApp, com ou sem formatação)
   document.getElementById('cliSave').addEventListener('click',function(){
     var nome=document.getElementById('cliNome').value.trim();
     var waRaw=document.getElementById('cliWa').value;
@@ -1755,7 +1736,7 @@ function modalMensagens(){
       var preview=previewTemplateText(template);
       listaHtml+='<div class="list-item" style="margin-bottom:10px;align-items:flex-start;gap:10px;">';
       listaHtml+='<div style="flex:1;min-width:0;"><div class="list-item-main">'+esc(renderTemplateName(key))+'</div>';
-      listaHtml+='<div class="list-item-sub" style="font-size:0.7rem;white-space:normal;word-break:break-word;line-height:1.35;margin-top:4px;">'+esc(preview)+'</div></div>';
+      listaHtml+='<div class="list-item-sub" data-preview="1" style="font-size:0.7rem;white-space:normal;word-break:break-word;line-height:1.35;margin-top:4px;"></div></div>';
       listaHtml+='<div class="list-item-actions">';
       listaHtml+='<button class="icon-btn" onclick="window._editarTemplate(\''+jsstr(key)+'\')"><i data-lucide="pencil" width="15" height="15"></i></button>';
       listaHtml+='<button class="icon-btn" onclick="window._excluirTemplate(\''+jsstr(key)+'\')" style="color:var(--danger);"><i data-lucide="trash-2" width="15" height="15"></i></button>';
@@ -1771,6 +1752,7 @@ function modalMensagens(){
   var body='<div style="margin-bottom:12px;font-size:0.75rem;color:var(--text2);line-height:1.45;">✏️ Clique no lápis para editar | 🗑️ Clique na lixeira para excluir<br>📌 Variáveis: <code>{nome}</code> <code>{primeiro_nome}</code> <code>{vencimento}</code> <code>{valor}</code><br>✅ A formatação é limpa automaticamente para evitar bugs no WhatsApp.</div>';
   body+='<div id="templateListContainer">'+renderTemplateLista()+'</div>';
   showModal('msg','Mensagens WhatsApp',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'msg\')">Fechar</button>');
+  var previewEls=document.querySelectorAll("[data-preview=\"1\"]");var previewKeys=Object.keys(db.templates||{});previewEls.forEach(function(el,i){var key=previewKeys[i];if(key!==undefined){el.textContent=previewTemplateText(db.templates[key]||"");}});
   document.getElementById('btnAddTemplate').addEventListener('click',function(){
     var nomeOriginal=document.getElementById('newTemplateName').value.trim();
     var nome=normalizeTemplateKey(nomeOriginal);
