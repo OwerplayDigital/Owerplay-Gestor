@@ -900,6 +900,34 @@ function hasBrokenUnicode(text){
   }
   return false;
 }
+function decodeHtmlEntities(str){
+  // Decodifica entidades HTML que foram salvas erroneamente nos templates (bug do esc() + innerHTML)
+  // Usa um textarea temporário — funciona em qualquer WebView Android sem depender de DOMParser
+  try{
+    var el=document.createElement('textarea');
+    el.innerHTML=str;
+    return el.value;
+  }catch(e){return str;}
+}
+function repararEmojisTemplates(){
+  // Detecta se algum template contém entidades HTML literais (ex: &#x26A0; ou &amp;)
+  // e decodifica, restaurando os emojis originais
+  if(!db.templates)return false;
+  var alterou=false;
+  Object.keys(db.templates).forEach(function(k){
+    var original=db.templates[k];
+    if(typeof original!=='string')return;
+    // Se contém padrão de entidade HTML
+    if(/&(?:#x?[0-9a-fA-F]+|[a-zA-Z]+);/.test(original)){
+      var decoded=decodeHtmlEntities(original);
+      if(decoded!==original){
+        db.templates[k]=decoded;
+        alterou=true;
+      }
+    }
+  });
+  return alterou;
+}
 function corrigirTemplatesPadrao(){
   var alterou=false;
   if(!db.templates){db.templates={};alterou=true;}
@@ -1039,7 +1067,7 @@ function initApp(){
   supabase.auth.getSession().then(function(res){if(res.data.session){currentUser=res.data.session.user;afterLogin();}else{authLoaded=true;renderLogin();}});
   supabase.auth.onAuthStateChange(function(event,session){if(event==='PASSWORD_RECOVERY'){emRecuperacao=true;renderPasswordRecovery();}else if(event==='SIGNED_IN'&&session){if(emRecuperacao)return;currentUser=session.user;afterLogin();}else if(event==='SIGNED_OUT'){emRecuperacao=false;currentUser=null;db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};renderLogin();}});
 }
-function afterLogin(){iniciarNotificacoes();carregarDados().then(function(){if(corrigirTemplatesPadrao())saveDB();authLoaded=true;setLoginMode(false);navigateTo('dashboard');hideSplash();setTimeout(verificarNotificacoes,1500);agendarVerificacaoNotificacoes();});}
+function afterLogin(){iniciarNotificacoes();carregarDados().then(function(){var precisaSalvar=corrigirTemplatesPadrao();if(repararEmojisTemplates())precisaSalvar=true;if(precisaSalvar)saveDB();authLoaded=true;setLoginMode(false);navigateTo('dashboard');hideSplash();setTimeout(verificarNotificacoes,1500);agendarVerificacaoNotificacoes();});}
 function logout(){supabase.auth.signOut();}
 
 async function carregarDados(){
@@ -1632,13 +1660,15 @@ function modalWhatsApp(id){
     var preview=previewTemplateText(db.templates[key]||'');
     botoes+='<button class="btn btn-ghost btn-full" id="btnTemplate_'+idx+'" style="justify-content:flex-start;gap:12px;margin-bottom:8px;padding:14px;min-height:64px;">'
       +'<div style="text-align:left;min-width:0;"><div style="font-weight:700;">'+esc(nomeBotao)+'</div>'
-      +'<div style="font-size:.72rem;color:var(--text3);margin-top:3px;white-space:normal;overflow:hidden;text-overflow:ellipsis;line-height:1.35;word-break:break-word;">'+esc(preview)+'</div></div></button>';
+      +'<div id="tplPreview_'+idx+'" style="font-size:.72rem;color:var(--text3);margin-top:3px;white-space:normal;overflow:hidden;text-overflow:ellipsis;line-height:1.35;word-break:break-word;"></div></div></button>';
   });
   var body='<p style="color:var(--text2);font-size:.88rem;margin-bottom:14px;">Qual mensagem enviar para <strong>'+esc(c.nome)+'</strong>?</p>'+botoes;
   showModal('wa','Enviar WhatsApp',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'wa\')">Cancelar</button>');
   templateKeys.forEach(function(key,idx){
     var btn=document.getElementById('btnTemplate_'+idx);
     if(btn)btn.addEventListener('click',function(){closeModal('wa');sendWA(c,key);});
+    var prevEl=document.getElementById('tplPreview_'+idx);
+    if(prevEl)prevEl.textContent=previewTemplateText(db.templates[key]||'');
   });
 }
 function modalPlano(id){var p=id?db.planos.find(function(x){return x.id===id;}):null;var body='<div class="field"><label class="field-label">Nome do plano *</label><input class="input" id="plNome" value="'+esc(p?p.nome:'')+'" placeholder="Ex: Mensal HD"></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="plValor" value="'+(p?p.valor:'')+'" placeholder="0.00" step="0.01" inputmode="decimal"></div>';var el=showModal('plano',id?'Editar Plano':'Novo Plano',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'plano\')">Cancelar</button><button class="btn btn-primary btn-full" id="plSave">Salvar</button>');document.getElementById('plSave').addEventListener('click',function(){var nome=document.getElementById('plNome').value.trim(),valor=parseFloat(document.getElementById('plValor').value)||0;if(!nome){toast('Informe o nome do plano','error');return;}if(id){db.planos=db.planos.map(function(x){return x.id===id?{id:id,nome:nome,valor:valor}:x;});}else{db.planos.push({id:'p'+Date.now(),nome:nome,valor:valor});}addLog('Plano '+(id?'atualizado':'criado')+': '+nome);saveDB();closeModal('plano');render(currentSec);toast(id?'Plano atualizado!':'Plano criado!','success');});}
