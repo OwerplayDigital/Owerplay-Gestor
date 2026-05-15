@@ -1551,11 +1551,18 @@ function modalCliente(id){
   var waInput = document.getElementById('cliWa');
   if(waInput) {
     waInput.addEventListener('input', function(e) {
-      var val = e.target.value.replace(/\D/g, '');
-      if (val.length <= 10) {
-        val = val.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+      var digits = e.target.value.replace(/\D/g, '');
+      var val;
+      if (digits.length === 0) {
+        val = '';
+      } else if (digits.length <= 2) {
+        val = '(' + digits;
+      } else if (digits.length <= 6) {
+        val = '(' + digits.slice(0,2) + ') ' + digits.slice(2);
+      } else if (digits.length <= 10) {
+        val = '(' + digits.slice(0,2) + ') ' + digits.slice(2,6) + '-' + digits.slice(6);
       } else {
-        val = val.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+        val = '(' + digits.slice(0,2) + ') ' + digits.slice(2,7) + '-' + digits.slice(7,11);
       }
       e.target.value = val;
     });
@@ -1784,9 +1791,10 @@ window._editarTemplate=function(nome){
   if(!template)return;
   var nomeDisplay=(db.templateNames&&db.templateNames[nome])||renderTemplateName(nome);
   var body='<div class="field"><label class="field-label">Nome do template</label><input class="input" id="editTemplateName" value="'+escAttr(nomeDisplay)+'" autocapitalize="off" autocorrect="off" spellcheck="false"></div>';
-  body+='<div class="field"><label class="field-label">Mensagem</label><textarea class="input" id="editTemplateMsg" rows="7" style="resize:vertical;line-height:1.45;">'+esc(template)+'</textarea></div>';
+  body+='<div class="field"><label class="field-label">Mensagem</label><textarea class="input" id="editTemplateMsg" rows="7" style="resize:vertical;line-height:1.45;"></textarea></div>';
   body+='<div style="font-size:.72rem;color:var(--text3);line-height:1.4;">Use: {nome} · {primeiro_nome} · {vencimento} · {valor}<br>Evite abrir *negrito* sem fechar, para não bagunçar o texto no WhatsApp.</div>';
   showModal('editTemplate','Editar Template',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'editTemplate\')">Cancelar</button><button class="btn btn-primary btn-full" id="editTemplateSave">Salvar</button>');
+  document.getElementById('editTemplateMsg').value=template;
   document.getElementById('editTemplateSave').addEventListener('click',function(){
     var nomeEditOriginal=document.getElementById('editTemplateName').value.trim();
     var novoNome=normalizeTemplateKey(nomeEditOriginal);
