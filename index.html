@@ -954,11 +954,15 @@ function corrigirTemplatesPadrao(){
   });
   db.templates=templatesNormalizados;
   var cob=db.templates.cobranca||'';
-  if(!cob || hasBrokenUnicode(cob) || cob.indexOf('*Na data do vencimento')!==-1 || cob.indexOf('*Favor enviar comprovante')!==-1 || cob.indexOf('R${valor}')!==-1){
+  // Só sobrescreve cobrança se estiver VAZIA ou com unicode realmente quebrado
+  // (surrogate pair solto). Não sobrescreve mais por conteúdo antigo — o usuário
+  // pode ter customizado e esse check apagava o conteúdo dele.
+  if(!cob || hasBrokenUnicode(cob)){
     db.templates.cobranca=DEFAULT_TEMPLATES.cobranca;
     alterou=true;
   }
   var ren=db.templates.renovacao||'';
+  // Idem para renovação: só reseta se vazio ou unicode quebrado
   if(!ren || hasBrokenUnicode(ren)){
     db.templates.renovacao=DEFAULT_TEMPLATES.renovacao;
     alterou=true;
@@ -1091,20 +1095,13 @@ async function carregarDados(){
     .maybeSingle();
 
   if(resp.data&&resp.data.dados){
-    db=Object.assign(db,resp.data.dados);
-
-    if(!db.templates)
-      db.templates=Object.assign({},DEFAULT_TEMPLATES);
-
-    if(!db.templateNames)
-      db.templateNames={
-        cobranca:'Cobrança',
-        renovacao:'Renovação'
-      };
-
-    if(!db.lembretes)
-      db.lembretes=[];
-
+    var dadosNuvem=resp.data.dados;
+    // Merge profundo: os dados salvos têm prioridade sobre os defaults
+    db=Object.assign({},db,dadosNuvem);
+    // Templates: defaults como base, templates salvos sobrescrevem (nunca perdem)
+    db.templates=Object.assign({},DEFAULT_TEMPLATES,dadosNuvem.templates||{});
+    db.templateNames=Object.assign({cobranca:'Cobrança',renovacao:'Renovação'},dadosNuvem.templateNames||{});
+    if(!db.lembretes)db.lembretes=[];
     saveLocal();
     return;
   }
@@ -1114,21 +1111,10 @@ async function carregarDados(){
   if(local){
     try{
       var parsed=JSON.parse(local);
-
-      db=Object.assign(db,parsed);
-
-      if(!db.templates)
-        db.templates=Object.assign({},DEFAULT_TEMPLATES);
-
-      if(!db.templateNames)
-        db.templateNames={
-          cobranca:'Cobrança',
-          renovacao:'Renovação'
-        };
-
-      if(!db.lembretes)
-        db.lembretes=[];
-
+      db=Object.assign({},db,parsed);
+      db.templates=Object.assign({},DEFAULT_TEMPLATES,parsed.templates||{});
+      db.templateNames=Object.assign({cobranca:'Cobrança',renovacao:'Renovação'},parsed.templateNames||{});
+      if(!db.lembretes)db.lembretes=[];
     }catch(e){}
   }
 }
