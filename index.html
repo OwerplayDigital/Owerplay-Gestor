@@ -1139,7 +1139,21 @@ function initApp(){
   // Restaura preferências de UI salvas localmente
   var savedMeta = localStorage.getItem('owerplay_meta_mensal');
   if(savedMeta){try{metaMensal=JSON.parse(savedMeta);}catch(e){}}
-  darkMode = localStorage.getItem('ow_dark')==='1';
+  // Modo escuro automático por horário:
+  // 6h–18h → claro | 18h–6h → escuro
+  // Se o usuário alterou manualmente hoje, respeita a escolha dele
+  var savedDark = localStorage.getItem('ow_dark');
+  var savedDarkDate = localStorage.getItem('ow_dark_date');
+  var hojeStr = new Date().toLocaleDateString('pt-BR');
+  var hora = new Date().getHours();
+  var escuroAutomatico = hora < 6 || hora >= 18;
+  if(savedDarkDate === hojeStr && savedDark !== null){
+    // Usuário alterou manualmente hoje — respeita a escolha
+    darkMode = savedDark === '1';
+  } else {
+    // Sem escolha manual hoje — aplica automático por horário
+    darkMode = escuroAutomatico;
+  }
   lucroOculto = localStorage.getItem('ow_lucroOc')!=='0';
   applyDark();
   supabase.auth.getSession().then(function(res){if(res.data.session){currentUser=res.data.session.user;afterLogin();}else{authLoaded=true;renderLogin();}});
@@ -1962,7 +1976,12 @@ function autoSincTrans(){
   saveDB();
 }
 function addLog(msg){db.log.unshift({msg:msg,ts:new Date().toLocaleString('pt-BR')});if(db.log.length>80)db.log.pop();}
-function applyDark(){document.documentElement.setAttribute('data-theme',darkMode?'dark':'light');localStorage.setItem('ow_dark',darkMode?'1':'0');var el=document.getElementById('darkModeLabel');if(el)el.textContent=darkMode?'Modo Claro':'Modo Escuro';}
+function applyDark(){
+  document.documentElement.setAttribute('data-theme',darkMode?'dark':'light');
+  localStorage.setItem('ow_dark',darkMode?'1':'0');
+  localStorage.setItem('ow_dark_date', new Date().toLocaleDateString('pt-BR'));
+  var el=document.getElementById('darkModeLabel');if(el)el.textContent=darkMode?'Modo Claro':'Modo Escuro';
+}
 
 
 
