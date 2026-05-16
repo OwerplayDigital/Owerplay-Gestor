@@ -1638,15 +1638,22 @@ function modalCliente(id){
     if(wa && (wa.length<10||wa.length>13)){toast('WhatsApp inválido (inclua DDD)','warning');return;}
     // Avisa se a data de vencimento já passou (pode ser erro de digitação)
     if(!id && venc < today()){
-      var prosseguir=confirm('⚠️ A data de vencimento '+fmtDate(venc)+' já passou. Deseja cadastrar mesmo assim?');
-      if(!prosseguir)return;
+      confirmModal(
+        '⚠️ Data no passado',
+        'O vencimento '+fmtDate(venc)+' já passou. Deseja cadastrar mesmo assim?',
+        function(){salvarCliente(nome,wa,venc,plano,desc);}
+      );
+      return;
     }
+    salvarCliente(nome,wa,venc,plano,desc);
+  });
+  function salvarCliente(nome,wa,venc,plano,desc){
     var novo={id:id||'c'+Date.now(),nome:nome,whatsapp:wa,vencimento:venc,planoId:plano,servidoresIds:servidoresSelecionados,desconto:desc,anotacoes:c?c.anotacoes||'':'',cadastradoEm:c?c.cadastradoEm||today():today(),renovacoes:c?c.renovacoes||[]:[]};
     if(id){db.clientes=db.clientes.map(function(x){return x.id===id?novo:x;});}else{db.clientes.push(novo);}
     addLog(nome+(id?' atualizado':' cadastrado'));
     if(!id){var pN=db.planos.find(function(x){return x.id===novo.planoId;});var vEnt=pN?(pN.valor-(novo.desconto||0)):0;if(vEnt>0){db.transacoes.push({id:'t'+Date.now()+Math.random().toString(36).slice(2),clienteId:novo.id,tipo:'entrada',valor:vEnt,data:today(),desc:novo.nome});}servidoresSelecionados.forEach(function(sid){var s=db.servidores.find(function(x){return x.id===sid;});if(s&&s.valor){db.transacoes.push({id:'t'+Date.now()+Math.random().toString(36).slice(2),clienteId:novo.id,servId:s.id,tipo:'saida',valor:s.valor,data:today(),desc:s.nome});}});}
     saveDB();closeModal('cli');render(currentSec);toast(id?'Atualizado!':'Cadastrado!','success');
-  });
+  }
 }
 
 function modalRenovar(id){
