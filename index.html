@@ -909,25 +909,72 @@ function decodeHtmlEntities(str){
     return el.value;
   }catch(e){return str;}
 }
+function pareceMojibake(str){
+  // Caracteres típicos de UTF-8 lido como Latin-1/Windows-1252:
+  // Ã, Â, â€, ðŸ, ï¿½, etc.
+  if(!str)return false;
+  if(str.indexOf('Ã')!==-1 && /Ã[\x80-\xBF\u0080-\u017F]/.test(str))return true;
+  if(/â[\u0080-\u017F]/.test(str))return true;
+  if(/ð[\u0080-\u017F]/.test(str))return true;
+  if(str.indexOf('Â')!==-1 && /Â[\x80-\xBF\u00A0-\u00BF]/.test(str))return true;
+  if(str.indexOf('ï¿½')!==-1)return true;
+  return false;
+}
+function repararMojibake(str){
+  // Reinterpreta os bytes (cada char & 0xFF) como UTF-8.
+  // Se decodificar com sucesso, retorna a string original (emojis restaurados).
+  if(typeof str!=='string'||!str)return str;
+  if(typeof Uint8Array==='undefined'||typeof TextDecoder==='undefined')return str;
+  try{
+    var bytes=new Uint8Array(str.length);
+    for(var i=0;i<str.length;i++){
+      var c=str.charCodeAt(i);
+      if(c>0xFF)return str; // já tem char alto, não é mojibake puro
+      bytes[i]=c;
+    }
+    var decoded=new TextDecoder('utf-8',{fatal:true}).decode(bytes);
+    return decoded;
+  }catch(e){return str;}
+}
 function repararEmojisTemplates(){
-  // Detecta se algum template contém entidades HTML literais (ex: &#x26A0; ou &amp;)
-  // e decodifica, restaurando os emojis originais
+  // Conserta (1) entidades HTML literais e (2) mojibake (UTF-8 lido como Latin-1)
+  // que aparece no APK quando o WebView salvou os templates com encoding errado.
   if(!db.templates)return false;
   var alterou=false;
   Object.keys(db.templates).forEach(function(k){
     var original=db.templates[k];
     if(typeof original!=='string')return;
-    // Se contém padrão de entidade HTML
-    if(/&(?:#x?[0-9a-fA-F]+|[a-zA-Z]+);/.test(original)){
-      var decoded=decodeHtmlEntities(original);
-      if(decoded!==original){
-        db.templates[k]=decoded;
-        alterou=true;
-      }
+    var atual=original;
+    // (1) Entidades HTML
+    if(/&(?:#x?[0-9a-fA-F]+|[a-zA-Z]+);/.test(atual)){
+      var dec=decodeHtmlEntities(atual);
+      if(dec&&dec!==atual)atual=dec;
+    }
+    // (2) Mojibake — pode estar duplo/triplo encodado, tenta até 3x
+    for(var t=0;t<3;t++){
+      if(!pareceMojibake(atual))break;
+      var rep=repararMojibake(atual);
+      if(!rep||rep===atual)break;
+      atual=rep;
+    }
+    if(atual!==original){
+      db.templates[k]=atual;
+      alterou=true;
     }
   });
   return alterou;
 }
+function restaurarTemplatesPadrao(){
+  db.templates=Object.assign({},DEFAULT_TEMPLATES);
+  db.templateNames={cobranca:'Cobrança',renovacao:'Renovação'};
+  saveDB();
+  toast('Templates restaurados!','success');
+  closeModal('msg');
+  setTimeout(function(){modalMensagens();},150);
+}
+window._restaurarTemplatesPadrao=function(){
+  confirmModal('Restaurar templates padrão?','Isso vai apagar TODOS os seus templates personalizados e voltar aos padrões (Cobrança e Renovação). Use isso se os emojis estiverem corrompidos.',restaurarTemplatesPadrao);
+};
 function corrigirTemplatesPadrao(){
   var alterou=false;
   if(!db.templates){db.templates={};alterou=true;}
@@ -1781,6 +1828,7 @@ function modalMensagens(){
   }
   var body='<div style="margin-bottom:12px;font-size:0.75rem;color:var(--text2);line-height:1.45;">✏️ Clique no lápis para editar | 🗑️ Clique na lixeira para excluir<br>📌 Variáveis: <code>{nome}</code> <code>{primeiro_nome}</code> <code>{vencimento}</code> <code>{valor}</code><br>✅ A formatação é limpa automaticamente para evitar bugs no WhatsApp.</div>';
   body+='<div id="templateListContainer">'+renderTemplateLista()+'</div>';
+  body+='<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--border);"><button class="btn btn-ghost btn-full" onclick="window._restaurarTemplatesPadrao()" style="color:var(--danger);font-size:.78rem;"><i data-lucide="rotate-ccw" width="14" height="14"></i> Restaurar templates padrão (corrigir emojis)</button></div>';
   showModal('msg','Mensagens WhatsApp',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'msg\')">Fechar</button>');
   var previewEls=document.querySelectorAll("[data-preview=\"1\"]");var previewKeys=Object.keys(db.templates||{});previewEls.forEach(function(el,i){var key=previewKeys[i];if(key!==undefined){el.textContent=previewTemplateText(db.templates[key]||"");}});
   document.getElementById('btnAddTemplate').addEventListener('click',function(){
