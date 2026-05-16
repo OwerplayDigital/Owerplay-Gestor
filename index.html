@@ -882,17 +882,15 @@ function openWhatsApp(num,msg){
   var phone=normalizarNumeroWhatsApp(num);
   var msgLimpa=normalizarTextoWhatsApp(msg);
   var texto=encodeURIComponent(msgLimpa);
-  // No Android WebView (APK), window.open abre dentro do próprio WebView e o
-  // wa.me pode recodificar os emojis, quebrando-os. Usamos o deep link nativo
-  // do WhatsApp (whatsapp://send) que passa a mensagem diretamente ao app sem
-  // redirecionamento extra, evitando a dupla codificação dos emojis.
   var ua=navigator.userAgent||'';
   var isAndroid=/Android/i.test(ua);
-  var isWebView=/wv|WebView/i.test(ua)||typeof Android!=='undefined'||typeof Capacitor!=='undefined'||typeof cordova!=='undefined';
-  if(isAndroid&&isWebView){
+  if(isAndroid){
+    // Android: sempre usar deep link nativo whatsapp:// para evitar que o
+    // wa.me abra no browser/WebView e recodifique os emojis.
     var waUrl=phone?'whatsapp://send?phone='+phone+'&text='+texto:'whatsapp://send?text='+texto;
     window.location.href=waUrl;
   }else{
+    // iOS e desktop: wa.me funciona corretamente sem dupla codificacao.
     var url=phone?'https://wa.me/'+phone+'?text='+texto:'https://wa.me/?text='+texto;
     var opened=window.open(url,'_blank');
     if(!opened)window.location.href=url;
