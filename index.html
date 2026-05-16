@@ -20,6 +20,14 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js');
   });
 }
+// Garante que o splash some assim que a página estiver pronta,
+// com fallback de 6s caso algo trave o carregamento
+window.addEventListener('load', function(){
+  if(typeof hideSplash === 'function') hideSplash();
+});
+window._splashFallback = setTimeout(function(){
+  if(typeof hideSplash === 'function') hideSplash();
+}, 6000);
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -60,7 +68,7 @@ if('serviceWorker' in navigator){
       --warning-bg:   #FFF3E0; --danger:       #C62828; --danger-bg:    #FFEBEE;
       --bg:           #F0F4F8; --surface:      #FFFFFF; --surface2:     #F7FAFC;
       --border:       #E2E8F0; --text:         #1A202C; --text2:        #4A5568;
-      --text3:        #718096; --radius:       14px;    --radius-sm:    8px;
+      --text3:        #5F6B7A; --radius:       14px;    --radius-sm:    8px;
       --shadow:       0 2px 12px rgba(0,0,0,.08); --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
       /* Cores financeiras fixas — nunca mudam com o tema */
       --fin-entrada:       #0288D1;
@@ -85,6 +93,9 @@ if('serviceWorker' in navigator){
       background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%) !important;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    /* Focus visível para navegação por teclado */
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+    button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none;}
     html{background:#000;color-scheme:light}
     body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans','Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;text-rendering:optimizeLegibility;font-variant-ligatures:none}
     #app{display:flex;height:100dvh;overflow:hidden}
@@ -698,7 +709,7 @@ button, a, .action-btn, .nav-btn, .sidebar-item, .btn, .icon-btn,
 <img alt="Owerplay" class="sidebar-logo" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex';" src="IMG_20260501_113710.png"/>
 <span id="logoFallback" style="display:none;width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#0288D1,#01579B);color:#fff;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;">✦</span>
 <span class="sidebar-brand">Owerplay Gestor</span>
-<button class="sidebar-close" id="sidebarClose"><i data-lucide="x" height="18" width="18"></i></button>
+<button class="sidebar-close" id="sidebarClose" aria-label="Fechar menu"><i data-lucide="x" height="18" width="18"></i></button>
 </div>
 <div class="sidebar-section" style="margin-top:8px;"><div class="sidebar-section-label">Navegação</div>
 <button class="sidebar-item sidebar-nav-btn active" data-sec="dashboard"><i data-lucide="home" height="17" width="17"></i> Início</button>
@@ -729,7 +740,7 @@ button, a, .action-btn, .nav-btn, .sidebar-item, .btn, .icon-btn,
 </div>
 </div><div class="sidebar-backdrop" id="sidebarBackdrop"></div></div>
 <div class="main-wrap">
-<div class="topbar" id="topbarWrap"><button class="topbar-menu" id="menuBtn"><i data-lucide="menu" height="22" width="22"></i></button><div class="topbar-center"><div class="topbar-brand">Owerplay Gestor</div><div class="topbar-slogan">Conectando você ao lucro</div><div id="syncStatus" style="display:none;font-size:.6rem;color:var(--text3);margin-top:2px;">🟢 Sincronizado</div></div><div style="width:34px;flex-shrink:0"></div></div>
+<div class="topbar" id="topbarWrap"><button class="topbar-menu" id="menuBtn" aria-label="Abrir menu"><i data-lucide="menu" height="22" width="22"></i></button><div class="topbar-center"><div class="topbar-brand">Owerplay Gestor</div><div class="topbar-slogan">Conectando você ao lucro</div><div id="syncStatus" style="display:none;font-size:.6rem;color:var(--text3);margin-top:2px;">🟢 Sincronizado</div></div><div style="width:34px;flex-shrink:0"></div></div>
 <div id="mainContent"></div>
 <nav class="bottom-nav" id="bottomNav">
 <button class="nav-btn active" data-sec="dashboard"><i data-lucide="home" height="20" width="20"></i>Início</button>
@@ -739,7 +750,7 @@ button, a, .action-btn, .nav-btn, .sidebar-item, .btn, .icon-btn,
 <button class="nav-btn" data-sec="financas"><i data-lucide="wallet" height="20" width="20"></i>Finanças</button>
 </nav>
 </div>
-<button id="fab"><i data-lucide="plus" height="24" width="24"></i></button>
+<button id="fab" aria-label="Adicionar novo item"><i data-lucide="plus" height="24" width="24"></i></button>
 <div id="toast"></div>
 </div>
 <script>
@@ -980,6 +991,17 @@ function corrigirTemplatesPadrao(){
   }
   return alterou;
 }
+function handleError(contexto, erro){
+  var msg = erro && erro.message ? erro.message : String(erro || 'Erro desconhecido');
+  console.error('[Owerplay] ' + contexto + ':', erro);
+  toast('Erro: ' + msg, 'error');
+}
+
+// Captura erros globais não tratados
+window.addEventListener('unhandledrejection', function(e){
+  console.error('[Owerplay] Promise não tratada:', e.reason);
+});
+
 function toast(msg,type){
   if(navigator.vibrate){
     if(type==='error') navigator.vibrate([30,50,30]);
@@ -1029,7 +1051,10 @@ function handleFocusScroll() {
   setTimeout(() => this.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
 }
 
-function hideSplash(){var sp=document.getElementById('splashScreen');if(!sp)return;sp.classList.add('hide');setTimeout(function(){if(sp&&sp.parentNode)sp.parentNode.removeChild(sp);},520);}
+function hideSplash(){
+  if(window._splashFallback){ clearTimeout(window._splashFallback); window._splashFallback=null; }
+  var sp=document.getElementById('splashScreen');if(!sp)return;sp.classList.add('hide');setTimeout(function(){if(sp&&sp.parentNode)sp.parentNode.removeChild(sp);},520);
+}
 
 function setLoginMode(m){var tb=document.getElementById('topbarWrap');var bn=document.getElementById('bottomNav');var fab=document.getElementById('fab');if(tb)tb.className='topbar'+(m?' hidden':'');if(bn)bn.className='bottom-nav'+(m?' hidden':'');if(fab)fab.className=(m?'hidden':'');}
 
@@ -1121,7 +1146,14 @@ function initApp(){
   supabase.auth.onAuthStateChange(function(event,session){if(event==='PASSWORD_RECOVERY'){emRecuperacao=true;renderPasswordRecovery();}else if(event==='SIGNED_IN'&&session){if(emRecuperacao)return;if(authLoaded&&currentUser&&currentUser.id===session.user.id)return;currentUser=session.user;afterLogin();}else if(event==='SIGNED_OUT'){emRecuperacao=false;currentUser=null;db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};renderLogin();}});
 }
 function afterLogin(){iniciarNotificacoes();carregarDados().then(function(){var precisaSalvar=corrigirTemplatesPadrao();if(repararEmojisTemplates())precisaSalvar=true;if(precisaSalvar)saveDB();authLoaded=true;setLoginMode(false);navigateTo('dashboard');hideSplash();setTimeout(verificarNotificacoes,1500);agendarVerificacaoNotificacoes();});}
-function logout(){supabase.auth.signOut();}
+function logout(){
+  // Confirmação antes de sair para evitar logout acidental
+  confirmModal(
+    'Sair da conta?',
+    'Seus dados estão salvos na nuvem e poderão ser acessados no próximo login.',
+    function(){ supabase.auth.signOut(); }
+  );
+}
 
 async function carregarDados(){
   var uid=currentUser.id;
@@ -1134,7 +1166,7 @@ async function carregarDados(){
 
   // Se houve erro de rede/Supabase, cai no localStorage silenciosamente
   if(resp.error && resp.error.code !== 'PGRST116'){
-    console.warn('Supabase load error, using local cache:', resp.error.message);
+    console.warn('[Owerplay] Supabase load error, using local cache:', resp.error.message);
   }
 
   if(resp.data&&resp.data.dados){
@@ -1267,7 +1299,7 @@ function render(sec){var mc=document.getElementById('mainContent');if(!mc)return
 function statCard(label,val,color,onclick){return'<div class="stat-card" onclick="'+onclick+'"><div class="stat-label">'+label+'</div><div class="stat-value'+(color?' '+color:'')+'">'+val+'</div></div>';}
 function renderDashboard(mc){var hoje=today(),mesAtual=hoje.slice(0,7);var ent=sumTrans('entrada',mesAtual),sai=sumTrans('saida',mesAtual),lucro=ent-sai;var ativos=db.clientes.filter(function(c){return c.vencimento>=hoje;}).length;var venc=db.clientes.filter(function(c){return c.vencimento<hoje;}).length;var hj=db.clientes.filter(function(c){return c.vencimento===hoje;}).length;var lv=lucroOculto?'••••••':'R$ '+fmt(lucro);
 var eyeIcon=lucroOculto?'eye-off':'eye';var list=db.clientes.slice();if(cliFilterDash==='active')list=list.filter(function(c){return c.vencimento>=hoje;});if(cliFilterDash==='expired')list=list.filter(function(c){return c.vencimento<hoje;});if(cliFilterDash==='today')list=list.filter(function(c){return c.vencimento===hoje;});
-mc.innerHTML='<div class="lucro-card"><button class="lucro-eye" onclick="window._toggleLucro()" ontouchend="event.preventDefault();window._toggleLucro();"><i data-lucide="'+eyeIcon+'" width="16" height="16"></i></button><div class="lucro-label">💰 Lucro do Mês</div><div class="lucro-value" id="lucroVal">'+lv+'</div></div><div class="stat-grid">'+statCard('✅ Ativos',ativos,'',"window._filter('active')")+statCard('⚠️ Vencidos',venc,'',"window._filter('expired')")+statCard('📅 Hoje',hj,'',"window._filter('today')")+statCard('👥 Total',db.clientes.length,'',"window._filter('all')")+'</div><div style="margin-bottom:10px;"><div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="dashSearch" placeholder="Buscar cliente..." autocomplete="off"></div><div id="dashCards"></div></div>';var baseList=cliFilterDash?list:db.clientes;renderCards('dashCards',baseList,hoje);
+mc.innerHTML='<div class="lucro-card"><button class="lucro-eye" aria-label="'+(lucroOculto?'Mostrar lucro':'Ocultar lucro')+'" onclick="window._toggleLucro()" ontouchend="event.preventDefault();window._toggleLucro();"><i data-lucide="'+eyeIcon+'" width="16" height="16"></i></button><div class="lucro-label">💰 Lucro do Mês</div><div class="lucro-value" id="lucroVal">'+lv+'</div></div><div class="stat-grid">'+statCard('✅ Ativos',ativos,'',"window._filter('active')")+statCard('⚠️ Vencidos',venc,'',"window._filter('expired')")+statCard('📅 Hoje',hj,'',"window._filter('today')")+statCard('👥 Total',db.clientes.length,'',"window._filter('all')")+'</div><div style="margin-bottom:10px;"><div class="search-bar"><i data-lucide="search" width="16" height="16"></i><input id="dashSearch" placeholder="Buscar cliente..." autocomplete="off"></div><div id="dashCards"></div></div>';var baseList=cliFilterDash?list:db.clientes;renderCards('dashCards',baseList,hoje);
 var inp=document.getElementById('dashSearch');if(inp)inp.addEventListener('input',function(){var q=this.value.trim().toLowerCase();var filtrados=baseList.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.whatsapp&&c.whatsapp.includes(q));});renderCards('dashCards',filtrados,today());});
 }
 
@@ -2056,7 +2088,8 @@ document.getElementById('btnMensagens').addEventListener('click',function(){clos
 document.getElementById('btnLogout').addEventListener('click',function(){closeSidebar();logout();});
 
 initApp();
-setTimeout(hideSplash,8000);
+// O splash é ocultado pelo evento 'load' (no head) ou pelo afterLogin/renderLogin,
+// com fallback de 6s definido no head. O timeout fixo de 8s foi removido.
 })();
 </script>
 </body>
