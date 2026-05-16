@@ -888,7 +888,18 @@ function openWhatsApp(num,msg){
     // Android: sempre usar deep link nativo whatsapp:// para evitar que o
     // wa.me abra no browser/WebView e recodifique os emojis.
     var waUrl=phone?'whatsapp://send?phone='+phone+'&text='+texto:'whatsapp://send?text='+texto;
+    // Detecta se o WhatsApp não está instalado: se o app não abrir em 1.5s,
+    // o document continua visível e exibimos um toast de erro.
+    var t0=Date.now();
+    document.addEventListener('visibilitychange',function onWaCheck(){
+      document.removeEventListener('visibilitychange',onWaCheck);
+    });
     window.location.href=waUrl;
+    setTimeout(function(){
+      if(Date.now()-t0<2000&&document.visibilityState==='visible'){
+        toast('WhatsApp não encontrado. Verifique se está instalado.','error');
+      }
+    },1500);
   }else{
     // iOS e desktop: wa.me funciona corretamente sem dupla codificacao.
     var url=phone?'https://wa.me/'+phone+'?text='+texto:'https://wa.me/?text='+texto;
@@ -1100,10 +1111,14 @@ function _onVisibilityChange(){
 }
 
 function initApp(){
+  // Restaura preferências de UI salvas localmente
   var savedMeta = localStorage.getItem('owerplay_meta_mensal');
-  if(savedMeta) metaMensal = JSON.parse(savedMeta);
+  if(savedMeta){try{metaMensal=JSON.parse(savedMeta);}catch(e){}}
+  darkMode = localStorage.getItem('ow_dark')==='1';
+  lucroOculto = localStorage.getItem('ow_lucroOc')!=='0';
+  applyDark();
   supabase.auth.getSession().then(function(res){if(res.data.session){currentUser=res.data.session.user;afterLogin();}else{authLoaded=true;renderLogin();}});
-  supabase.auth.onAuthStateChange(function(event,session){if(event==='PASSWORD_RECOVERY'){emRecuperacao=true;renderPasswordRecovery();}else if(event==='SIGNED_IN'&&session){if(emRecuperacao)return;currentUser=session.user;afterLogin();}else if(event==='SIGNED_OUT'){emRecuperacao=false;currentUser=null;db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};renderLogin();}});
+  supabase.auth.onAuthStateChange(function(event,session){if(event==='PASSWORD_RECOVERY'){emRecuperacao=true;renderPasswordRecovery();}else if(event==='SIGNED_IN'&&session){if(emRecuperacao)return;if(authLoaded&&currentUser&&currentUser.id===session.user.id)return;currentUser=session.user;afterLogin();}else if(event==='SIGNED_OUT'){emRecuperacao=false;currentUser=null;db={clientes:[],planos:[],servidores:[],transacoes:[],log:[],lembretes:[],templates:Object.assign({},DEFAULT_TEMPLATES)};renderLogin();}});
 }
 function afterLogin(){iniciarNotificacoes();carregarDados().then(function(){var precisaSalvar=corrigirTemplatesPadrao();if(repararEmojisTemplates())precisaSalvar=true;if(precisaSalvar)saveDB();authLoaded=true;setLoginMode(false);navigateTo('dashboard');hideSplash();setTimeout(verificarNotificacoes,1500);agendarVerificacaoNotificacoes();});}
 function logout(){supabase.auth.signOut();}
@@ -1116,6 +1131,11 @@ async function carregarDados(){
     .select('dados')
     .eq('user_id', uid)
     .maybeSingle();
+
+  // Se houve erro de rede/Supabase, cai no localStorage silenciosamente
+  if(resp.error && resp.error.code !== 'PGRST116'){
+    console.warn('Supabase load error, using local cache:', resp.error.message);
+  }
 
   if(resp.data&&resp.data.dados){
     var dadosNuvem=resp.data.dados;
@@ -1144,6 +1164,8 @@ async function carregarDados(){
 function saveLocal(){if(!currentUser)return;try{localStorage.setItem(STORAGE_KEY+'_'+currentUser.id,JSON.stringify(db));}catch(e){}}
 function salvarNuvem(){
 if(!currentUser)return;
+// Proteção: nunca sobrescreve nuvem com db vazio (ex: erro de carregamento)
+if(!db.clientes&&!db.planos&&!db.transacoes){return;}
 var sync=document.getElementById('syncStatus');
 if(sync){
 sync.innerHTML='🟡 Salvando...';
@@ -1168,7 +1190,18 @@ supabase.from('backups').upsert(
 
 });
 }
-function saveDB(){saveLocal();salvarNuvem();}
+function limparTransacoesAntigas(){
+  // Mantém apenas transações dos últimos 12 meses.
+  // Transações manuais (sem clienteId) também são preservadas dentro do período.
+  var limite=monthStr(-12);
+  var antes=db.transacoes.length;
+  db.transacoes=db.transacoes.filter(function(t){
+    return !t.data||t.data.slice(0,7)>=limite;
+  });
+  var removidas=antes-db.transacoes.length;
+  if(removidas>0)addLog('Limpeza automática: '+removidas+' transações antigas removidas');
+}
+function saveDB(){limparTransacoesAntigas();saveLocal();salvarNuvem();}
 
 function renderPasswordRecovery(){
   setLoginMode(true);
@@ -1576,7 +1609,7 @@ function renderChart(){setTimeout(function(){
 
 function showModal(id,title,body,actions){closeModal(id);var el=document.createElement('div');el.className='modal-overlay';el.id='mo_'+id;el.innerHTML='<div class="modal"><div class="modal-handle"></div><div class="modal-title">'+title+'</div>'+body+'<div class="modal-actions">'+actions+'</div></div>';document.body.appendChild(el);el.addEventListener('click',function(e){if(e.target===el)closeModal(id);});icons(el);setupScrollOnFocus();return el;}
 function closeModal(id){var el=document.getElementById('mo_'+id);if(el){el.remove();var remaining=document.querySelectorAll('.modal-overlay');if(remaining.length===0&&window._sidebarWasOpen&&window.innerWidth<768){openSidebar();window._sidebarWasOpen=false;}}}
-function confirmModal(title,msg,onConfirm){var el=showModal('confirm',title,'<p style="color:var(--text2);font-size:.9rem;margin-bottom:0;">'+msg+'</p>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'confirm\')">Cancelar</button><button class="btn btn-danger btn-full" id="confirmOk">Confirmar</button>');document.getElementById('confirmOk').addEventListener('click',function(){closeModal('confirm');onConfirm();});}
+function confirmModal(title,msg,onConfirm){var el=showModal('confirm',esc(title),'<p style="color:var(--text2);font-size:.9rem;margin-bottom:0;">'+esc(msg)+'</p>','<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'confirm\')">Cancelar</button><button class="btn btn-danger btn-full" id="confirmOk">Confirmar</button>');document.getElementById('confirmOk').addEventListener('click',function(){closeModal('confirm');onConfirm();});}
 
 function modalCliente(id){
   if(db.planos.length===0&&!id){toast('Cadastre um plano primeiro!','warning');return;}
@@ -1603,6 +1636,11 @@ function modalCliente(id){
     var venc=document.getElementById('cliVenc').value;var plano=document.getElementById('cliPlano').value;var desc=parseFloat(document.getElementById('cliDesc').value)||0;
     if(!nome||!venc){toast('Preencha nome e vencimento','error');return;}
     if(wa && (wa.length<10||wa.length>13)){toast('WhatsApp inválido (inclua DDD)','warning');return;}
+    // Avisa se a data de vencimento já passou (pode ser erro de digitação)
+    if(!id && venc < today()){
+      var prosseguir=confirm('⚠️ A data de vencimento '+fmtDate(venc)+' já passou. Deseja cadastrar mesmo assim?');
+      if(!prosseguir)return;
+    }
     var novo={id:id||'c'+Date.now(),nome:nome,whatsapp:wa,vencimento:venc,planoId:plano,servidoresIds:servidoresSelecionados,desconto:desc,anotacoes:c?c.anotacoes||'':'',cadastradoEm:c?c.cadastradoEm||today():today(),renovacoes:c?c.renovacoes||[]:[]};
     if(id){db.clientes=db.clientes.map(function(x){return x.id===id?novo:x;});}else{db.clientes.push(novo);}
     addLog(nome+(id?' atualizado':' cadastrado'));
@@ -1692,7 +1730,7 @@ function modalWhatsApp(id){
   });
 }
 function modalPlano(id){var p=id?db.planos.find(function(x){return x.id===id;}):null;var body='<div class="field"><label class="field-label">Nome do plano *</label><input class="input" id="plNome" value="'+esc(p?p.nome:'')+'" placeholder="Ex: Mensal HD"></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="plValor" value="'+(p?p.valor:'')+'" placeholder="0.00" step="0.01" inputmode="decimal"></div>';var el=showModal('plano',id?'Editar Plano':'Novo Plano',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'plano\')">Cancelar</button><button class="btn btn-primary btn-full" id="plSave">Salvar</button>');document.getElementById('plSave').addEventListener('click',function(){var nome=document.getElementById('plNome').value.trim(),valor=parseFloat(document.getElementById('plValor').value)||0;if(!nome){toast('Informe o nome do plano','error');return;}if(id){db.planos=db.planos.map(function(x){return x.id===id?{id:id,nome:nome,valor:valor}:x;});}else{db.planos.push({id:'p'+Date.now(),nome:nome,valor:valor});}addLog('Plano '+(id?'atualizado':'criado')+': '+nome);saveDB();closeModal('plano');render(currentSec);toast(id?'Plano atualizado!':'Plano criado!','success');});}
-function modalServ(id){var s=id?db.servidores.find(function(x){return x.id===id;}):null;var body='<div class="field"><label class="field-label">Nome do servidor *</label><input class="input" id="servNome" value="'+esc(s?s.nome:'')+'" placeholder="Ex: Servidor Alpha"></div><div class="field"><label class="field-label">Custo mensal (R$)</label><input type="number" class="input" id="servValor" value="'+(s?s.valor||'':'')+'" placeholder="0.00" step="0.01" inputmode="decimal"></div>';var el=showModal('serv',id?'Editar Servidor':'Novo Servidor',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'serv\')">Cancelar</button><button class="btn btn-primary btn-full" id="servSave">Salvar</button>');document.getElementById('servSave').addEventListener('click',function(){var nome=document.getElementById('servNome').value.trim();if(!nome){toast('Informe o nome','error');return;}var sval=parseFloat(document.getElementById('servValor').value)||0;if(id){db.servidores=db.servidores.map(function(x){return x.id===id?{id:id,nome:nome,valor:sval}:x;});}else{db.servidores.push({id:'s'+Date.now(),nome:nome,valor:sval});}addLog('Servidor '+(id?'atualizado':'criado')+': '+nome);saveDB();autoSincTrans();saveDB();closeModal('serv');render(currentSec);toast(id?'Servidor atualizado!':'Servidor criado!','success');});}
+function modalServ(id){var s=id?db.servidores.find(function(x){return x.id===id;}):null;var body='<div class="field"><label class="field-label">Nome do servidor *</label><input class="input" id="servNome" value="'+esc(s?s.nome:'')+'" placeholder="Ex: Servidor Alpha"></div><div class="field"><label class="field-label">Custo mensal (R$)</label><input type="number" class="input" id="servValor" value="'+(s?s.valor||'':'')+'" placeholder="0.00" step="0.01" inputmode="decimal"></div>';var el=showModal('serv',id?'Editar Servidor':'Novo Servidor',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'serv\')">Cancelar</button><button class="btn btn-primary btn-full" id="servSave">Salvar</button>');document.getElementById('servSave').addEventListener('click',function(){var nome=document.getElementById('servNome').value.trim();if(!nome){toast('Informe o nome','error');return;}var sval=parseFloat(document.getElementById('servValor').value)||0;if(id){db.servidores=db.servidores.map(function(x){return x.id===id?{id:id,nome:nome,valor:sval}:x;});}else{db.servidores.push({id:'s'+Date.now(),nome:nome,valor:sval});}addLog('Servidor '+(id?'atualizado':'criado')+': '+nome);autoSincTrans();saveDB();closeModal('serv');render(currentSec);toast(id?'Servidor atualizado!':'Servidor criado!','success');});}
 function modalTrans(){var body='<div class="field"><label class="field-label">Tipo</label><select class="input" id="transType"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div><div class="field"><label class="field-label">Valor (R$) *</label><input type="number" class="input" id="transVal" placeholder="0.00" step="0.01" inputmode="decimal"></div><div class="field"><label class="field-label">Descrição</label><input class="input" id="transDesc" placeholder="Ex: Mensalidade extra"></div><div class="field"><label class="field-label">Data</label><input type="date" class="input" id="transData" value="'+today()+'"></div>';showModal('trans','Adicionar Transação',body,'<button class="btn btn-ghost btn-full" onclick="window._closeModal(\'trans\')">Cancelar</button><button class="btn btn-primary btn-full" id="transSave">Salvar</button>');document.getElementById('transSave').addEventListener('click',function(){var tipo=document.getElementById('transType').value,val=parseFloat(document.getElementById('transVal').value)||0,desc=document.getElementById('transDesc').value.trim(),data=document.getElementById('transData').value;if(!val||!data){toast('Informe valor e data','error');return;}db.transacoes.push({id:'t'+Date.now()+Math.random().toString(36).slice(2),tipo:tipo,valor:val,data:data,desc:desc});addLog('Transação manual: '+tipo+' R$'+fmt(val));saveDB();closeModal('trans');render('financas');toast('Transação salva!','success');});}
 
 function modalInadimplencia(){
