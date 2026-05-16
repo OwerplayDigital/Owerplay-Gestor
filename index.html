@@ -1030,8 +1030,24 @@ function iniciarNotificacoes(){
 }
 
 function verificarNotificacoes(){
-  if(!('Notification' in window)||Notification.permission!=='granted') return;
   var hoje=today();
+
+  // ── Lembretes com data agendada para hoje ─────────────────────────────────
+  // Verifica SEMPRE (independente de permissão de notificação do sistema),
+  // exibindo toast in-app para cada lembrete vencido não concluído.
+  var lembretesHoje=db.lembretes.filter(function(l){
+    return !l.feito && l.dataAgendada && l.dataAgendada<=hoje && !l.alertaMostrado;
+  });
+  lembretesHoje.forEach(function(l,i){
+    setTimeout(function(){
+      toast('📅 Lembrete: '+l.texto,'success');
+    },i*800);
+    l.alertaMostrado=true;
+  });
+  if(lembretesHoje.length) saveDB();
+
+  // ── Notificações do sistema (push) para vencimentos de clientes ───────────
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
   var amanha=new Date();amanha.setDate(amanha.getDate()+1);var amanhaStr=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo'}).format(amanha);
   var d3=new Date();d3.setDate(d3.getDate()+3);var d3Str=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo'}).format(d3);
 
@@ -1071,9 +1087,16 @@ function verificarNotificacoes(){
 var _notifInterval=null;
 function agendarVerificacaoNotificacoes(){
   if(_notifInterval)clearInterval(_notifInterval);
+  // Verifica a cada 5 minutos (lembretes precisam de granularidade menor que 1h)
   _notifInterval=setInterval(function(){
     if(document.visibilityState==='visible')verificarNotificacoes();
-  },60*60*1000);
+  },5*60*1000);
+  // Verifica também toda vez que o app volta ao foco (usuário retorna ao app)
+  document.removeEventListener('visibilitychange',_onVisibilityChange);
+  document.addEventListener('visibilitychange',_onVisibilityChange);
+}
+function _onVisibilityChange(){
+  if(document.visibilityState==='visible')verificarNotificacoes();
 }
 
 function initApp(){
